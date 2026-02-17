@@ -1,7 +1,7 @@
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { useState } from "react"; // Ajout de useState pour gérer l'état
-
+import {Link} from 'react-router-dom'
 export default function Artisant() {
   const [selectedFilter, setSelectedFilter] = useState("Par defaut");
   const [selectedSpecialite, setSelectedSpecialite] = useState("Tous");
@@ -268,30 +268,17 @@ export default function Artisant() {
                 </div>
 
                 <div className="border-t border-gray-100 p-3 bg-gray-50">
-                  <button className="w-full text-center text-blue-600 hover:text-blue-800 font-medium text-sm">
-                    Voir le profil complet
-                  </button>
+                  <Link to={`/artisan/${artisan.id}`}>
+                    <button className="w-full text-center text-blue-600 hover:text-blue-800 font-medium text-sm">
+                      Voir le profil complet
+                    </button>
+                  </Link>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Pagination */}
-          <div className="flex justify-center items-center space-x-2 mt-10">
-            <button className="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-50">
-              ←
-            </button>
-            {[1, 2, 3, 4, 5].map((page) => (
-              <button
-                key={page}
-                className={`w-10 h-10 flex items-center justify-center rounded-lg ${page === 1 ? "bg-blue-600 text-white" : "border border-gray-300 hover:bg-gray-50"}`}>
-                {page}
-              </button>
-            ))}
-            <button className="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-50">
-              →
-            </button>
-          </div>
+
         </div>
       </section>
       <Footer />
