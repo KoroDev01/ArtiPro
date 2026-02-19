@@ -1,9 +1,21 @@
 // models/User.js
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 const { Schema } = mongoose;
 
 const userSchema = new Schema(
   {
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+    },
+    password: {
+      type: String,
+      required: true,
+      select: false,
+    },
     role: {
       type: String,
       enum: ["admin", "pro", "client"],
@@ -21,35 +33,25 @@ const userSchema = new Schema(
       required: true,
       trim: true,
     },
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-    },
-    password: {
-      type: String,
-      required: true,
-      select: false,
-    },
+
     phone: String,
     avatar: String,
 
-    location: {
-      city: String,
-      postalCode: String,
-      address: String,
-      coordinates: {
-        type: {
-          type: String,
-          enum: ["Point"],
-          default: "Point",
-        },
-        coordinates: {
-          type: [Number], 
-        },
-      },
-    },
+    // location: {
+    //   city: String,
+    //   postalCode: String,
+    //   address: String,
+    //   coordinates: {
+    //     type: {
+    //       type: String,
+    //       enum: ["Point"],
+    //       default: "Point",
+    //     },
+    //     coordinates: {
+    //       type: [Number],
+    //     },
+    //   },
+    // },
 
     // PRO uniquement
     companyName: String,
@@ -88,6 +90,17 @@ const userSchema = new Schema(
   { timestamps: true },
 );
 
-userSchema.index({ "location.coordinates": "2dsphere" });
+userSchema.statics.hashPassword = async (pswd) => {
+  try {
+    const salt = await bcrypt.genSalt(8);
+    return bcrypt.hash(pswd, salt);
+  } catch (error) {
+    console.log("Error hashing password:", error);
+    throw error;
+  }
+};
+userSchema.methods.comparePassword = function (pswd) {
+  return bcrypt.compare(pswd, this.password);
+};
 
 module.exports = mongoose.model("User", userSchema);
