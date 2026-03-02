@@ -130,3 +130,14 @@ exports.removeCategoryFromPro = async (req, res) => {
     res.status(400).json({ error: e.message });
   }
 };
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find()
+      .select("-password") 
+      .populate("categories", "name");
+
+    res.status(200).json(users);
+  } catch (e) {
+    res.status(400).json({ error: e.message });
+  }
+};

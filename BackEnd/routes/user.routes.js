@@ -4,11 +4,13 @@ const {
   userNew,
   assignCategoriesToPro,
   removeCategoryFromPro,
-searchPros} = require("../controllers/user.controller.js");
+  searchPros,
+  getAllUsers,
+} = require("../controllers/user.controller.js");
 
 const { isAuthenticated, hasRole } = require("../config/security.config");
 router.post("/createUser", userCreate);
-router.get("/users", userNew);
+router.get("/users", getAllUsers);
 router.put(
   "/:id/categories",
   isAuthenticated,
