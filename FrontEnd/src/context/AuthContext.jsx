@@ -6,7 +6,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const API = "";
+  const API = "https://artipro-production.up.railway.app";
 
   const safeFetch = async (url, options = {}) => {
     const res = await fetch(url, { credentials: "include", ...options });
