@@ -12,8 +12,7 @@ export default function Acceuil() {
       <Hero />
       <Services />
       <HowItWork />
-      <ArtiMenu />
-      <Devis />
+
       <Footer />
     </>
   );

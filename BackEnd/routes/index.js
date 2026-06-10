@@ -5,8 +5,10 @@ const categoryRoutes = require("./category.routes");
 const postRoutes = require("./post.routes");
 const messageRoutes = require("./message.routes");
 const offerRoutes = require("./offer.routes");
-
-
+const reviewRoutes = require("./review.routes");
+const notificationRoutes = require("./notification.routes");
+router.use("/notifications", notificationRoutes);
+router.use("/reviews", reviewRoutes);
 router.use("/offers", offerRoutes);
 router.use("/messages", messageRoutes);
 router.use("/", userRoute);

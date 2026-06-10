@@ -3,28 +3,107 @@ import Acceuil from "./assets/Pages/Accuill.jsx";
 import Artisant from "./assets/Pages/Artisants.jsx";
 import ProfileArtisants from "./assets/Pages/ProfileArtisants.jsx";
 import JobRequests from "./assets/Pages/Demandes.jsx";
+import JobDetails from "./assets/Pages/JobDetails.jsx";
 import Login from "./assets/Pages/Login.jsx";
 import SignIn from "./assets/Pages/Register.jsx";
 import "./App.css";
+import Messages from "./assets/Pages/Messages.jsx";
+import Profile from "./assets/Pages/Profile.jsx";
+import Dashboard from "./assets/Pages/Dashboard.jsx";
+import NotFound from "./assets/Pages/NotFound.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import AdminCategories from "./assets/Pages/AdminCategories.jsx";
+import AdminUsers from "./assets/Pages/AdminUsers.jsx";
+import AdminCandidatures from "./assets/Pages/AdminCandidatures.jsx";
+import PendingApproval from "./assets/Pages/PendingApproval.jsx";
+import BannedPage from "./assets/Pages/BannedPage.jsx";
+import CGU from "./assets/Pages/CGU.jsx";
+import MentionsLegales from "./assets/Pages/MentionsLegales.jsx";
+import Confidentialite from "./assets/Pages/Confidentialite.jsx";
 
 function App() {
   return (
     <>
       <Routes>
+
         <Route path="/" element={<Acceuil />} />
         <Route path="/find-artisan" element={<Artisant />} />
         <Route path="/artisan/:id" element={<ProfileArtisants />} />
-        <Route path="/demandes" element={<JobRequests />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/SignIn" element={<SignIn />} />
+
         <Route
-          path="*"
+          path="/demandes"
           element={
-            <h1 className="text-center mt-20 text-2xl font-bold">
-              Page Not Found
-            </h1>
+            <ProtectedRoute>
+              <JobRequests />
+            </ProtectedRoute>
           }
         />
+        <Route
+          path="/demandes/:id"
+          element={
+            <ProtectedRoute>
+              <JobDetails />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/messages"
+          element={
+            <ProtectedRoute>
+              <Messages />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/categories"
+          element={
+            <ProtectedRoute>
+              <AdminCategories />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/users"
+          element={
+            <ProtectedRoute>
+              <AdminUsers />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/candidatures"
+          element={
+            <ProtectedRoute>
+              <AdminCandidatures />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/inscription-en-attente" element={<PendingApproval />} />
+        <Route path="/compte-suspendu" element={<BannedPage />} />
+        <Route path="/cgu" element={<CGU />} />
+        <Route path="/mentions-legales" element={<MentionsLegales />} />
+        <Route path="/confidentialite" element={<Confidentialite />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   );

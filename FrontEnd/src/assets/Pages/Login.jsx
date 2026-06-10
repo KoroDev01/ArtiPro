@@ -1,10 +1,57 @@
-import React from "react";
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Login() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      const user = await login(email, password);
+      if (user.role === "pro") navigate("/dashboard");
+      else navigate("/");
+    } catch (err) {
+      if (err.proStatus === "pending" || err.proStatus === "rejected") {
+        navigate("/inscription-en-attente", {
+          state: {
+            proStatus: err.proStatus,
+            proRejectionReason: err.proRejectionReason,
+            email: err.email || email,
+            firstName: err.firstName,
+            lastName: err.lastName,
+            companyName: err.companyName,
+            siret: err.siret,
+          },
+        });
+        return;
+      }
+      if (err.banned) {
+        if (err.banPermanent) {
+          navigate("/compte-suspendu");
+        } else {
+          navigate("/demandes");
+        }
+        return;
+      }
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="flex w-[1200px] h-[700px]">
-        {/* Image Left */}
+
         <div className="w-1/2 flex items-center justify-center">
           <img
             src="/src/assets/img/photo-1678803262992-d79d06dd5d96.jpeg"
@@ -13,85 +60,69 @@ export default function Login() {
           />
         </div>
 
-        {/* Form Right */}
         <div className="w-1/2 flex items-center justify-center">
           <div className="bg-white w-[420px] p-10 rounded-2xl shadow-sm">
-            {/* Logo */}
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg mb-6">
+            <Link
+              to="/"
+              className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg mb-6 text-sm font-semibold">
               ArtiPro
-            </button>
+            </Link>
 
             <h2 className="text-2xl font-semibold mb-2">Bienvenue</h2>
             <p className="text-gray-500 text-sm mb-6">
-              Connectez-vous ou créez un compte pour continuer
+              Connectez-vous pour continuer
             </p>
 
-            {/* Switch */}
-            <div className="flex bg-gray-100 rounded-full p-1 mb-6">
-              <button className="flex-1 bg-white rounded-full py-2 text-sm shadow">
-                Client
-              </button>
-              <button className="flex-1 py-2 text-sm text-gray-500">
-                Artisan
-              </button>
-            </div>
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 mb-4">
+                {error}
+              </div>
+            )}
 
-            {/* Form */}
-            <div className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="text-sm">Email</label>
+                <label className="text-sm font-medium text-gray-700">
+                  Email
+                </label>
                 <input
                   type="email"
                   placeholder="votre@email.com"
-                  className="w-full mt-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                 />
               </div>
 
               <div>
-                <label className="text-sm">Mot de passe</label>
+                <label className="text-sm font-medium text-gray-700">
+                  Mot de passe
+                </label>
                 <input
                   type="password"
                   placeholder="••••••••"
-                  className="w-full mt-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                 />
               </div>
 
-              <div className="flex justify-between items-center text-sm">
-                <label className="flex items-center gap-2">
-                  <input type="checkbox" />
-                  Se souvenir de moi
-                </label>
-                <a href="/" className="text-blue-600">
-                  Mot de passe oublié ?
-                </a>
-              </div>
-
-              <button className="w-full bg-blue-600 text-white py-2 rounded-lg mt-2 hover:bg-blue-700 transition">
-                Se connecter
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-blue-600 text-white py-2.5 rounded-lg mt-2 hover:bg-blue-700 transition font-medium text-sm disabled:opacity-60 disabled:cursor-not-allowed">
+                {loading ? "Connexion en cours..." : "Se connecter"}
               </button>
-            </div>
+            </form>
 
-            {/* Divider */}
-            <div className="my-6 text-center text-gray-400 text-sm">
-              Ou continuer avec
-            </div>
-
-            {/* Social Buttons */}
-            <div className="flex gap-4">
-              <button className="flex-1 border py-2 rounded-lg hover:bg-gray-50">
-                Google
-              </button>
-              <button className="flex-1 border py-2 rounded-lg hover:bg-gray-50">
-                Facebook
-              </button>
-            </div>
-
-            {/* Signup */}
-            <p className="text-center text-sm mt-6">
+            <p className="text-center text-sm mt-6 text-gray-600">
               Pas encore de compte ?{" "}
-              <a href="/" className="text-blue-600">
+              <Link
+                to="/SignIn"
+                className="text-blue-600 font-medium hover:underline">
                 Inscrivez-vous
-              </a>
+              </Link>
             </p>
           </div>
         </div>

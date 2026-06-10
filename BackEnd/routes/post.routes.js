@@ -1,10 +1,18 @@
 const router = require("express").Router();
-const { createPost } = require("../controllers/post.controller");
+const {
+  createPost,
+  getPostList,
+  getPostById,
+  deletePost,
+  completePost,
+} = require("../controllers/post.controller");
 const { isAuthenticated } = require("../config/security.config");
-const { completePost } = require("../controllers/post.controller");
-
+const { uploadPost } = require("../config/multer.config");
 
 router.put("/:postId/complete", isAuthenticated, completePost);
-router.post("/", isAuthenticated, createPost);
+router.post("/", isAuthenticated, uploadPost.array("photos", 3), createPost);
+router.get("/list", getPostList);
+router.get("/:postId", getPostById);
+router.delete("/:postId", isAuthenticated, deletePost);
 
 module.exports = router;

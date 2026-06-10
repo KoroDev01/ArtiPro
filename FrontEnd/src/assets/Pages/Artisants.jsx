@@ -1,287 +1,414 @@
+import { useState, useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
-import { useState } from "react"; // Ajout de useState pour gérer l'état
-import {Link} from 'react-router-dom'
+import api from "../../api";
+import EmptyState from "../../components/EmptyState";
+import { WILAYAS } from "../../data/wilaya";
+import {
+  FiMapPin,
+  FiStar,
+  FiCheckCircle,
+  FiClock,
+  FiUser,
+  FiSearch,
+  FiSliders,
+  FiX,
+} from "react-icons/fi";
+
 export default function Artisant() {
-  const [selectedFilter, setSelectedFilter] = useState("Par defaut");
-  const [selectedSpecialite, setSelectedSpecialite] = useState("Tous");
+  const [searchParams] = useSearchParams();
+
+  const [artisans, setArtisans] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [location, setLocation] = useState("");
+  const [selectedCity, setSelectedCity] = useState(
+    searchParams.get("city") || "",
+  );
+  const [selectedCat, setSelectedCat] = useState(
+    searchParams.get("category") || "",
+  );
+  const [onlyAvailable, setOnlyAvailable] = useState(false);
+  const [sortBy, setSortBy] = useState("default");
 
-  const filtreBy = [
-    "Par defaut",
-    "Prix croissant",
-    "Prix décroissant",
-    "Popularité",
-    "Nouveauté",
-    "Prix",
-    "Proximité",
-    "Certification",
-  ];
+  useEffect(() => {
+    api
+      .get("/categories")
+      .then((res) => setCategories(Array.isArray(res.data) ? res.data : []))
+      .catch(() => {});
+  }, []);
 
-  const filtreSpecialite = [
-    "Tous",
-    "Plomberie",
-    "Électricité",
-    "Menuiserie",
-    "Peinture",
-    "Maçonnerie",
-    "Toiture",
-    "Jardinage",
-    "Nettoyage",
-  ];
+  const fetchPros = () => {
+    setLoading(true);
+    setError("");
+    const params = {};
+    if (selectedCat) params.category = selectedCat;
+    if (selectedCity) params.city = selectedCity;
+    if (onlyAvailable) params.available = "true";
+    api
+      .get("/pros/search", { params })
+      .then((res) => setArtisans(Array.isArray(res.data) ? res.data : []))
+      .catch(() => setError("Impossible de charger les artisans."))
+      .finally(() => setLoading(false));
+  };
 
-  // Données d'exemple pour les artisans
-  const artisans = [
-    {
-      id: 1,
-      name: "Jean Dupont",
-      specialite: "Plomberie",
-      rating: 4.8,
-      price: 45,
-      certified: true,
-    },
-    {
-      id: 2,
-      name: "Marie Lambert",
-      specialite: "Électricité",
-      rating: 4.9,
-      price: 50,
-      certified: true,
-    },
-    {
-      id: 3,
-      name: "Pierre Martin",
-      specialite: "Menuiserie",
-      rating: 4.7,
-      price: 55,
-      certified: false,
-    },
-    {
-      id: 4,
-      name: "Sophie Bernard",
-      specialite: "Peinture",
-      rating: 4.6,
-      price: 40,
-      certified: true,
-    },
-    {
-      id: 5,
-      name: "Thomas Leroy",
-      specialite: "Maçonnerie",
-      rating: 4.5,
-      price: 60,
-      certified: true,
-    },
-    {
-      id: 6,
-      name: "Julie Petit",
-      specialite: "Jardinage",
-      rating: 4.4,
-      price: 35,
-      certified: false,
-    },
-  ];
+  useEffect(() => {
+    fetchPros();
+  }, []);
+
+  const filtered = artisans.filter((a) => {
+    if (!searchTerm) return true;
+    const q = searchTerm.toLowerCase();
+    return (
+      a.firstName?.toLowerCase().includes(q) ||
+      a.lastName?.toLowerCase().includes(q) ||
+      a.companyName?.toLowerCase().includes(q) ||
+      a.categories?.some((c) => c.name?.toLowerCase().includes(q))
+    );
+  });
+
+  const sorted = [...filtered].sort((a, b) => {
+    if (sortBy === "rating_desc")
+      return (b.ratingAverage ?? 0) - (a.ratingAverage ?? 0);
+    if (sortBy === "rating_asc")
+      return (a.ratingAverage ?? 0) - (b.ratingAverage ?? 0);
+    if (sortBy === "exp_desc")
+      return (b.experienceYears ?? 0) - (a.experienceYears ?? 0);
+    return 0;
+  });
+
+  const activeFilterCount = [selectedCat, selectedCity, onlyAvailable].filter(
+    Boolean,
+  ).length;
+
+  const resetFilters = () => {
+    setSelectedCat("");
+    setSelectedCity("");
+    setOnlyAvailable(false);
+  };
+
+  const Stars = ({ rating = 0 }) => (
+    <span className="text-yellow-400 text-sm">
+      {"★".repeat(Math.floor(rating))}
+      <span className="text-gray-200">
+        {"★".repeat(5 - Math.floor(rating))}
+      </span>
+    </span>
+  );
 
   return (
-    <section className="bg-[#F9FAFB] min-h-screen">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
-      <div className="mt-[72px]"></div> {/* Espace pour le header fixe */}
-      {/* Section Hero */}
-      <section className="find-artisant">
-        <div className="bg-blue-500 p-8 md:p-12 text-white text-center">
-          <h2 className="text-2xl md:text-3xl lg:text-[32px] font-bold mb-4">
-            Trouver un artisan
-          </h2>
-          <p className="text-lg md:text-xl">
-            Plus de 12 000 professionnels qualifiés à votre service
-          </p>
-        </div>
-      </section>
-      {/* Section Filtres Principaux */}
-      <section className="artisants-filtre bg-white shadow-sm">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 md:p-6 px-4 md:px-15 max-w-7xl mx-auto">
-          <input
-            className="border border-gray-200 p-3 md:col-span-5 lg:col-span-4 bg-[#F3F3F5] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Rechercher un artisan, une compétence..."
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
 
-          <input
-            className="border border-gray-200 p-3 md:col-span-3 bg-[#F3F3F5] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Ville, code postal..."
-            type="text"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-          />
+      <section className="mt-16 bg-blue-600 py-10 px-6 text-white text-center">
+        <h1 className="text-3xl font-bold mb-1">Trouver un artisan</h1>
+        <p className="text-blue-100 text-sm">
+          {sorted.length} professionnel{sorted.length !== 1 ? "s" : ""} qualifié
+          {sorted.length !== 1 ? "s" : ""} disponible
+          {sorted.length !== 1 ? "s" : ""}
+        </p>
+      </section>
+
+      <section className="bg-white border-b border-gray-100 shadow-sm sticky top-16 z-30">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex gap-3 items-center">
+
+          <div className="relative flex-1 max-w-sm">
+            <FiSearch
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              size={15}
+            />
+            <input
+              className="w-full border border-gray-200 pl-9 pr-3 py-2.5 bg-gray-50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Nom, compétence..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
 
           <select
-            className="bg-blue-600 text-white rounded-lg p-3 text-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-300 md:col-span-4 lg:col-span-3"
-            name="filter"
-            id="filter"
-            value={selectedFilter}
-            onChange={(e) => setSelectedFilter(e.target.value)}>
-            {filtreBy.map((filtre, index) => (
-              <option
-                key={index}
-                value={filtre}
-                className={`${selectedFilter === filtre ? "bg-white text-black" : "hover:bg-gray-100"}`}>
-                {filtre}
-              </option>
-            ))}
+            className="border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}>
+            <option value="default">Trier par défaut</option>
+            <option value="rating_desc">Meilleures notes</option>
+            <option value="rating_asc">Notes croissantes</option>
+            <option value="exp_desc">Plus expérimentés</option>
           </select>
 
-          <button className="bg-blue-700 hover:bg-blue-800 text-white font-medium py-3 px-6 rounded-lg text-sm transition duration-200 md:col-span-12 lg:col-span-2">
+          <button
+            onClick={() => setShowFilters((v) => !v)}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition ${
+              showFilters || activeFilterCount > 0
+                ? "bg-blue-600 text-white border-blue-600"
+                : "bg-white text-gray-700 border-gray-200 hover:border-blue-300"
+            }`}>
+            <FiSliders size={15} />
+            Filtres
+            {activeFilterCount > 0 && (
+              <span className="bg-white text-blue-600 text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                {activeFilterCount}
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={fetchPros}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-5 rounded-xl text-sm transition flex-shrink-0">
             Rechercher
           </button>
         </div>
-      </section>
-      {/* Section Contenu Principal */}
-      <section className="p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-7xl mx-auto my-6">
-        {/* Sidebar Filtres */}
-        <div className="lg:col-span-3 bg-white border border-gray-200 rounded-xl shadow-sm p-4 md:p-6">
-          <h2 className="text-lg font-semibold mb-6 pb-3 border-b">Filtres</h2>
 
-          <div className="mb-6">
-            <h3 className="text-sm font-medium text-gray-700 mb-3">
-              Spécialité
-            </h3>
-            <select
-              className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              name="specialite"
-              id="specialite"
-              value={selectedSpecialite}
-              onChange={(e) => setSelectedSpecialite(e.target.value)}>
-              {filtreSpecialite.map((specialite, index) => (
-                <option
-                  key={index}
-                  value={specialite}
-                  className={`${selectedSpecialite === specialite ? "bg-white text-black" : ""}`}>
-                  {specialite}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Filtres supplémentaires */}
-          <div className="mb-6">
-            <h3 className="text-sm font-medium text-gray-700 mb-3">
-              Disponibilité
-            </h3>
-            <div className="space-y-2">
-              {["Immédiate", "Sous 48h", "Sous 1 semaine"].map(
-                (option, index) => (
-                  <label
-                    key={index}
-                    className="flex items-center space-x-2 cursor-pointer">
-                    <input type="checkbox" className="rounded text-blue-600" />
-                    <span className="text-sm">{option}</span>
-                  </label>
-                ),
-              )}
+        {showFilters && (
+          <div className="max-w-7xl mx-auto px-4 md:px-6 pb-4 flex flex-wrap gap-4 items-end">
+            <div className="flex-1 min-w-[160px]">
+              <label className="text-xs font-medium text-gray-500 mb-1.5 block">
+                Spécialité
+              </label>
+              <select
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
+                value={selectedCat}
+                onChange={(e) => setSelectedCat(e.target.value)}>
+                <option value="">Toutes les spécialités</option>
+                {categories.map((c) => (
+                  <option key={c._id} value={c._id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
             </div>
+
+            <div className="flex-1 min-w-[160px]">
+              <label className="text-xs font-medium text-gray-500 mb-1.5 block">
+                Wilaya
+              </label>
+              <select
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
+                value={selectedCity}
+                onChange={(e) => setSelectedCity(e.target.value)}>
+                <option value="">Toutes les wilayas</option>
+                {WILAYAS.map((w) => (
+                  <option key={w} value={w}>
+                    {w}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2 pb-0.5">
+              <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  checked={onlyAvailable}
+                  onChange={(e) => setOnlyAvailable(e.target.checked)}
+                  className="rounded text-blue-600 w-4 h-4"
+                />
+                Disponibles uniquement
+              </label>
+            </div>
+
+            {activeFilterCount > 0 && (
+              <button
+                onClick={resetFilters}
+                className="flex items-center gap-1.5 text-sm text-red-500 hover:text-red-600 font-medium pb-0.5">
+                <FiX size={14} /> Réinitialiser
+              </button>
+            )}
           </div>
+        )}
 
-          <div className="mb-6">
-            <h3 className="text-sm font-medium text-gray-700 mb-3">
-              Certification
-            </h3>
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" className="rounded text-blue-600" />
-              <span className="text-sm">Artisans certifiés uniquement</span>
-            </label>
-          </div>
-
-          <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg text-sm transition duration-200">
-            Appliquer les filtres
-          </button>
-        </div>
-
-        {/* Liste des Artisans */}
-        <div className="lg:col-span-9">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold">
-              {selectedSpecialite === "Tous"
-                ? "Tous les artisans"
-                : `Artisans en ${selectedSpecialite}`}
-              <span className="text-gray-600 text-sm ml-2">
-                ({artisans.length} résultats)
+        {activeFilterCount > 0 && !showFilters && (
+          <div className="max-w-7xl mx-auto px-4 md:px-6 pb-3 flex flex-wrap gap-2">
+            {selectedCat && (
+              <span className="flex items-center gap-1.5 bg-blue-50 text-blue-700 text-xs px-3 py-1 rounded-full font-medium">
+                {categories.find((c) => c._id === selectedCat)?.name ||
+                  "Catégorie"}
+                <button onClick={() => setSelectedCat("")}>
+                  <FiX size={11} />
+                </button>
               </span>
-            </h2>
-            <div className="text-sm text-gray-600">
-              Tri: <span className="font-medium">{selectedFilter}</span>
-            </div>
+            )}
+            {selectedCity && (
+              <span className="flex items-center gap-1.5 bg-blue-50 text-blue-700 text-xs px-3 py-1 rounded-full font-medium">
+                📍 {selectedCity}
+                <button onClick={() => setSelectedCity("")}>
+                  <FiX size={11} />
+                </button>
+              </span>
+            )}
+            {onlyAvailable && (
+              <span className="flex items-center gap-1.5 bg-green-50 text-green-700 text-xs px-3 py-1 rounded-full font-medium">
+                Disponibles
+                <button onClick={() => setOnlyAvailable(false)}>
+                  <FiX size={11} />
+                </button>
+              </span>
+            )}
           </div>
+        )}
+      </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {artisans.map((artisan) => (
+      <main className="flex-1 max-w-7xl mx-auto px-4 md:px-6 py-8 w-full">
+        {loading && (
+          <div className="space-y-4">
+            {[...Array(4)].map((_, i) => (
               <div
-                key={artisan.id}
-                className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition duration-200">
-                <div className="p-5">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                      <span className="text-blue-600 font-bold">
-                        {artisan.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </span>
-                    </div>
-                    {artisan.certified && (
-                      <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded">
-                        Certifié
-                      </span>
-                    )}
-                  </div>
-
-                  <h3 className="font-semibold text-lg mb-1">{artisan.name}</h3>
-                  <p className="text-gray-600 text-sm mb-3">
-                    {artisan.specialite}
-                  </p>
-
-                  <div className="flex items-center mb-4">
-                    <div className="flex text-yellow-400 mr-2">
-                      {"★".repeat(Math.floor(artisan.rating))}
-                      <span className="text-gray-300">
-                        {"★".repeat(5 - Math.floor(artisan.rating))}
-                      </span>
-                    </div>
-                    <span className="text-sm font-medium">
-                      {artisan.rating}/5
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <span className="text-2xl font-bold">
-                        {artisan.price}€
-                      </span>
-                      <span className="text-gray-600 text-sm ml-1">/heure</span>
-                    </div>
-                    <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition duration-200">
-                      Contacter
-                    </button>
-                  </div>
-                </div>
-
-                <div className="border-t border-gray-100 p-3 bg-gray-50">
-                  <Link to={`/artisan/${artisan.id}`}>
-                    <button className="w-full text-center text-blue-600 hover:text-blue-800 font-medium text-sm">
-                      Voir le profil complet
-                    </button>
-                  </Link>
+                key={i}
+                className="bg-white rounded-2xl border border-gray-100 p-6 animate-pulse flex gap-4">
+                <div className="w-20 h-20 rounded-full bg-gray-200 flex-shrink-0" />
+                <div className="flex-1 space-y-3">
+                  <div className="h-4 bg-gray-200 rounded w-1/3" />
+                  <div className="h-3 bg-gray-100 rounded w-1/2" />
+                  <div className="h-3 bg-gray-100 rounded w-2/3" />
                 </div>
               </div>
             ))}
           </div>
+        )}
 
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-2xl px-5 py-4 text-sm">
+            {error}
+          </div>
+        )}
 
-        </div>
-      </section>
+        {!loading && !error && sorted.length === 0 && (
+          <EmptyState
+            preset="artisans"
+            className="bg-white rounded-2xl border border-gray-100"
+          />
+        )}
+
+        {!loading && !error && sorted.length > 0 && (
+          <div className="space-y-4">
+            {sorted.map((artisan) => {
+              const initials =
+                `${artisan.firstName?.[0] ?? ""}${artisan.lastName?.[0] ?? ""}`.toUpperCase();
+              const rating = artisan.ratingAverage ?? 0;
+              const available = artisan.availability !== false;
+
+              return (
+                <div
+                  key={artisan._id}
+                  className="bg-white border border-gray-100 rounded-2xl shadow-sm p-5 md:p-6 hover:shadow-md transition-shadow">
+                  <div className="flex flex-col sm:flex-row gap-5">
+
+                    <div className="flex-shrink-0">
+                      {artisan.avatar ? (
+                        <img
+                          src={`http://localhost:3000${artisan.avatar}`}
+                          alt={artisan.firstName}
+                          className="w-20 h-20 rounded-2xl object-cover border-2 border-blue-100"
+                        />
+                      ) : (
+                        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center border-2 border-blue-100">
+                          {initials ? (
+                            <span className="text-blue-600 font-bold text-xl">
+                              {initials}
+                            </span>
+                          ) : (
+                            <FiUser className="w-8 h-8 text-blue-400" />
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-start flex-wrap gap-2">
+                        <div>
+                          <h3 className="text-base font-bold text-gray-900">
+                            {artisan.firstName} {artisan.lastName}
+                          </h3>
+                          {artisan.companyName && (
+                            <p className="text-gray-400 text-xs mt-0.5">
+                              {artisan.companyName}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {artisan.isVerified && (
+                            <span className="flex items-center gap-1 text-green-600 text-xs font-medium bg-green-50 px-2 py-0.5 rounded-full">
+                              <FiCheckCircle size={11} /> Vérifié
+                            </span>
+                          )}
+                          <span
+                            className={`text-xs px-2.5 py-1 rounded-full font-medium ${
+                              available
+                                ? "bg-green-100 text-green-700"
+                                : "bg-gray-100 text-gray-500"
+                            }`}>
+                            {available ? "Disponible" : "Occupé"}
+                          </span>
+                        </div>
+                      </div>
+
+                      {artisan.categories?.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mt-2.5">
+                          {artisan.categories.slice(0, 4).map((c) => (
+                            <span
+                              key={c._id}
+                              className="text-xs bg-blue-50 text-blue-600 px-2.5 py-0.5 rounded-full font-medium">
+                              {c.name}
+                            </span>
+                          ))}
+                          {artisan.categories.length > 4 && (
+                            <span className="text-xs bg-gray-100 text-gray-400 px-2.5 py-0.5 rounded-full">
+                              +{artisan.categories.length - 4}
+                            </span>
+                          )}
+                        </div>
+                      )}
+
+                      <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                        <div className="flex items-center gap-1.5">
+                          <Stars rating={rating} />
+                          <span className="font-semibold text-gray-700">
+                            {rating.toFixed(1)}
+                          </span>
+                          <span className="text-gray-400 text-xs">
+                            ({artisan.ratingCount ?? 0} avis)
+                          </span>
+                        </div>
+                        {artisan.experienceYears && (
+                          <span className="flex items-center gap-1 text-xs">
+                            <FiClock className="text-blue-400" size={13} />
+                            {artisan.experienceYears} ans d'exp.
+                          </span>
+                        )}
+                        {artisan.location?.city && (
+                          <span className="flex items-center gap-1 text-xs">
+                            <FiMapPin className="text-blue-400" size={13} />
+                            {artisan.location.city}
+                          </span>
+                        )}
+                      </div>
+
+                      {artisan.description && (
+                        <p className="mt-2 text-xs text-gray-400 line-clamp-1">
+                          {artisan.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="mt-4 pt-4 border-t border-gray-50 flex justify-end">
+                    <Link
+                      to={`/artisan/${artisan._id?.toString()}`}
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-xl text-sm transition">
+                      Voir le profil →
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </main>
+
       <Footer />
-    </section>
+    </div>
   );
 }

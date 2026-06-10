@@ -10,7 +10,7 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 * 14, // session 14 days
+      maxAge: 1000 * 60 * 60 * 24 * 14,
     },
     store: MongoStore.create({
       mongoUrl: "mongodb://localhost:27017/ArtiPro",

@@ -1,4 +1,4 @@
-// models/User.js
+
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const { Schema } = mongoose;
@@ -22,7 +22,6 @@ const userSchema = new Schema(
       required: true,
     },
 
-    // Infos communes
     firstName: {
       type: String,
       required: true,
@@ -37,23 +36,6 @@ const userSchema = new Schema(
     phone: String,
     avatar: String,
 
-    // location: {
-    //   city: String,
-    //   postalCode: String,
-    //   address: String,
-    //   coordinates: {
-    //     type: {
-    //       type: String,
-    //       enum: ["Point"],
-    //       default: "Point",
-    //     },
-    //     coordinates: {
-    //       type: [Number],
-    //     },
-    //   },
-    // },
-
-    // PRO uniquement
     companyName: String,
     siret: String,
     description: String,
@@ -86,6 +68,19 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    proStatus: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: function () {
+        return this.role === "pro" ? "pending" : undefined;
+      },
+    },
+    proRejectionReason: { type: String, default: null },
+    companyName: String,
+    siret: String,
+    description: String,
+    experienceYears: Number,
+    banUntil: { type: Date, default: null },
   },
   { timestamps: true },
 );
