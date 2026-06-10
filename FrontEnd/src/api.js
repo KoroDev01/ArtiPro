@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "/",
+  baseURL: "https://artipro-production.up.railway.app",
   withCredentials: true,
 });
 
