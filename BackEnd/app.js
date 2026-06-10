@@ -12,7 +12,11 @@ require("./config/passport.config");
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://artipro01.fr/"],
+    origin: [
+      "http://localhost:5173",
+      "https://artipro01.fr",
+      "https://www.artipro01.fr",
+    ],
     credentials: true,
   }),
 );
