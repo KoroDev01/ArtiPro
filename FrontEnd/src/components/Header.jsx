@@ -112,13 +112,11 @@ export default function Header() {
 
   return (
     <>
-
       {user?.isBlocked && user?.banUntil && <BanBanner user={user} />}
 
       <header
         className={`fixed left-0 right-0 h-16 bg-white border-b border-gray-100 shadow-sm z-50 ${user?.isBlocked && user?.banUntil ? "top-[44px]" : "top-0"}`}>
         <div className="max-w-7xl mx-auto h-full px-4 md:px-6 flex items-center justify-between gap-4">
-
           <Link
             to="/"
             className="flex-shrink-0 bg-blue-600 text-white font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-blue-700 transition">
@@ -132,9 +130,11 @@ export default function Header() {
             <Link to="/find-artisan" className={navLinkCls("/find-artisan")}>
               Trouver un artisan
             </Link>
-            <Link to="/demandes" className={navLinkCls("/demandes")}>
-              Demandes
-            </Link>
+            {user && (
+              <Link to="/demandes" className={navLinkCls("/demandes")}>
+                Demandes
+              </Link>
+            )}
             {user && (
               <>
                 <Link to="/messages" className={navLinkCls("/messages")}>
@@ -174,7 +174,6 @@ export default function Header() {
           <div className="flex items-center gap-2 flex-shrink-0">
             {user ? (
               <>
-
                 <div className="relative" ref={notifRef}>
                   <button
                     onClick={(e) => {
@@ -269,12 +268,14 @@ export default function Header() {
                 active={isActive("/find-artisan")}>
                 Trouver un artisan
               </MobileLink>
-              <MobileLink
-                to="/demandes"
-                icon={<FiFileText size={16} />}
-                active={isActive("/demandes")}>
-                Demandes
-              </MobileLink>
+              {user && (
+                <MobileLink
+                  to="/demandes"
+                  icon={<FiFileText size={16} />}
+                  active={isActive("/demandes")}>
+                  Demandes
+                </MobileLink>
+              )}
 
               {user ? (
                 <>
