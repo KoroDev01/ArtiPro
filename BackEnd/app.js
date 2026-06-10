@@ -1,11 +1,10 @@
-
 const express = require("express");
 require("./database");
 const path = require("path");
 const router = require("./routes/index");
 const cors = require("cors");
 const app = express();
-
+app.set("trust proxy", 1);
 exports.app = app;
 require("./config/session.config");
 require("./config/passport.config");
