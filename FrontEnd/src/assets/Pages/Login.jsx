@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
+import LoginImage from "../../assets/img/photo-1678803262992-d79d06dd5d96.jpeg";
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -51,10 +52,9 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="flex w-[1200px] h-[700px]">
-
         <div className="w-1/2 flex items-center justify-center">
           <img
-            src="/src/assets/img/photo-1678803262992-d79d06dd5d96.jpeg"
+            src={LoginImage}
             alt="chantier"
             className="w-[85%] h-[90%] object-cover rounded-2xl shadow-lg"
           />
