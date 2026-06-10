@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 require("./database");
 const path = require("path");
@@ -11,7 +12,7 @@ require("./config/passport.config");
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://artipro01.fr"],
+    origin: ["http://localhost:5173", "https://artipro01.fr/"],
     credentials: true,
   }),
 );
