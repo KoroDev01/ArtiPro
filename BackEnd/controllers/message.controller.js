@@ -1,6 +1,8 @@
 const Message = require("../database/models/message.model");
 const Post = require("../database/models/post.model");
 const Offer = require("../database/models/offer.model");
+const User = require("../database/models/user.model");
+const { createNotification } = require("./notification.controller");
 
 exports.sendMessage = async (req, res) => {
   try {
@@ -10,7 +12,6 @@ exports.sendMessage = async (req, res) => {
     if (!post) return res.status(404).json({ message: "Post not found" });
 
     const isClient = post.client.toString() === req.user._id.toString();
-
     const proOffer =
       req.user.role === "pro"
         ? await Offer.findOne({ post: postId, pro: req.user._id })
@@ -27,6 +28,13 @@ exports.sendMessage = async (req, res) => {
       content,
     });
 
+    await createNotification({
+      recipient: receiverId,
+      type: "new_message",
+      message: `Nouveau message de ${req.user.firstName} : "${content.slice(0, 50)}${content.length > 50 ? "…" : ""}"`,
+      link: `/messages`,
+    });
+
     res.status(201).json(message);
   } catch (e) {
     res.status(400).json({ error: e.message });
@@ -39,7 +47,6 @@ exports.getMessagesByPost = async (req, res) => {
     if (!post) return res.status(404).json({ message: "Post not found" });
 
     const isClient = post.client.toString() === req.user._id.toString();
-
     const proOffer =
       req.user.role === "pro"
         ? await Offer.findOne({ post: req.params.postId, pro: req.user._id })
