@@ -11,8 +11,8 @@ app.use(
     cookie: {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 14,
-      secure: true,
-      sameSite: "none",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     },
     store: MongoStore.create({
       mongoUrl: process.env.MONGO_URI || "mongodb://localhost:27017/ArtiPro",
