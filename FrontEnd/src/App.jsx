@@ -25,7 +25,6 @@ function App() {
   return (
     <>
       <Routes>
-
         <Route path="/" element={<Acceuil />} />
         <Route path="/find-artisan" element={<Artisant />} />
         <Route path="/artisan/:id" element={<ProfileArtisants />} />

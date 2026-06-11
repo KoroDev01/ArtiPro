@@ -8,7 +8,7 @@ import EmptyState from "../../components/EmptyState";
 import { WILAYAS } from "../../data/wilaya";
 import api from "../../api";
 
-const API = "http://localhost:3000";
+const API = "https://artipro-production.up.railway.app";
 
 const STATUS_LABELS = {
   open: { label: "Ouvert", cls: "bg-green-100 text-green-700" },
