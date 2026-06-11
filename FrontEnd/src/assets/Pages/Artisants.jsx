@@ -115,7 +115,6 @@ export default function Artisant() {
 
       <section className="bg-white border-b border-gray-100 shadow-sm sticky top-16 z-30">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex gap-3 items-center">
-
           <div className="relative flex-1 max-w-sm">
             <FiSearch
               className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
@@ -295,11 +294,10 @@ export default function Artisant() {
                   key={artisan._id}
                   className="bg-white border border-gray-100 rounded-2xl shadow-sm p-5 md:p-6 hover:shadow-md transition-shadow">
                   <div className="flex flex-col sm:flex-row gap-5">
-
                     <div className="flex-shrink-0">
                       {artisan.avatar ? (
                         <img
-                          src={`http://localhost:3000${artisan.avatar}`}
+                          src={`https://artipro-production.up.railway.app${artisan.avatar}`}
                           alt={artisan.firstName}
                           className="w-20 h-20 rounded-2xl object-cover border-2 border-blue-100"
                         />

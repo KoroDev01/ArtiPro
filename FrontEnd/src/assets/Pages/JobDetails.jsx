@@ -1,18 +1,14 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
-import api from "../../api";
+import { Link } from "react-router-dom";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
-import {
-  FiArrowLeft,
-  FiMapPin,
-  FiCalendar,
-  FiDollarSign,
-  FiTag,
-  FiStar,
-} from "react-icons/fi";
+import EmptyState from "../../components/EmptyState";
+import { WILAYAS } from "../../data/wilaya";
+import api from "../../api";
+
+const API = "https://artipro-production.up.railway.app";
 
 const STATUS_LABELS = {
   open: { label: "Ouvert", cls: "bg-green-100 text-green-700" },
@@ -20,618 +16,457 @@ const STATUS_LABELS = {
   completed: { label: "Terminé", cls: "bg-gray-100 text-gray-500" },
 };
 
-export default function JobDetails() {
-  const { id } = useParams();
-  const navigate = useNavigate();
+export default function JobRequests() {
   const { user } = useAuth();
   const toast = useToast();
 
-  const [job, setJob] = useState(null);
-  const [offers, setOffers] = useState([]);
+  const [posts, setPosts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
 
-  const [showForm, setShowForm] = useState(false);
-  const [offerPrice, setOfferPrice] = useState("");
-  const [offerMessage, setOfferMessage] = useState("");
+  const [tab, setTab] = useState("active");
+  const [filterCategory, setFilterCategory] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+
+  const [showModal, setShowModal] = useState(false);
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    category: "",
+    budget: "",
+    city: "",
+  });
+  const [photos, setPhotos] = useState([]);
   const [submitting, setSubmitting] = useState(false);
-  const [offerSuccess, setOfferSuccess] = useState(false);
-  const [offerError, setOfferError] = useState("");
-
-  const [reviewRating, setReviewRating] = useState(0);
-  const [reviewHover, setReviewHover] = useState(0);
-  const [reviewComment, setReviewComment] = useState("");
-  const [reviewSubmitting, setReviewSubmitting] = useState(false);
-  const [reviewSuccess, setReviewSuccess] = useState(false);
-  const [reviewError, setReviewError] = useState("");
-  const [existingReview, setExistingReview] = useState(false);
-
-  const fetchData = async () => {
-    try {
-      const [jobRes, offersRes] = await Promise.all([
-        api.get(`/posts/${id}`),
-        api.get(`/offers/post/${id}`),
-      ]);
-      setJob(jobRes.data);
-      setOffers(Array.isArray(offersRes.data) ? offersRes.data : []);
-    } catch {
-      setError("Demande introuvable.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const checkExistingReview = async () => {
-    try {
-      const res = await api.get(`/reviews/post/${id}`);
-      if (res.data && res.data._id) setExistingReview(true);
-    } catch {}
-  };
+  const [formError, setFormError] = useState("");
 
   useEffect(() => {
-    fetchData();
-  }, [id]);
-  useEffect(() => {
-    if (job?.status === "completed" && user) checkExistingReview();
-  }, [job, user]);
+    Promise.all([
+      api.get("/posts/list").then((r) => r.data),
+      api.get("/categories").then((r) => r.data),
+    ])
+      .then(([postsData, catsData]) => {
+        setPosts(Array.isArray(postsData) ? postsData : []);
+        setCategories(Array.isArray(catsData) ? catsData : []);
+      })
+      .catch(() => setError("Impossible de charger les demandes."))
+      .finally(() => setLoading(false));
+  }, []);
 
-  const handleDelete = async () => {
-    if (!window.confirm("Supprimer cette demande ?")) return;
-    try {
-      await api.delete(`/posts/${id}`);
-      toast.success("Demande supprimée.");
-      navigate("/demandes");
-    } catch {
-      toast.error("Erreur lors de la suppression.");
-    }
-  };
+  const activePosts = posts.filter((p) => {
+    if (p.status === "completed") return false;
+    if (filterCategory && p.category?._id !== filterCategory) return false;
+    if (filterStatus && p.status !== filterStatus) return false;
+    return true;
+  });
 
-  const handleAccept = async (offerId) => {
-    try {
-      const res = await api.put(`/offers/${offerId}/accept`);
-      toast.success("Offre acceptée ! Redirection vers la messagerie...");
-      setTimeout(() => navigate("/messages"), 1500);
-    } catch (err) {
-      toast.error(
-        err.response?.data?.message || "Erreur lors de l'acceptation.",
-      );
-    }
-  };
+  const completedPosts = posts.filter(
+    (p) =>
+      p.status === "completed" &&
+      user &&
+      (p.author?._id === user._id || p.client === user._id),
+  );
 
-  const handleComplete = async () => {
-    try {
-      await api.put(`/posts/${id}/complete`);
-      toast.success("Mission marquée comme terminée !");
-      fetchData();
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Erreur.");
-    }
-  };
+  const displayed = tab === "active" ? activePosts : completedPosts;
 
-  const handleSubmitOffer = async (e) => {
+  const handleCreate = async (e) => {
     e.preventDefault();
     if (user?.isBlocked) {
-      setOfferError(
-        "Votre compte est suspendu. Vous ne pouvez pas envoyer d'offre.",
+      setFormError(
+        "Votre compte est suspendu. Vous ne pouvez pas créer de demande.",
       );
       return;
     }
-    setOfferError("");
+    setFormError("");
     setSubmitting(true);
     try {
-      await api.post("/offers", {
-        postId: id,
-        price: Number(offerPrice),
-        message: offerMessage,
+      const body = new FormData();
+      body.append("title", formData.title);
+      body.append("description", formData.description);
+      body.append("category", formData.category);
+      if (formData.budget) body.append("budget", formData.budget);
+      if (formData.city) body.append("city", formData.city);
+      photos.forEach((f) => body.append("photos", f));
+
+      const res = await api.post("/posts", body, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
-      setOfferSuccess(true);
-      setShowForm(false);
-      setOfferPrice("");
-      setOfferMessage("");
-      fetchData();
+      const data = res.data;
+
+      setPosts((prev) => [data.savedPost ?? data, ...prev]);
+      setShowModal(false);
+      setFormData({
+        title: "",
+        description: "",
+        category: "",
+        budget: "",
+        city: "",
+      });
+      setPhotos([]);
+      toast.success("Demande publiée !");
     } catch (err) {
-      setOfferError(
-        err.response?.data?.message ||
-          err.response?.data?.error ||
-          "Erreur lors de l'envoi.",
+      setFormError(
+        err.response?.data?.error || err.response?.data?.message || err.message,
       );
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleSubmitReview = async (e) => {
-    e.preventDefault();
-    if (reviewRating === 0) {
-      setReviewError("Veuillez sélectionner une note.");
-      return;
-    }
-    setReviewError("");
-    setReviewSubmitting(true);
+  const handleDelete = async (postId) => {
+    if (!confirm("Supprimer cette demande ?")) return;
     try {
-      await api.post("/reviews", {
-        postId: id,
-        rating: reviewRating,
-        comment: reviewComment,
-      });
-      setReviewSuccess(true);
-      setExistingReview(true);
-    } catch (err) {
-      setReviewError(
-        err.response?.data?.message || "Erreur lors de l'envoi de l'avis.",
-      );
-    } finally {
-      setReviewSubmitting(false);
+      await api.delete(`/posts/${postId}`);
+      setPosts((prev) => prev.filter((p) => p._id !== postId));
+      toast.success("Demande supprimée.");
+    } catch {
+      toast.error("Impossible de supprimer ce post.");
     }
   };
 
-  const isOwner = user && job && user._id === job.author?._id;
-  const isPro = user?.role === "pro";
-  const alreadyApplied = offers.some((o) => o.pro?._id === user?._id);
-  const acceptedOffer = offers.find((o) => o.status === "accepted");
-  const canReview =
-    isOwner && job?.status === "completed" && !existingReview && !reviewSuccess;
-
-  if (loading)
-    return (
-      <>
-        <Header />
-        <div className="mt-[72px] max-w-5xl mx-auto px-6 py-12 animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-1/3" />
-          <div className="h-48 bg-gray-200 rounded-xl" />
-          <div className="h-32 bg-gray-200 rounded-xl" />
-        </div>
-      </>
-    );
-
-  if (error)
-    return (
-      <>
-        <Header />
-        <div className="mt-[72px] min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <p className="text-red-500 text-xl mb-4">{error}</p>
-            <button
-              onClick={() => navigate("/demandes")}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg">
-              ← Retour aux demandes
-            </button>
-          </div>
-        </div>
-      </>
-    );
-
-  const status = STATUS_LABELS[job.status] ?? STATUS_LABELS.open;
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
       <Header />
 
-      <main className="mt-[72px] max-w-5xl mx-auto px-4 md:px-6 py-8">
-        <Link
-          to="/demandes"
-          className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-blue-600 mb-6 transition">
-          <FiArrowLeft /> Retour aux demandes
-        </Link>
+      <main className="mt-[72px] bg-gray-50 min-h-screen">
+        <section className="bg-blue-600 text-white px-6 py-10">
+          <div className="max-w-7xl mx-auto flex justify-between items-center flex-wrap gap-4">
+            <div>
+              <h1 className="text-3xl font-bold">Demandes de Travaux</h1>
+              <p className="mt-1 text-blue-100">
+                {displayed.length} demande{displayed.length !== 1 ? "s" : ""}{" "}
+                {tab === "active" ? "disponible" : "terminée"}
+                {displayed.length !== 1 ? "s" : ""}
+              </p>
+            </div>
+            {user?.role === "client" && !user?.isBlocked && (
+              <button
+                onClick={() => setShowModal(true)}
+                className="bg-white text-blue-600 font-semibold px-5 py-2.5 rounded-xl hover:bg-blue-50 transition text-sm">
+                + Nouvelle demande
+              </button>
+            )}
+          </div>
+        </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8">
-              <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
-                <span className="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full uppercase flex items-center gap-1">
-                  <FiTag /> {job.category?.name || "Général"}
-                </span>
-                <span
-                  className={`text-xs font-medium px-3 py-1 rounded-full ${status.cls}`}>
-                  {status.label}
-                </span>
-              </div>
-
-              <h1 className="text-2xl md:text-3xl font-bold mb-2">
-                {job.title}
-              </h1>
-
-              <div className="flex flex-wrap gap-4 text-sm text-gray-500 mb-6">
-                {job.location?.city && (
-                  <span className="flex items-center gap-1">
-                    <FiMapPin className="text-blue-400" />
-                    {job.location.city}
+        <section className="max-w-7xl mx-auto px-6 pt-4">
+          <div className="flex gap-1 border-b border-gray-200">
+            <button
+              onClick={() => setTab("active")}
+              className={`px-5 py-2.5 text-sm font-medium border-b-2 transition ${
+                tab === "active"
+                  ? "border-blue-600 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+              }`}>
+              Demandes actives
+            </button>
+            {user?.role === "client" && (
+              <button
+                onClick={() => setTab("completed")}
+                className={`px-5 py-2.5 text-sm font-medium border-b-2 transition ${
+                  tab === "completed"
+                    ? "border-blue-600 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700"
+                }`}>
+                Mes missions terminées
+                {completedPosts.length > 0 && (
+                  <span className="ml-2 bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">
+                    {completedPosts.length}
                   </span>
                 )}
-                <span className="flex items-center gap-1">
-                  <FiCalendar className="text-blue-400" />
-                  {new Date(job.createdAt).toLocaleDateString("fr-FR")}
-                </span>
-                {job.budget && (
-                  <span className="flex items-center gap-1 font-semibold text-blue-600">
-                    <FiDollarSign />
-                    {job.budget.toLocaleString()} DZD
-                  </span>
-                )}
-              </div>
+              </button>
+            )}
+          </div>
+        </section>
 
-              <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-4 mb-6">
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-                  {job.author?.firstName?.[0]?.toUpperCase() || "U"}
-                </div>
-                <div>
-                  <p className="font-semibold text-sm">
-                    {job.author?.firstName} {job.author?.lastName}
+        {tab === "active" && (
+          <section className="max-w-7xl mx-auto px-6 py-4">
+            <div className="bg-white rounded-xl shadow-sm p-4 flex flex-col md:flex-row gap-3 items-center">
+              <span className="text-gray-400 text-lg">🔍</span>
+              <select
+                value={filterCategory}
+                onChange={(e) => setFilterCategory(e.target.value)}
+                className="w-full md:w-auto border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Toutes les catégories</option>
+                {categories.map((c) => (
+                  <option key={c._id} value={c._id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="w-full md:w-auto border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Tous les statuts</option>
+                <option value="open">Ouvert</option>
+                <option value="in_progress">En cours</option>
+              </select>
+            </div>
+          </section>
+        )}
+
+        <section className="max-w-7xl mx-auto px-6 pb-12 pt-2">
+          {loading && (
+            <p className="text-center py-20 text-gray-400">Chargement...</p>
+          )}
+          {error && <p className="text-center py-20 text-red-500">{error}</p>}
+          {!loading &&
+            !error &&
+            displayed.length === 0 &&
+            (tab === "active" ? (
+              <EmptyState
+                preset={
+                  posts.filter((p) => p.status !== "completed").length === 0
+                    ? "demandes"
+                    : "demandes_filtres"
+                }
+                onCtaClick={() => setShowModal(true)}
+              />
+            ) : (
+              <div className="text-center py-20 text-gray-400">
+                <p className="text-4xl mb-3">🏁</p>
+                <p className="text-sm">
+                  Aucune mission terminée pour l'instant.
+                </p>
+              </div>
+            ))}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {displayed.map((post) => {
+              const status = STATUS_LABELS[post.status] ?? STATUS_LABELS.open;
+              const initials =
+                post.author?.firstName?.[0]?.toUpperCase() ?? "?";
+              const isOwner = user && post.author?._id === user._id;
+
+              return (
+                <div
+                  key={post._id}
+                  className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col gap-4 hover:shadow-md transition">
+                  {post.photos?.length > 0 && (
+                    <div className="flex gap-2 overflow-x-auto">
+                      {post.photos.map((photo, i) => (
+                        <img
+                          key={i}
+                          src={`${API}/images/posts/${photo}`}
+                          alt="photo"
+                          className="w-24 h-20 object-cover rounded-lg flex-shrink-0"
+                        />
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="flex justify-between items-start">
+                    <div className="flex gap-3 items-center">
+                      <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-lg">
+                        🔧
+                      </div>
+                      <div>
+                        <span className="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">
+                          {post.category?.name ?? "Catégorie"}
+                        </span>
+                        <h3 className="font-semibold mt-1">{post.title}</h3>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`text-xs px-3 py-1 rounded-full font-medium ${status.cls}`}>
+                        {status.label}
+                      </span>
+                      {isOwner && (
+                        <button
+                          onClick={() => handleDelete(post._id)}
+                          className="text-red-400 hover:text-red-600 text-xs font-medium">
+                          Supprimer
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <p className="text-sm text-gray-600 line-clamp-2">
+                    {post.description}
                   </p>
-                  <p className="text-xs text-gray-400">{job.author?.email}</p>
+
+                  <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+                    {post.location?.city && (
+                      <span>📍 {post.location.city}</span>
+                    )}
+                    {post.budget && (
+                      <span>💰 {post.budget.toLocaleString()} DZD</span>
+                    )}
+                    <span>
+                      📅 {new Date(post.createdAt).toLocaleDateString("fr-FR")}
+                    </span>
+                  </div>
+
+                  <hr className="border-gray-100" />
+
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">
+                      {initials}
+                    </div>
+                    {post.author?.firstName} {post.author?.lastName}
+                  </div>
+                  <Link
+                    to={`/demandes/${post._id?.toString()}`}
+                    className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                    Voir les détails →
+                  </Link>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      </main>
+
+      {showModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold">Nouvelle demande</h2>
+              <button
+                onClick={() => setShowModal(false)}
+                className="text-gray-400 hover:text-gray-600 text-2xl leading-none">
+                &times;
+              </button>
+            </div>
+
+            {formError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 mb-4">
+                {formError}
+              </div>
+            )}
+
+            <form onSubmit={handleCreate} className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Titre
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ex: Fuite d'eau à réparer"
+                  value={formData.title}
+                  onChange={(e) =>
+                    setFormData({ ...formData, title: e.target.value })
+                  }
+                  required
+                  className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Description
+                </label>
+                <textarea
+                  placeholder="Décrivez votre besoin..."
+                  value={formData.description}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
+                  required
+                  rows={3}
+                  className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none"
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <label className="text-sm font-medium text-gray-700">
+                    Catégorie
+                  </label>
+                  <select
+                    value={formData.category}
+                    onChange={(e) =>
+                      setFormData({ ...formData, category: e.target.value })
+                    }
+                    required
+                    className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                    <option value="">Choisir...</option>
+                    {categories.map((c) => (
+                      <option key={c._id} value={c._id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex-1">
+                  <label className="text-sm font-medium text-gray-700">
+                    Budget (DZD)
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="5000"
+                    value={formData.budget}
+                    onChange={(e) =>
+                      setFormData({ ...formData, budget: e.target.value })
+                    }
+                    className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
                 </div>
               </div>
 
               <div>
-                <h2 className="font-semibold text-lg mb-3">📋 Description</h2>
-                <p className="text-gray-700 leading-relaxed text-sm">
-                  {job.description}
-                </p>
-              </div>
-            </div>
-
-            {job.photos?.length > 0 && (
-              <div className="bg-white rounded-2xl shadow-sm p-6">
-                <h2 className="font-semibold text-lg mb-4">📷 Photos</h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {job.photos.map((photo, i) => (
-                    <img
-                      key={i}
-                      src={`http://localhost:3000/images/posts/${photo}`}
-                      alt={`Photo ${i + 1}`}
-                      className="rounded-xl w-full h-40 object-cover hover:scale-105 transition cursor-pointer border"
-                    />
+                <label className="text-sm font-medium text-gray-700">
+                  Wilaya
+                </label>
+                <select
+                  value={formData.city}
+                  onChange={(e) =>
+                    setFormData({ ...formData, city: e.target.value })
+                  }
+                  className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                  <option value="">Choisir une wilaya...</option>
+                  {WILAYAS.map((w) => (
+                    <option key={w} value={w}>
+                      {w}
+                    </option>
                   ))}
-                </div>
+                </select>
               </div>
-            )}
 
-            {isOwner && (
-              <div className="bg-white rounded-2xl shadow-sm p-6">
-                <h2 className="font-semibold text-lg mb-4">
-                  📬 Offres reçues
-                  <span className="text-gray-400 text-sm font-normal ml-2">
-                    ({offers.length})
-                  </span>
-                </h2>
-
-                {offers.length === 0 ? (
-                  <p className="text-center text-gray-400 py-8">
-                    Aucune offre reçue pour l'instant.
-                  </p>
-                ) : (
-                  <div className="space-y-4">
-                    {offers.map((offer) => (
-                      <div
-                        key={offer._id}
-                        className={`rounded-xl p-5 border-l-4 border flex flex-col sm:flex-row justify-between gap-4 ${
-                          offer.status === "accepted"
-                            ? "border-l-green-500 bg-green-50"
-                            : offer.status === "rejected"
-                              ? "border-l-red-400 bg-red-50"
-                              : "border-l-blue-400 bg-gray-50"
-                        }`}>
-                        <div className="flex items-start gap-3">
-                          <div className="w-11 h-11 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold flex-shrink-0">
-                            {offer.pro?.firstName?.[0]?.toUpperCase() || "P"}
-                          </div>
-                          <div>
-                            <p className="font-semibold">
-                              {offer.pro?.firstName} {offer.pro?.lastName || ""}
-                            </p>
-                            {offer.pro?.ratingAverage > 0 && (
-                              <p className="text-xs text-yellow-500">
-                                ⭐ {offer.pro.ratingAverage.toFixed(1)} / 5
-                              </p>
-                            )}
-                            <p className="text-sm text-gray-600 mt-1">
-                              {offer.message}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                          <p className="text-lg font-bold text-blue-600">
-                            {offer.price?.toLocaleString()} DZD
-                          </p>
-                          <span
-                            className={`text-xs font-bold px-3 py-1 rounded-full ${
-                              offer.status === "accepted"
-                                ? "bg-green-100 text-green-700"
-                                : offer.status === "rejected"
-                                  ? "bg-red-100 text-red-700"
-                                  : "bg-yellow-100 text-yellow-700"
-                            }`}>
-                            {offer.status === "accepted"
-                              ? "✅ Acceptée"
-                              : offer.status === "rejected"
-                                ? "❌ Refusée"
-                                : "⏳ En attente"}
-                          </span>
-                          {offer.status === "pending" &&
-                            job.status === "open" && (
-                              <button
-                                onClick={() => handleAccept(offer._id)}
-                                className="bg-green-500 hover:bg-green-600 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition">
-                                ✅ Accepter
-                              </button>
-                            )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {job.status === "in_progress" && (
-                  <button
-                    onClick={handleComplete}
-                    className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition">
-                    🏁 Marquer comme terminé
-                  </button>
-                )}
-              </div>
-            )}
-
-            {isOwner && job?.status === "completed" && (
-              <div className="bg-white rounded-2xl shadow-sm p-6">
-                <h2 className="font-semibold text-lg mb-4 flex items-center gap-2">
-                  <FiStar className="text-yellow-400" /> Laisser un avis
-                </h2>
-
-                {existingReview && !reviewSuccess ? (
-                  <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center text-gray-500 text-sm">
-                    ✅ Vous avez déjà laissé un avis pour cette mission.
-                  </div>
-                ) : reviewSuccess ? (
-                  <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
-                    <p className="text-green-700 font-semibold text-lg">
-                      🎉 Merci pour votre avis !
-                    </p>
-                    <p className="text-green-600 text-sm mt-1">
-                      Votre retour aide la communauté ArtiPro.
-                    </p>
-                    <div className="flex justify-center gap-1 mt-3">
-                      {[1, 2, 3, 4, 5].map((s) => (
-                        <span
-                          key={s}
-                          className={`text-2xl ${s <= reviewRating ? "text-yellow-400" : "text-gray-200"}`}>
-                          ★
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <form onSubmit={handleSubmitReview} className="space-y-5">
-                    {reviewError && (
-                      <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
-                        {reviewError}
-                      </div>
-                    )}
-
-                    <div>
-                      <label className="text-sm font-medium text-gray-700 block mb-2">
-                        Note *
-                      </label>
-                      <div className="flex gap-1">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <button
-                            key={star}
-                            type="button"
-                            onClick={() => setReviewRating(star)}
-                            onMouseEnter={() => setReviewHover(star)}
-                            onMouseLeave={() => setReviewHover(0)}
-                            className="text-3xl transition-transform hover:scale-110 focus:outline-none">
-                            <span
-                              className={`${(reviewHover || reviewRating) >= star ? "text-yellow-400" : "text-gray-200"}`}>
-                              ★
-                            </span>
-                          </button>
-                        ))}
-                        {reviewRating > 0 && (
-                          <span className="ml-2 self-center text-sm text-gray-500 font-medium">
-                            {
-                              [
-                                "",
-                                "Très déçu",
-                                "Déçu",
-                                "Correct",
-                                "Bien",
-                                "Excellent !",
-                              ][reviewRating]
-                            }
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium text-gray-700 block mb-1">
-                        Commentaire{" "}
-                        <span className="text-gray-400 font-normal">
-                          (optionnel)
-                        </span>
-                      </label>
-                      <textarea
-                        value={reviewComment}
-                        onChange={(e) => setReviewComment(e.target.value)}
-                        rows={4}
-                        placeholder="Décrivez votre expérience avec cet artisan..."
-                        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
-                      />
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={reviewSubmitting || reviewRating === 0}
-                      className="w-full bg-yellow-400 hover:bg-yellow-500 text-white py-3 rounded-xl font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-                      {reviewSubmitting ? "Envoi..." : "⭐ Publier mon avis"}
-                    </button>
-                  </form>
-                )}
-              </div>
-            )}
-
-            {!isOwner && isPro && (
-              <div className="bg-white rounded-2xl shadow-sm p-6">
-                {offerSuccess && (
-                  <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-4 text-center font-medium">
-                    ✅ Votre offre a été envoyée avec succès !
-                  </div>
-                )}
-
-                {alreadyApplied && !offerSuccess ? (
-                  <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-xl text-center font-medium">
-                    ⏳ Vous avez déjà envoyé une offre pour cette demande.
-                  </div>
-                ) : (
-                  !offerSuccess &&
-                  job.status === "open" && (
-                    <>
-                      {user?.isBlocked ? (
-                        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm text-center font-medium">
-                          🚫 Compte suspendu — envoi d'offre impossible.
-                        </div>
-                      ) : !showForm ? (
-                        <button
-                          onClick={() => setShowForm(true)}
-                          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition">
-                          💼 Envoyer une offre
-                        </button>
-                      ) : (
-                        <form
-                          onSubmit={handleSubmitOffer}
-                          className="space-y-4">
-                          <h3 className="font-semibold text-lg">
-                            💼 Votre offre
-                          </h3>
-
-                          {offerError && (
-                            <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
-                              {offerError}
-                            </div>
-                          )}
-
-                          <div>
-                            <label className="text-sm font-medium text-gray-700">
-                              Prix proposé (DZD)
-                            </label>
-                            <input
-                              type="number"
-                              min="1"
-                              value={offerPrice}
-                              onChange={(e) => setOfferPrice(e.target.value)}
-                              required
-                              placeholder="Ex: 15000"
-                              className="w-full mt-1 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="text-sm font-medium text-gray-700">
-                              Message au client
-                            </label>
-                            <textarea
-                              value={offerMessage}
-                              onChange={(e) => setOfferMessage(e.target.value)}
-                              required
-                              rows={4}
-                              placeholder="Décrivez votre approche, votre expérience..."
-                              className="w-full mt-1 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm resize-none"
-                            />
-                          </div>
-
-                          <div className="flex gap-3">
-                            <button
-                              type="submit"
-                              disabled={submitting}
-                              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition disabled:opacity-50">
-                              {submitting ? "Envoi..." : "📤 Envoyer l'offre"}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setShowForm(false)}
-                              className="flex-1 border border-gray-200 py-3 rounded-xl font-medium hover:bg-gray-50 transition text-sm">
-                              Annuler
-                            </button>
-                          </div>
-                        </form>
-                      )}
-                    </>
-                  )
-                )}
-
-                {job.status !== "open" && !alreadyApplied && !offerSuccess && (
-                  <p className="text-center text-gray-400 py-4">
-                    Cette demande n'est plus disponible.
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Photos (max 3)
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={(e) =>
+                    setPhotos(Array.from(e.target.files).slice(0, 3))
+                  }
+                  className="w-full mt-1 text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-600 file:text-sm file:font-medium hover:file:bg-blue-100"
+                />
+                {photos.length > 0 && (
+                  <p className="text-xs text-gray-400 mt-1">
+                    {photos.length} photo{photos.length > 1 ? "s" : ""}{" "}
+                    sélectionnée{photos.length > 1 ? "s" : ""}
                   </p>
                 )}
               </div>
-            )}
 
-            {!user && (
-              <div className="bg-white rounded-2xl shadow-sm p-6 text-center">
-                <p className="text-gray-500 mb-3">
-                  Connectez-vous pour envoyer une offre
-                </p>
-                <Link to="/Login">
-                  <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition">
-                    Se connecter
-                  </button>
-                </Link>
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-lg hover:bg-gray-50 transition text-sm font-medium">
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="flex-1 bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition text-sm font-medium disabled:opacity-60">
+                  {submitting ? "Envoi..." : "Publier"}
+                </button>
               </div>
-            )}
-          </div>
-
-          <div className="space-y-4">
-            <div className="bg-white rounded-xl shadow-sm p-6 space-y-3 text-sm">
-              <h2 className="font-semibold border-b pb-2">Récapitulatif</h2>
-              <div className="flex justify-between text-gray-600">
-                <span>Statut</span>
-                <span
-                  className={`font-medium px-2 py-0.5 rounded-full text-xs ${status.cls}`}>
-                  {status.label}
-                </span>
-              </div>
-              {job.budget && (
-                <div className="flex justify-between text-gray-600">
-                  <span>Budget</span>
-                  <span className="font-semibold text-blue-600">
-                    {job.budget.toLocaleString()} DZD
-                  </span>
-                </div>
-              )}
-              {job.location?.city && (
-                <div className="flex justify-between text-gray-600">
-                  <span>Ville</span>
-                  <span className="font-medium">{job.location.city}</span>
-                </div>
-              )}
-              <div className="flex justify-between text-gray-600">
-                <span>Offres reçues</span>
-                <span className="font-medium">{offers.length}</span>
-              </div>
-              {acceptedOffer && (
-                <div className="flex justify-between text-gray-600">
-                  <span>Artisan retenu</span>
-                  <span className="font-medium text-green-600">
-                    {acceptedOffer.pro?.firstName}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {isOwner && (
-              <button
-                onClick={handleDelete}
-                className="w-full bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 py-2.5 rounded-xl text-sm font-medium transition">
-                🗑️ Supprimer cette demande
-              </button>
-            )}
+            </form>
           </div>
         </div>
-      </main>
+      )}
 
       <Footer />
-    </div>
+    </>
   );
 }

@@ -56,7 +56,6 @@ export default function Profile() {
 
   useEffect(() => {
     if (!user && profileData === null) {
-
     }
   }, [user]);
 
@@ -194,7 +193,6 @@ export default function Profile() {
       <Header />
 
       <main className="flex-1 mt-[72px] max-w-5xl mx-auto px-4 md:px-6 py-8 w-full">
-
         {saveSuccess && (
           <div className="mb-4 flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm font-medium">
             <FiCheck /> Profil mis à jour avec succès
@@ -202,14 +200,12 @@ export default function Profile() {
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
           <div className="space-y-5">
-
             <div className="bg-white rounded-2xl shadow-sm p-6 flex flex-col items-center text-center">
               <div className="relative mb-4">
                 {profileData.avatar ? (
                   <img
-                    src={`http://localhost:3000${profileData.avatar}`}
+                    src={`https://artipro-production.up.railway.app${profileData.avatar}`}
                     alt={profileData.firstName}
                     className="w-24 h-24 rounded-2xl object-cover border-4 border-white shadow"
                   />
@@ -321,7 +317,6 @@ export default function Profile() {
           </div>
 
           <div className="lg:col-span-2 space-y-6">
-
             <div className="bg-white rounded-2xl shadow-sm p-6">
               <div className="flex justify-between items-center mb-5">
                 <h2 className="font-semibold text-lg">

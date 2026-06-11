@@ -50,7 +50,8 @@ export default function ArtisanProfile() {
       .finally(() => setLoading(false));
 
     if (user && user.role === "client") {
-      api.get("/offers/mine")
+      api
+        .get("/offers/mine")
         .then((res) => {
           const offers = Array.isArray(res.data) ? res.data : [];
           const offer = offers.find((o) => o.pro?._id === id || o.pro === id);
@@ -83,12 +84,19 @@ export default function ArtisanProfile() {
         "1week": 7 * 24 * 60 * 60 * 1000,
         "2weeks": 14 * 24 * 60 * 60 * 1000,
       };
-      const banUntil = banDuration === "permanent" ? null : new Date(Date.now() + durations[banDuration]);
+      const banUntil =
+        banDuration === "permanent"
+          ? null
+          : new Date(Date.now() + durations[banDuration]);
       const res = await api.put(`/users/${id}/ban`, { duration: banDuration });
-      setArtisan((prev) => ({ ...prev, isBlocked: true, banUntil: res.data.user?.banUntil }));
+      setArtisan((prev) => ({
+        ...prev,
+        isBlocked: true,
+        banUntil: res.data.user?.banUntil,
+      }));
       setBanSuccess("Compte suspendu avec succès.");
       setShowBanModal(false);
-    } catch { }
+    } catch {}
     setBanning(false);
   };
 
@@ -97,7 +105,7 @@ export default function ArtisanProfile() {
       await api.put(`/users/${id}/unban`);
       setArtisan((prev) => ({ ...prev, isBlocked: false, banUntil: null }));
       setBanSuccess("Compte réactivé.");
-    } catch { }
+    } catch {}
   };
 
   if (loading)
@@ -147,19 +155,15 @@ export default function ArtisanProfile() {
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
           <div className="lg:col-span-2 space-y-6">
-
             <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-
               <div className="h-32 bg-gradient-to-r from-blue-700 to-blue-400" />
 
               <div className="px-6 pb-6 -mt-12">
                 <div className="flex flex-col sm:flex-row sm:items-end gap-4 mb-4">
-
                   {artisan.avatar ? (
                     <img
-                      src={`http://localhost:3000${artisan.avatar}`}
+                      src={`https://artipro-production.up.railway.app${artisan.avatar}`}
                       alt={artisan.firstName}
                       className="w-24 h-24 rounded-xl object-cover border-4 border-white shadow"
                     />
@@ -354,10 +358,10 @@ export default function ArtisanProfile() {
                     C'est votre profil.
                   </p>
                 ) : existingOffer ? (
-
                   <div className="space-y-3">
                     <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-2 text-xs text-green-700 flex items-center gap-2">
-                      <FiCheckCircle size={12} /> Vous avez déjà une offre avec cet artisan
+                      <FiCheckCircle size={12} /> Vous avez déjà une offre avec
+                      cet artisan
                     </div>
                     {sent ? (
                       <div className="bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg px-4 py-3 text-center">
@@ -384,7 +388,8 @@ export default function ArtisanProfile() {
                             setSendError("");
                             try {
                               await api.post("/messages", {
-                                postId: existingOffer.post?._id || existingOffer.post,
+                                postId:
+                                  existingOffer.post?._id || existingOffer.post,
                                 receiverId: id,
                                 content: message.trim(),
                               });
@@ -392,7 +397,10 @@ export default function ArtisanProfile() {
                               setMessage("");
                               setTimeout(() => navigate("/messages"), 1500);
                             } catch (err) {
-                              setSendError(err.response?.data?.message || "Erreur lors de l'envoi.");
+                              setSendError(
+                                err.response?.data?.message ||
+                                  "Erreur lors de l'envoi.",
+                              );
                             } finally {
                               setSending(false);
                             }
@@ -413,7 +421,8 @@ export default function ArtisanProfile() {
                 ) : (
                   <div className="space-y-3">
                     <p className="text-xs text-gray-400 bg-gray-50 rounded-lg px-3 py-2">
-                      💡 Publiez une demande pour recevoir une offre de cet artisan et pouvoir lui écrire.
+                      💡 Publiez une demande pour recevoir une offre de cet
+                      artisan et pouvoir lui écrire.
                     </p>
                     <Link to="/demandes">
                       <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2">
@@ -442,12 +451,17 @@ export default function ArtisanProfile() {
                   🛡️ Modération
                 </h2>
                 {banSuccess && (
-                  <p className="text-xs text-green-600 bg-green-50 px-3 py-2 rounded-lg">{banSuccess}</p>
+                  <p className="text-xs text-green-600 bg-green-50 px-3 py-2 rounded-lg">
+                    {banSuccess}
+                  </p>
                 )}
                 {artisan.isBlocked ? (
                   <div className="space-y-2">
                     <p className="text-xs text-red-600 bg-red-50 px-3 py-2 rounded-lg flex items-center gap-1.5">
-                      🚫 Compte suspendu {artisan.banUntil ? `jusqu'au ${new Date(artisan.banUntil).toLocaleDateString("fr-FR")}` : "(permanent)"}
+                      🚫 Compte suspendu{" "}
+                      {artisan.banUntil
+                        ? `jusqu'au ${new Date(artisan.banUntil).toLocaleDateString("fr-FR")}`
+                        : "(permanent)"}
                     </p>
                     <button
                       onClick={handleUnban}
@@ -509,12 +523,18 @@ export default function ArtisanProfile() {
                 🚫
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900">Bannir ce compte</h3>
-                <p className="text-sm text-gray-500">{artisan.firstName} {artisan.lastName}</p>
+                <h3 className="font-semibold text-gray-900">
+                  Bannir ce compte
+                </h3>
+                <p className="text-sm text-gray-500">
+                  {artisan.firstName} {artisan.lastName}
+                </p>
               </div>
             </div>
 
-            <p className="text-sm text-gray-600 mb-4">Choisissez la durée de suspension :</p>
+            <p className="text-sm text-gray-600 mb-4">
+              Choisissez la durée de suspension :
+            </p>
 
             <div className="grid grid-cols-1 gap-2 mb-6">
               {[
@@ -533,7 +553,9 @@ export default function ArtisanProfile() {
                       : "border-gray-100 text-gray-700 hover:border-gray-200 hover:bg-gray-50"
                   }`}>
                   <span>{d.label}</span>
-                  {banDuration === d.value && <span className="w-2 h-2 rounded-full bg-red-500" />}
+                  {banDuration === d.value && (
+                    <span className="w-2 h-2 rounded-full bg-red-500" />
+                  )}
                 </button>
               ))}
             </div>
