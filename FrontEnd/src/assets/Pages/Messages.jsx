@@ -49,7 +49,6 @@ export default function Messages() {
       .then((res) => {
         const fetched = Array.isArray(res.data) ? res.data : [];
         setMessages((prev) => {
-
           if (
             prev.length === fetched.length &&
             prev[prev.length - 1]?._id === fetched[fetched.length - 1]?._id
@@ -89,7 +88,6 @@ export default function Messages() {
           const msgs = Array.isArray(res.data) ? res.data : [];
           const lastCount = lastMsgCountRef.current[postId] || 0;
           if (msgs.length > lastCount) {
-
             setHiddenConvs((prev) => {
               const next = new Set(prev);
               next.delete(convId);
@@ -181,7 +179,6 @@ export default function Messages() {
     <>
       <Header />
       <div className="mt-[72px] h-[calc(100vh-72px)] flex bg-gray-50">
-
         <aside className="w-80 bg-white border-r border-gray-200 flex flex-col flex-shrink-0">
           <div className="p-4 border-b border-gray-100">
             <h1 className="text-lg font-semibold">Messages</h1>
@@ -277,7 +274,6 @@ export default function Messages() {
             </div>
           ) : (
             <>
-
               <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
                 <div>
                   <h2 className="font-semibold">
@@ -320,27 +316,40 @@ export default function Messages() {
                 )}
                 {messages.map((msg) => {
                   const isMe = msg.sender?._id === user?._id;
+                  const senderName =
+                    `${msg.sender?.firstName || ""} ${msg.sender?.lastName || ""}`.trim();
+                  const avatarUrl = msg.sender?.avatar
+                    ? `https://artipro-production.up.railway.app${msg.sender.avatar}`
+                    : null;
                   return (
                     <div
                       key={msg._id}
-                      className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
+                      className={`flex items-end gap-2 ${isMe ? "justify-end" : "justify-start"}`}>
                       {!isMe && (
-                        <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold mr-2 flex-shrink-0 mt-1">
-                          {msg.sender?.firstName?.[0]?.toUpperCase()}
+                        <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold flex-shrink-0 overflow-hidden">
+                          {avatarUrl ? (
+                            <img
+                              src={avatarUrl}
+                              alt={senderName}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            msg.sender?.firstName?.[0]?.toUpperCase()
+                          )}
                         </div>
                       )}
                       <div
                         className={`max-w-[70%] flex flex-col ${isMe ? "items-end" : "items-start"}`}>
                         {!isMe && (
-                          <span className="text-xs text-gray-400 mb-1 ml-1">
-                            {msg.sender?.firstName}
+                          <span className="text-xs text-gray-500 font-medium mb-1 ml-1">
+                            {senderName || "Utilisateur"}
                           </span>
                         )}
                         <div
                           className={`px-4 py-2.5 rounded-2xl text-sm ${
                             isMe
                               ? "bg-blue-600 text-white rounded-br-sm"
-                              : "bg-white border border-gray-200 text-gray-800 rounded-bl-sm"
+                              : "bg-white border border-gray-200 text-gray-800 rounded-bl-sm shadow-sm"
                           }`}>
                           {msg.content}
                         </div>
@@ -351,6 +360,19 @@ export default function Messages() {
                           })}
                         </span>
                       </div>
+                      {isMe && (
+                        <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold flex-shrink-0 overflow-hidden">
+                          {user?.avatar ? (
+                            <img
+                              src={`https://artipro-production.up.railway.app${user.avatar}`}
+                              alt="moi"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            user?.firstName?.[0]?.toUpperCase()
+                          )}
+                        </div>
+                      )}
                     </div>
                   );
                 })}

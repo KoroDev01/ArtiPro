@@ -10,7 +10,14 @@ const notificationSchema = new Schema(
     },
     type: {
       type: String,
-      enum: ["new_offer", "offer_accepted", "offer_rejected", "post_completed", "new_review"],
+      enum: [
+        "new_offer",
+        "offer_accepted",
+        "offer_rejected",
+        "post_completed",
+        "new_review",
+        "new_message",
+      ],
       required: true,
     },
     message: {
@@ -25,7 +32,7 @@ const notificationSchema = new Schema(
       default: false,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("Notification", notificationSchema);
