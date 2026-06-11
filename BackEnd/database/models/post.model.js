@@ -40,6 +40,11 @@ const postSchema = new Schema(
       ref: "User",
       required: true,
     },
+
+    photos: {
+      type: [String],
+      default: [],
+    },
   },
   { timestamps: true },
 );

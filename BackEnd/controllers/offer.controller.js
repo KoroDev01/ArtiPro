@@ -4,10 +4,23 @@ const { createNotification } = require("./notification.controller");
 
 exports.getOffersByPost = async (req, res) => {
   try {
+    const post = await Post.findById(req.params.postId);
+    if (!post) return res.status(404).json({ message: "Post not found" });
+
+    const isOwner = post.client.toString() === req.user._id.toString();
+    const hasOffer = await Offer.exists({
+      post: post._id,
+      pro: req.user._id,
+    });
+
+    if (!isOwner && !hasOffer && req.user.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
     const offers = await Offer.find({
       post: req.params.postId,
     })
-      .populate("pro", "firstName ratingAverage")
+      .populate("pro", "firstName lastName ratingAverage")
       .sort({ createdAt: -1 });
 
     res.json(offers);

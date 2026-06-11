@@ -1,11 +1,16 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 export default function PendingApproval() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const state = location.state ?? {};
 
-  const isRejected = user?.proStatus === "rejected";
+  const proStatus = user?.proStatus ?? state.proStatus;
+  const proRejectionReason =
+    user?.proRejectionReason ?? state.proRejectionReason;
+  const isRejected = proStatus === "rejected";
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
@@ -27,10 +32,10 @@ export default function PendingApproval() {
             <p className="text-gray-500 text-sm mb-4">
               Votre candidature n'a pas été acceptée par notre équipe.
             </p>
-            {user?.proRejectionReason && (
+            {proRejectionReason && (
               <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-700 mb-6 text-left">
                 <span className="font-medium">Motif :</span>{" "}
-                {user.proRejectionReason}
+                {proRejectionReason}
               </div>
             )}
             <button

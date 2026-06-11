@@ -60,7 +60,11 @@ exports.getAllUsers = async (req, res) => {
 exports.searchPros = async (req, res) => {
   try {
     const { category, city, available } = req.query;
-    const filter = { role: "pro" };
+    const filter = {
+      role: "pro",
+      proStatus: "approved",
+      isBlocked: false,
+    };
     if (category) filter.categories = category;
     if (city) filter["location.city"] = city;
     if (available === "true") filter.availability = true;
@@ -162,10 +166,14 @@ exports.banUser = async (req, res) => {
       "1week": 7 * 24 * 60 * 60 * 1000,
       "2weeks": 14 * 24 * 60 * 60 * 1000,
     };
+    const { duration } = req.body;
+    if (!duration || (duration !== "permanent" && !durations[duration])) {
+      return res.status(400).json({ message: "Durée de bannissement invalide." });
+    }
     const banUntil =
-      req.body.duration === "permanent"
+      duration === "permanent"
         ? null
-        : new Date(Date.now() + durations[req.body.duration]);
+        : new Date(Date.now() + durations[duration]);
     const user = await updateUser(req.params.id, { isBlocked: true, banUntil });
     if (!user) return res.status(404).json({ message: "User not found" });
     res.json({ message: "User banned", user });

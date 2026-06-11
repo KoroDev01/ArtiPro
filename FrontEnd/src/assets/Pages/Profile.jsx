@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { useAuth } from "../../context/AuthContext";
-import api from "../../api";
+import api, { API_BASE } from "../../api";
 import { WILAYAS } from "../../data/wilaya";
 import {
   FiUser,
@@ -205,7 +205,7 @@ export default function Profile() {
               <div className="relative mb-4">
                 {profileData.avatar ? (
                   <img
-                    src={`https://artipro-production.up.railway.app${profileData.avatar}`}
+                    src={`${API_BASE}${profileData.avatar}`}
                     alt={profileData.firstName}
                     className="w-24 h-24 rounded-2xl object-cover border-4 border-white shadow"
                   />

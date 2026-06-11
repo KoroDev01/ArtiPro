@@ -36,6 +36,10 @@ const userSchema = new Schema(
     phone: String,
     avatar: String,
 
+    location: {
+      city: String,
+    },
+
     companyName: String,
     siret: String,
     description: String,
@@ -76,10 +80,6 @@ const userSchema = new Schema(
       },
     },
     proRejectionReason: { type: String, default: null },
-    companyName: String,
-    siret: String,
-    description: String,
-    experienceYears: Number,
     banUntil: { type: Date, default: null },
   },
   { timestamps: true },

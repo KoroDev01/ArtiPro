@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Header from "../../components/Header";
 import { useAuth } from "../../context/AuthContext";
-import api from "../../api";
+import api, { API_BASE } from "../../api";
 import EmptyState from "../../components/EmptyState";
 
 const POLL_INTERVAL = 4000;
@@ -319,7 +319,7 @@ export default function Messages() {
                   const senderName =
                     `${msg.sender?.firstName || ""} ${msg.sender?.lastName || ""}`.trim();
                   const avatarUrl = msg.sender?.avatar
-                    ? `https://artipro-production.up.railway.app${msg.sender.avatar}`
+                    ? `${API_BASE}${msg.sender.avatar}`
                     : null;
                   return (
                     <div
@@ -364,7 +364,7 @@ export default function Messages() {
                         <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold flex-shrink-0 overflow-hidden">
                           {user?.avatar ? (
                             <img
-                              src={`https://artipro-production.up.railway.app${user.avatar}`}
+                              src={`${API_BASE}${user.avatar}`}
                               alt="moi"
                               className="w-full h-full object-cover"
                             />

@@ -1,7 +1,6 @@
 const router = require("express").Router();
 const {
   userCreate,
-  userNew,
   assignCategoriesToPro,
   removeCategoryFromPro,
   searchPros,
@@ -26,7 +25,17 @@ const {
 const { uploadAvatar } = require("../config/multer.config");
 
 router.post("/createUser", userCreate);
-router.get("/users", getAllUsers);
+router.get("/pros/search", searchPros);
+router.get("/me", isAuthenticated, getCurrentUser);
+router.put("/me", isAuthenticated, updateProfile);
+router.post(
+  "/me/avatar",
+  isAuthenticated,
+  uploadAvatar.single("avatar"),
+  updateAvatar,
+);
+router.get("/users", isAuthenticated, isAdmin, getAllUsers);
+router.get("/pro/:proId", getProById);
 router.put(
   "/:id/categories",
   isAuthenticated,
@@ -39,16 +48,6 @@ router.put(
   hasRole("admin"),
   removeCategoryFromPro,
 );
-router.get("/pros/search", searchPros);
-router.get("/me", isAuthenticated, getCurrentUser);
-router.put("/me", isAuthenticated, updateProfile);
-router.post(
-  "/me/avatar",
-  isAuthenticated,
-  uploadAvatar.single("avatar"),
-  updateAvatar,
-);
-router.get("/pro/:proId", getProById);
 router.put("/users/:id/approve", isAuthenticated, isAdmin, approvePro);
 router.put("/users/:id/reject", isAuthenticated, isAdmin, rejectPro);
 router.put("/users/:id/ban", isAuthenticated, isAdmin, banUser);

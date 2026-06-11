@@ -21,12 +21,20 @@ export default function AdminCategories() {
   const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
 
-  if (!authLoading && user?.role !== "admin")
-    return <Navigate to="/" replace />;
-
   useEffect(() => {
+    if (authLoading || user?.role !== "admin") return;
     fetchCategories();
-  }, []);
+  }, [authLoading, user?.role]);
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <span className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (user?.role !== "admin") return <Navigate to="/" replace />;
 
   const fetchCategories = async () => {
     setLoading(true);

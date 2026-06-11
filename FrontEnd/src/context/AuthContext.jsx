@@ -1,12 +1,11 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { API_BASE } from "../api";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  const API = "https://artipro-production.up.railway.app";
 
   const safeFetch = async (url, options = {}) => {
     const res = await fetch(url, { credentials: "include", ...options });
@@ -23,7 +22,7 @@ export function AuthProvider({ children }) {
   };
 
   useEffect(() => {
-    safeFetch(`${API}/me`)
+    safeFetch(`${API_BASE}/me`)
       .then(({ res, data }) => {
         if (res.ok && data) setUser(data);
       })
@@ -32,13 +31,20 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (email, password) => {
-    const { res, data } = await safeFetch(`${API}/auth/signin`, {
+    const { res, data } = await safeFetch(`${API_BASE}/auth/signin`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
 
     if (!res.ok) {
+      if (res.status === 403 && data.banned) {
+        const err = new Error(data.message || "Compte suspendu.");
+        err.banned = true;
+        err.banPermanent = data.banPermanent;
+        err.banUntil = data.banUntil;
+        throw err;
+      }
       if (res.status === 403 && data.proStatus) {
         const err = new Error(
           data.message || "Compte en attente de validation.",
@@ -56,21 +62,11 @@ export function AuthProvider({ children }) {
     }
 
     setUser(data.user);
-
-    if (data.banned) {
-      const err = new Error("Compte suspendu.");
-      err.banned = true;
-      err.banPermanent = data.banPermanent;
-      err.banUntil = data.banUntil;
-      err.user = data.user;
-      throw err;
-    }
-
     return data.user;
   };
 
   const register = async (formData) => {
-    const { res, data } = await safeFetch(`${API}/createUser`, {
+    const { res, data } = await safeFetch(`${API_BASE}/createUser`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
@@ -81,11 +77,15 @@ export function AuthProvider({ children }) {
         data.error || data.message || "Erreur lors de l'inscription",
       );
 
+    if (data.user && formData.role !== "pro") {
+      setUser(data.user);
+    }
+
     return data;
   };
 
   const logout = async () => {
-    await safeFetch(`${API}/auth/signout`);
+    await safeFetch(`${API_BASE}/auth/signout`);
     setUser(null);
   };
 

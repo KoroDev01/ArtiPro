@@ -64,7 +64,7 @@ export default function Register() {
       if (role === "pro") {
         navigate("/inscription-en-attente");
       } else {
-        navigate("/Login");
+        navigate("/");
       }
     } catch (err) {
       setError(err.message);

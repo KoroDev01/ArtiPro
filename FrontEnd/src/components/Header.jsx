@@ -112,10 +112,10 @@ export default function Header() {
 
   return (
     <>
-      {user?.isBlocked && user?.banUntil && <BanBanner user={user} />}
+      {user?.isBlocked && <BanBanner user={user} />}
 
       <header
-        className={`fixed left-0 right-0 h-16 bg-white border-b border-gray-100 shadow-sm z-50 ${user?.isBlocked && user?.banUntil ? "top-[44px]" : "top-0"}`}>
+        className={`fixed left-0 right-0 h-16 bg-white border-b border-gray-100 shadow-sm z-50 ${user?.isBlocked ? "top-[44px]" : "top-0"}`}>
         <div className="max-w-7xl mx-auto h-full px-4 md:px-6 flex items-center justify-between gap-4">
           <Link
             to="/"
@@ -453,27 +453,35 @@ function NotifPanel({ notifs, onMarkAll, onClickNotif, onClose }) {
 }
 
 function BanBanner({ user }) {
-  if (!user?.isBlocked || !user?.banUntil) return null;
+  if (!user?.isBlocked) return null;
 
-  const diff = new Date(user.banUntil) - new Date();
-  if (diff <= 0) return null;
+  const isPermanent = !user.banUntil;
+  let timeLeft = null;
 
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  if (!isPermanent) {
+    const diff = new Date(user.banUntil) - new Date();
+    if (diff <= 0) return null;
 
-  let timeLeft = "";
-  if (days > 0) timeLeft = `${days} jour${days > 1 ? "s" : ""} et ${hours}h`;
-  else if (hours > 0) timeLeft = `${hours}h ${mins}min`;
-  else timeLeft = `${mins} minute${mins > 1 ? "s" : ""}`;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor(
+      (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+    );
+    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+    if (days > 0) timeLeft = `${days} jour${days > 1 ? "s" : ""} et ${hours}h`;
+    else if (hours > 0) timeLeft = `${hours}h ${mins}min`;
+    else timeLeft = `${mins} minute${mins > 1 ? "s" : ""}`;
+  }
 
   return (
     <div className="fixed top-0 left-0 right-0 z-[60] bg-red-600 text-white px-4 py-2.5 flex items-center justify-center gap-2 text-sm font-medium shadow-lg">
       <FiAlertOctagon size={16} className="flex-shrink-0" />
       <span>
-        🚫 Votre compte est suspendu — temps restant :{" "}
-        <strong>{timeLeft}</strong>. Vous pouvez uniquement consulter les
-        demandes.
+        🚫 Votre compte est suspendu
+        {isPermanent
+          ? " de façon permanente"
+          : ` — temps restant : ${timeLeft}`}
+        . Vous pouvez uniquement consulter les demandes.
       </span>
     </div>
   );

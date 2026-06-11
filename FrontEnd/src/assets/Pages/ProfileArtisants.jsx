@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { useAuth } from "../../context/AuthContext";
-import api from "../../api";
+import api, { API_BASE } from "../../api";
 import {
   FiMapPin,
   FiStar,
@@ -59,7 +59,7 @@ export default function ArtisanProfile() {
         })
         .catch(() => {});
     }
-  }, [id]);
+  }, [id, user?._id, user?.role]);
 
   const Stars = ({ rating = 0, size = "sm" }) => {
     const sz = size === "lg" ? "text-xl" : "text-sm";
@@ -163,7 +163,7 @@ export default function ArtisanProfile() {
                 <div className="flex flex-col sm:flex-row sm:items-end gap-4 mb-4">
                   {artisan.avatar ? (
                     <img
-                      src={`https://artipro-production.up.railway.app${artisan.avatar}`}
+                      src={`${API_BASE}${artisan.avatar}`}
                       alt={artisan.firstName}
                       className="w-24 h-24 rounded-xl object-cover border-4 border-white shadow"
                     />

@@ -6,9 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
 import EmptyState from "../../components/EmptyState";
 import { WILAYAS } from "../../data/wilaya";
-import api from "../../api";
-
-const API = "https://artipro-production.up.railway.app";
+import api, { API_BASE } from "../../api";
 
 const STATUS_LABELS = {
   open: { label: "Ouvert", cls: "bg-green-100 text-green-700" },
@@ -61,12 +59,11 @@ export default function JobRequests() {
     return true;
   });
 
-  const completedPosts = posts.filter(
-    (p) =>
-      p.status === "completed" &&
-      user &&
-      (p.author?._id === user._id || p.client === user._id),
-  );
+  const completedPosts = posts.filter((p) => {
+    if (p.status !== "completed" || !user) return false;
+    const clientId = p.author?._id ?? p.client?._id ?? p.client;
+    return clientId?.toString() === user._id?.toString();
+  });
 
   const displayed = tab === "active" ? activePosts : completedPosts;
 
@@ -239,7 +236,10 @@ export default function JobRequests() {
               const status = STATUS_LABELS[post.status] ?? STATUS_LABELS.open;
               const initials =
                 post.author?.firstName?.[0]?.toUpperCase() ?? "?";
-              const isOwner = user && post.author?._id === user._id;
+              const clientId =
+                post.author?._id ?? post.client?._id ?? post.client;
+              const isOwner =
+                user && clientId?.toString() === user._id?.toString();
 
               return (
                 <div
@@ -250,7 +250,7 @@ export default function JobRequests() {
                       {post.photos.map((photo, i) => (
                         <img
                           key={i}
-                          src={`${API}/images/posts/${photo}`}
+                          src={`${API_BASE}/images/posts/${photo}`}
                           alt="photo"
                           className="w-24 h-20 object-cover rounded-lg flex-shrink-0"
                         />

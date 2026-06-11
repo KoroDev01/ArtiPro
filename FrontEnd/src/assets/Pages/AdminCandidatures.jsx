@@ -46,10 +46,8 @@ export default function AdminCandidatures() {
   const [reason, setReason] = useState("");
   const [processing, setProcessing] = useState(false);
 
-  if (!authLoading && user?.role !== "admin")
-    return <Navigate to="/" replace />;
-
   useEffect(() => {
+    if (authLoading || user?.role !== "admin") return;
     api
       .get("/users")
       .then((res) => {
@@ -58,7 +56,17 @@ export default function AdminCandidatures() {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  }, [authLoading, user?.role]);
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <span className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (user?.role !== "admin") return <Navigate to="/" replace />;
 
   const handleApprove = async (proId) => {
     setProcessing(true);

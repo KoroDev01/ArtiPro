@@ -47,16 +47,24 @@ export default function AdminUsers() {
   const [selectedDuration, setSelectedDuration] = useState("1day");
   const [banning, setBanning] = useState(false);
 
-  if (!authLoading && user?.role !== "admin")
-    return <Navigate to="/" replace />;
-
   useEffect(() => {
+    if (authLoading || user?.role !== "admin") return;
     api
       .get("/users")
       .then((res) => setUsers(Array.isArray(res.data) ? res.data : []))
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  }, [authLoading, user?.role]);
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <span className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (user?.role !== "admin") return <Navigate to="/" replace />;
 
   const handleBan = async () => {
     if (!banTarget) return;

@@ -27,6 +27,7 @@ exports.createUserQuerie = async (body) => {
         siret: body.siret,
         description: body.description,
         experienceYears: body.experienceYears,
+        ...(body.city && { location: { city: body.city } }),
       }),
     });
 

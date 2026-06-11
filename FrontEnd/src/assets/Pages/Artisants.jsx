@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
-import api from "../../api";
+import api, { API_BASE } from "../../api";
 import EmptyState from "../../components/EmptyState";
 import { WILAYAS } from "../../data/wilaya";
 import {
@@ -57,8 +57,13 @@ export default function Artisant() {
   };
 
   useEffect(() => {
+    setSelectedCity(searchParams.get("city") || "");
+    setSelectedCat(searchParams.get("category") || "");
+  }, [searchParams]);
+
+  useEffect(() => {
     fetchPros();
-  }, []);
+  }, [selectedCat, selectedCity, onlyAvailable]);
 
   const filtered = artisans.filter((a) => {
     if (!searchTerm) return true;
@@ -297,7 +302,7 @@ export default function Artisant() {
                     <div className="flex-shrink-0">
                       {artisan.avatar ? (
                         <img
-                          src={`https://artipro-production.up.railway.app${artisan.avatar}`}
+                          src={`${API_BASE}${artisan.avatar}`}
                           alt={artisan.firstName}
                           className="w-20 h-20 rounded-2xl object-cover border-2 border-blue-100"
                         />
