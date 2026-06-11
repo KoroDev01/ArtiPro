@@ -16,6 +16,9 @@ import {
   FiMessageSquare,
   FiTrendingUp,
   FiUser,
+  FiUsers,
+  FiTag,
+  FiBriefcase as FiBriefcaseAdmin,
 } from "react-icons/fi";
 
 const STATUS_LABELS = {
@@ -33,6 +36,22 @@ const OFFER_STATUS = {
 export default function Dashboard() {
   const { user } = useAuth();
   const isPro = user?.role === "pro";
+  const [pendingPros, setPendingPros] = useState(0);
+
+  useEffect(() => {
+    if (user?.role === "admin") {
+      api
+        .get("/users")
+        .then((res) => {
+          const all = Array.isArray(res.data) ? res.data : [];
+          setPendingPros(
+            all.filter((u) => u.role === "pro" && u.proStatus === "pending")
+              .length,
+          );
+        })
+        .catch(() => {});
+    }
+  }, [user]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -46,7 +65,13 @@ export default function Dashboard() {
             Bonjour {user?.firstName}, voici un aperçu de votre activité.
           </p>
         </div>
-        {isPro ? <ProDashboard user={user} /> : <ClientDashboard user={user} />}
+        {user?.role === "admin" ? (
+          <AdminDashboard pendingPros={pendingPros} />
+        ) : isPro ? (
+          <ProDashboard user={user} />
+        ) : (
+          <ClientDashboard user={user} />
+        )}
       </main>
       <Footer />
     </div>
@@ -82,7 +107,6 @@ function ClientDashboard({ user }) {
 
   return (
     <div className="space-y-6">
-
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard
           icon={<FiFileText />}
@@ -252,7 +276,6 @@ function ProDashboard({ user }) {
 
   return (
     <div className="space-y-6">
-
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard
           icon={<FiBriefcase />}
@@ -403,6 +426,76 @@ function ProDashboard({ user }) {
           </div>
         )}
       </Section>
+    </div>
+  );
+}
+
+function AdminDashboard({ pendingPros }) {
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <Link
+          to="/admin/candidatures"
+          className="bg-white rounded-2xl shadow-sm p-6 flex items-center gap-4 hover:shadow-md transition group">
+          <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl flex-shrink-0">
+            <FiBriefcase />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-gray-800 group-hover:text-blue-600 transition">
+              Candidatures
+            </p>
+            <p className="text-sm text-gray-400 mt-0.5">
+              {pendingPros > 0 ? (
+                <span className="text-red-500 font-medium">
+                  {pendingPros} en attente
+                </span>
+              ) : (
+                "Tout traité ✓"
+              )}
+            </p>
+          </div>
+          <FiChevronRight
+            size={16}
+            className="text-gray-300 group-hover:text-blue-400 transition flex-shrink-0"
+          />
+        </Link>
+
+        <Link
+          to="/admin/users"
+          className="bg-white rounded-2xl shadow-sm p-6 flex items-center gap-4 hover:shadow-md transition group">
+          <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl flex-shrink-0">
+            <FiUsers />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-gray-800 group-hover:text-purple-600 transition">
+              Utilisateurs
+            </p>
+            <p className="text-sm text-gray-400 mt-0.5">Gérer les comptes</p>
+          </div>
+          <FiChevronRight
+            size={16}
+            className="text-gray-300 group-hover:text-purple-400 transition flex-shrink-0"
+          />
+        </Link>
+
+        <Link
+          to="/admin/categories"
+          className="bg-white rounded-2xl shadow-sm p-6 flex items-center gap-4 hover:shadow-md transition group">
+          <div className="w-12 h-12 rounded-xl bg-green-50 text-green-600 flex items-center justify-center text-xl flex-shrink-0">
+            <FiTag />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-gray-800 group-hover:text-green-600 transition">
+              Catégories
+            </p>
+            <p className="text-sm text-gray-400 mt-0.5">Gérer les métiers</p>
+          </div>
+          <FiChevronRight
+            size={16}
+            className="text-gray-300 group-hover:text-green-400 transition flex-shrink-0"
+          />
+        </Link>
+      </div>
     </div>
   );
 }

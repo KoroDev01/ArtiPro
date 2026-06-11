@@ -35,7 +35,6 @@ export default function Header() {
 
   const [notifs, setNotifs] = useState([]);
   const [notifOpen, setNotifOpen] = useState(false);
-  const [pendingPros, setPendingPros] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const notifRef = useRef(null);
   const pollRef = useRef(null);
@@ -57,18 +56,6 @@ export default function Header() {
       return;
     }
     fetchNotifs();
-    if (user.role === "admin") {
-      api
-        .get("/users")
-        .then((res) => {
-          const all = Array.isArray(res.data) ? res.data : [];
-          setPendingPros(
-            all.filter((u) => u.role === "pro" && u.proStatus === "pending")
-              .length,
-          );
-        })
-        .catch(() => {});
-    }
     pollRef.current = window.setInterval(fetchNotifs, 15000);
     return () => window.clearInterval(pollRef.current);
   }, [user]);
@@ -143,30 +130,6 @@ export default function Header() {
                 <Link to="/dashboard" className={navLinkCls("/dashboard")}>
                   Dashboard
                 </Link>
-                {user.role === "admin" && (
-                  <>
-                    <Link
-                      to="/admin/candidatures"
-                      className={`${navLinkCls("/admin/candidatures")} relative inline-flex items-center gap-1`}>
-                      Candidatures
-                      {pendingPros > 0 && (
-                        <span className="ml-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
-                          {pendingPros}
-                        </span>
-                      )}
-                    </Link>
-                    <Link
-                      to="/admin/categories"
-                      className={navLinkCls("/admin/categories")}>
-                      Catégories
-                    </Link>
-                    <Link
-                      to="/admin/users"
-                      className={navLinkCls("/admin/users")}>
-                      Utilisateurs
-                    </Link>
-                  </>
-                )}
               </>
             )}
           </nav>
@@ -312,35 +275,7 @@ export default function Header() {
                     active={isActive("/profile")}>
                     Mon profil
                   </MobileLink>
-                  {user.role === "admin" && (
-                    <>
-                      <MobileLink
-                        to="/admin/candidatures"
-                        icon={<FiBriefcase size={16} />}
-                        active={isActive("/admin/candidatures")}>
-                        <span className="flex items-center gap-2">
-                          Candidatures
-                          {pendingPros > 0 && (
-                            <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
-                              {pendingPros}
-                            </span>
-                          )}
-                        </span>
-                      </MobileLink>
-                      <MobileLink
-                        to="/admin/categories"
-                        icon={<FiTag size={16} />}
-                        active={isActive("/admin/categories")}>
-                        Catégories
-                      </MobileLink>
-                      <MobileLink
-                        to="/admin/users"
-                        icon={<FiUsers size={16} />}
-                        active={isActive("/admin/users")}>
-                        Utilisateurs
-                      </MobileLink>
-                    </>
-                  )}
+
                   <div className="h-px bg-gray-100 mx-4 my-2" />
                   <button
                     onClick={logout}
