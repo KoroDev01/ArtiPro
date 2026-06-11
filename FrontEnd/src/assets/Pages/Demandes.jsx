@@ -245,7 +245,6 @@ export default function JobRequests() {
                 <div
                   key={post._id}
                   className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col gap-4 hover:shadow-md transition">
-
                   {post.photos?.length > 0 && (
                     <div className="flex gap-2 overflow-x-auto">
                       {post.photos.map((photo, i) => (
