@@ -90,7 +90,6 @@ userSchema.statics.hashPassword = async (pswd) => {
     const salt = await bcrypt.genSalt(8);
     return bcrypt.hash(pswd, salt);
   } catch (error) {
-    console.log("Error hashing password:", error);
     throw error;
   }
 };

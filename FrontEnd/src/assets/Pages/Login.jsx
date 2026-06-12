@@ -37,9 +37,9 @@ export default function Login() {
       }
       if (err.banned) {
         if (err.banPermanent) {
-          navigate("/compte-suspendu");
+          navigate("/compte-suspendu", { replace: true });
         } else {
-          navigate("/demandes");
+          navigate("/demandes", { replace: true });
         }
         return;
       }

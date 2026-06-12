@@ -15,11 +15,24 @@ exports.sessionCreate = (req, res, next) => {
       const isStillBanned = isPermanent || user.banUntil > now;
 
       if (isStillBanned) {
-        return res.status(403).json({
-          message: "Compte suspendu.",
-          banned: true,
-          banPermanent: isPermanent,
-          banUntil: user.banUntil || null,
+        if (isPermanent) {
+          return res.status(403).json({
+            message: "Compte suspendu.",
+            banned: true,
+            banPermanent: true,
+            banUntil: null,
+          });
+        }
+
+        return req.login(user, (loginErr) => {
+          if (loginErr) return next(loginErr);
+          return res.status(200).json({
+            message: "Login successful",
+            user,
+            banned: true,
+            banPermanent: false,
+            banUntil: user.banUntil,
+          });
         });
       }
 

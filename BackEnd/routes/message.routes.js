@@ -4,9 +4,12 @@ const {
   getMessagesByPost,
 } = require("../controllers/message.controller");
 
-const { isAuthenticated } = require("../config/security.config");
+const {
+  isAuthenticated,
+  isNotBanned,
+} = require("../config/security.config");
 
-router.post("/", isAuthenticated, sendMessage);
+router.post("/", isAuthenticated, isNotBanned, sendMessage);
 router.get("/post/:postId", isAuthenticated, getMessagesByPost);
 
 module.exports = router;

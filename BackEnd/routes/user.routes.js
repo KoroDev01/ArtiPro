@@ -19,6 +19,7 @@ const {
 
 const {
   isAuthenticated,
+  isNotBanned,
   isAdmin,
   hasRole,
 } = require("../config/security.config");
@@ -27,7 +28,7 @@ const { uploadAvatar } = require("../config/multer.config");
 router.post("/createUser", userCreate);
 router.get("/pros/search", searchPros);
 router.get("/me", isAuthenticated, getCurrentUser);
-router.put("/me", isAuthenticated, updateProfile);
+router.put("/me", isAuthenticated, isNotBanned, updateProfile);
 router.post(
   "/me/avatar",
   isAuthenticated,

@@ -39,6 +39,5 @@ exports.createNotification = async ({ recipient, type, message, link }) => {
   try {
     await Notification.create({ recipient, type, message, link });
   } catch (e) {
-    console.error("Notification error:", e.message);
   }
 };

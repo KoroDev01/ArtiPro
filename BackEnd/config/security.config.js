@@ -1,21 +1,24 @@
+const isStillBanned = (user) => {
+  if (!user?.isBlocked) return false;
+  const now = new Date();
+  return !user.banUntil || user.banUntil > now;
+};
+
+const clearExpiredBan = (user) => {
+  if (user.isBlocked && user.banUntil && user.banUntil <= new Date()) {
+    user.isBlocked = false;
+    user.banUntil = null;
+    user.save().catch(() => {});
+  }
+};
+
 exports.isAuthenticated = (req, res, next) => {
   if (!req.isAuthenticated()) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
   const user = req.user;
-
-  if (user.isBlocked) {
-    const now = new Date();
-    if (!user.banUntil || user.banUntil > now) {
-      return res
-        .status(403)
-        .json({ message: "Compte suspendu.", banUntil: user.banUntil });
-    }
-    user.isBlocked = false;
-    user.banUntil = null;
-    user.save().catch(() => {});
-  }
+  clearExpiredBan(user);
 
   if (user.role === "pro" && user.proStatus !== "approved") {
     return res.status(403).json({
@@ -25,6 +28,19 @@ exports.isAuthenticated = (req, res, next) => {
   }
 
   return next();
+};
+
+exports.isNotBanned = (req, res, next) => {
+  if (!isStillBanned(req.user)) {
+    return next();
+  }
+
+  return res.status(403).json({
+    message: "Compte suspendu.",
+    banned: true,
+    banPermanent: !req.user.banUntil,
+    banUntil: req.user.banUntil || null,
+  });
 };
 
 exports.isAdmin = (req, res, next) => {

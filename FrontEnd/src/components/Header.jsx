@@ -145,26 +145,7 @@ export default function Header() {
                 </Link>
                 {user.role === "admin" && (
                   <>
-                    <Link
-                      to="/admin/candidatures"
-                      className={`${navLinkCls("/admin/candidatures")} relative inline-flex items-center gap-1`}>
-                      Candidatures
-                      {pendingPros > 0 && (
-                        <span className="ml-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
-                          {pendingPros}
-                        </span>
-                      )}
-                    </Link>
-                    <Link
-                      to="/admin/categories"
-                      className={navLinkCls("/admin/categories")}>
-                      Catégories
-                    </Link>
-                    <Link
-                      to="/admin/users"
-                      className={navLinkCls("/admin/users")}>
-                      Utilisateurs
-                    </Link>
+                    
                   </>
                 )}
               </>
@@ -314,31 +295,7 @@ export default function Header() {
                   </MobileLink>
                   {user.role === "admin" && (
                     <>
-                      <MobileLink
-                        to="/admin/candidatures"
-                        icon={<FiBriefcase size={16} />}
-                        active={isActive("/admin/candidatures")}>
-                        <span className="flex items-center gap-2">
-                          Candidatures
-                          {pendingPros > 0 && (
-                            <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
-                              {pendingPros}
-                            </span>
-                          )}
-                        </span>
-                      </MobileLink>
-                      <MobileLink
-                        to="/admin/categories"
-                        icon={<FiTag size={16} />}
-                        active={isActive("/admin/categories")}>
-                        Catégories
-                      </MobileLink>
-                      <MobileLink
-                        to="/admin/users"
-                        icon={<FiUsers size={16} />}
-                        active={isActive("/admin/users")}>
-                        Utilisateurs
-                      </MobileLink>
+                      
                     </>
                   )}
                   <div className="h-px bg-gray-100 mx-4 my-2" />

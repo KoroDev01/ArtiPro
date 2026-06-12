@@ -4,9 +4,12 @@ const {
   getReviewsByPro,
   getReviewByPost,
 } = require("../controllers/review.controller");
-const { isAuthenticated } = require("../config/security.config");
+const {
+  isAuthenticated,
+  isNotBanned,
+} = require("../config/security.config");
 
-router.post("/", isAuthenticated, createReview);
+router.post("/", isAuthenticated, isNotBanned, createReview);
 router.get("/pro/:proId", getReviewsByPro);
 router.get("/post/:postId", isAuthenticated, getReviewByPost);
 module.exports = router;

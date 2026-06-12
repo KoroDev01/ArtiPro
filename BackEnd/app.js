@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 require("./database");
 const path = require("path");
@@ -13,6 +15,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
+      "http://127.0.0.1:5173",
       "https://artipro01.fr",
       "https://www.artipro01.fr",
     ],

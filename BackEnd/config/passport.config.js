@@ -4,8 +4,6 @@ const User = require("../database/models/user.model");
 const localStrategy = require("passport-local").Strategy;
 const { findUserPerEmail } = require("../queries/user.queries.js");
 
-console.log("Initializing Passport.js configuration");
-
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -29,12 +27,15 @@ passport.use(
       try {
         const user = await findUserPerEmail(email);
         if (!user) {
-          console.log("User not found with email:", email);
-          return done(null, false, { message: "Incorrect email." });
+          return done(null, false, {
+            message: "Email ou mot de passe incorrect.",
+          });
         }
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
-          return done(null, false, { message: "Incorrect password." });
+          return done(null, false, {
+            message: "Email ou mot de passe incorrect.",
+          });
         }
         return done(null, user);
       } catch (e) {

@@ -163,9 +163,7 @@ export default function Profile() {
       });
       setProfileData((prev) => ({ ...prev, avatar: res.data.user.avatar }));
     } catch {
-      setAvatarError(
-        "Échec de l'upload. Vérifiez que la route /me/avatar est configurée.",
-      );
+      setAvatarError("Impossible de mettre à jour la photo.");
     } finally {
       setAvatarUploading(false);
     }

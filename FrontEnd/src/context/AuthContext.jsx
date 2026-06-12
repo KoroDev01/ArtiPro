@@ -12,11 +12,9 @@ export function AuthProvider({ children }) {
     const text = await res.text();
     let data;
     try {
-      data = JSON.parse(text);
+      data = text ? JSON.parse(text) : {};
     } catch {
-      throw new Error(
-        "Le serveur n'a pas répondu correctement. Vérifiez que le backend est démarré.",
-      );
+      throw new Error("Impossible de contacter le serveur.");
     }
     return { res, data };
   };
@@ -30,6 +28,14 @@ export function AuthProvider({ children }) {
       .finally(() => setLoading(false));
   }, []);
 
+  const buildBannedError = (data) => {
+    const err = new Error(data.message || "Compte suspendu.");
+    err.banned = true;
+    err.banPermanent = data.banPermanent ?? !data.banUntil;
+    err.banUntil = data.banUntil ?? null;
+    return err;
+  };
+
   const login = async (email, password) => {
     const { res, data } = await safeFetch(`${API_BASE}/auth/signin`, {
       method: "POST",
@@ -38,12 +44,13 @@ export function AuthProvider({ children }) {
     });
 
     if (!res.ok) {
-      if (res.status === 403 && data.banned) {
-        const err = new Error(data.message || "Compte suspendu.");
-        err.banned = true;
-        err.banPermanent = data.banPermanent;
-        err.banUntil = data.banUntil;
-        throw err;
+      if (
+        res.status === 403 &&
+        (data.banned ||
+          data.banPermanent ||
+          data.message?.toLowerCase().includes("suspendu"))
+      ) {
+        throw buildBannedError(data);
       }
       if (res.status === 403 && data.proStatus) {
         const err = new Error(
@@ -58,10 +65,17 @@ export function AuthProvider({ children }) {
         err.siret = data.siret;
         throw err;
       }
-      throw new Error(data.error || data.message || "Erreur de connexion");
+      throw new Error(
+        data.error || data.message || "Email ou mot de passe incorrect.",
+      );
     }
 
     setUser(data.user);
+
+    if (data.banned) {
+      throw buildBannedError(data);
+    }
+
     return data.user;
   };
 
@@ -74,7 +88,7 @@ export function AuthProvider({ children }) {
 
     if (!res.ok)
       throw new Error(
-        data.error || data.message || "Erreur lors de l'inscription",
+        data.error || data.message || "Erreur lors de l'inscription.",
       );
 
     if (data.user && formData.role !== "pro") {
@@ -98,6 +112,6 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth doit être utilisé dans un AuthProvider");
+  if (!ctx) throw new Error("useAuth hors AuthProvider");
   return ctx;
 }
