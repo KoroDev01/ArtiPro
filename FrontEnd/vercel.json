@@ -4,6 +4,10 @@
       "source": "/api/:path*",
       "destination": "https://artipro-production.up.railway.app/:path*"
     },
+    {
+      "source": "/images/:path*",
+      "destination": "https://artipro-production.up.railway.app/images/:path*"
+    },
     { "source": "/(.*)", "destination": "/" }
   ]
 }

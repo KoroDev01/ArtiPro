@@ -59,7 +59,11 @@ export default function Dashboard() {
       <main className="flex-1 mt-[72px] max-w-6xl mx-auto px-4 md:px-6 py-8 w-full">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">
-            {isPro ? "Dashboard artisan" : "Dashboard client"}
+            {user?.role === "admin"
+              ? "Dashboard admin"
+              : isPro
+                ? "Dashboard artisan"
+                : "Dashboard client"}
           </h1>
           <p className="text-sm text-gray-500 mt-1">
             Bonjour {user?.firstName}, voici un aperçu de votre activité.
