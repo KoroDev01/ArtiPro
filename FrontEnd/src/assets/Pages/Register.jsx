@@ -60,11 +60,9 @@ const handleSubmit = async (e) => {
   setLoading(true);
   try {
     const data = await register({ ...formData, role });
-    navigate("/verification-email", {
+    navigate("/Login", {
       state: {
-        email: data.email,
-        role,
-        emailWarning: data.emailWarning || null,
+        message: data.message || "Compte créé ! Connectez-vous.",
       },
     });
   } catch (err) {

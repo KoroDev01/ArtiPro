@@ -8,15 +8,30 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   const safeFetch = async (url, options = {}) => {
-    const res = await fetch(url, { credentials: "include", ...options });
-    const text = await res.text();
-    let data;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 25000);
     try {
-      data = text ? JSON.parse(text) : {};
-    } catch {
-      throw new Error("Impossible de contacter le serveur.");
+      const res = await fetch(url, {
+        credentials: "include",
+        signal: controller.signal,
+        ...options,
+      });
+      const text = await res.text();
+      let data;
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        throw new Error("Impossible de contacter le serveur.");
+      }
+      return { res, data };
+    } catch (err) {
+      if (err.name === "AbortError") {
+        throw new Error("Le serveur met trop de temps à répondre. Réessayez.");
+      }
+      throw err;
+    } finally {
+      clearTimeout(timeout);
     }
-    return { res, data };
   };
 
   useEffect(() => {
