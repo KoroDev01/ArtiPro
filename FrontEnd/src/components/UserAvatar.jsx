@@ -5,11 +5,18 @@ const SIZES = {
   sm: "w-8 h-8 text-xs",
   md: "w-10 h-10 text-sm",
   lg: "w-14 h-14 text-lg",
+  card: "w-14 h-14 sm:w-20 sm:h-20 text-base sm:text-xl",
 };
 
 /** Avatar utilisateur : photo si disponible, sinon initiale. */
-export default function UserAvatar({ user, size = "md", className = "" }) {
+export default function UserAvatar({
+  user,
+  size = "md",
+  className = "",
+  square = false,
+}) {
   const cls = SIZES[size] || SIZES.md;
+  const round = square ? "rounded-xl sm:rounded-2xl" : "rounded-full";
   const url = imageUrl(user?.avatar, "avatars");
 
   if (url) {
@@ -17,7 +24,7 @@ export default function UserAvatar({ user, size = "md", className = "" }) {
       <img
         src={url}
         alt=""
-        className={`${cls} rounded-full object-cover border border-gray-200 flex-shrink-0 ${className}`}
+        className={`${cls} ${round} object-cover border border-gray-200 flex-shrink-0 ${className}`}
       />
     );
   }
@@ -29,7 +36,7 @@ export default function UserAvatar({ user, size = "md", className = "" }) {
 
   return (
     <div
-      className={`${cls} rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold flex-shrink-0 ${className}`}>
+      className={`${cls} ${round} bg-blue-100 text-blue-600 flex items-center justify-center font-bold flex-shrink-0 ${className}`}>
       {initial}
     </div>
   );
