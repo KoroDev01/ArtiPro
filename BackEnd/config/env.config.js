@@ -47,14 +47,34 @@ exports.getCorsOrigins = () => {
     .map((o) => o.trim())
     .filter(Boolean);
 
-  if (fromEnv?.length) return fromEnv;
-
-  return [
+  const defaults = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "https://artipro01.fr",
     "https://www.artipro01.fr",
+    "https://arti-pro.vercel.app",
   ];
+
+  if (fromEnv?.length) return [...new Set([...fromEnv, ...defaults])];
+
+  return defaults;
+};
+
+/** Autorise les origines listées + tous les sous-domaines *.vercel.app */
+exports.corsOriginCheck = (origin, callback) => {
+  if (!origin) return callback(null, true);
+
+  const allowed = exports.getCorsOrigins();
+  if (allowed.includes(origin)) return callback(null, true);
+
+  try {
+    const { hostname } = new URL(origin);
+    if (hostname.endsWith(".vercel.app")) return callback(null, true);
+  } catch {
+    /* ignore */
+  }
+
+  callback(null, false);
 };
 
 exports.getFrontendUrl = () =>

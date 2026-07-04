@@ -4,7 +4,7 @@ const express = require("express");
 const helmet = require("helmet");
 const path = require("path");
 const cors = require("cors");
-const { validateEnv, getCorsOrigins } = require("./config/env.config");
+const { validateEnv, corsOriginCheck } = require("./config/env.config");
 const { connectDatabase } = require("./database");
 const router = require("./routes/index");
 
@@ -20,6 +20,13 @@ app.use(
   }),
 );
 
+app.use(
+  cors({
+    origin: corsOriginCheck,
+    credentials: true,
+  }),
+);
+
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
@@ -30,13 +37,6 @@ async function start() {
 
     require("./config/session.config");
     require("./config/passport.config");
-
-    app.use(
-      cors({
-        origin: getCorsOrigins(),
-        credentials: true,
-      }),
-    );
 
     app.use(router);
 
