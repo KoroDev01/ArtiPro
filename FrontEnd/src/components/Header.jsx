@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api from "../api";
-import { imageUrl } from "../utils/imageUrl";
+import UserAvatar from "./UserAvatar";
 import {
   FiBell,
   FiX,
@@ -246,7 +246,7 @@ export default function Header() {
                 <>
                   <div className="h-px bg-gray-100 mx-4 my-2" />
                   <div className="px-4 py-2 flex items-center gap-3">
-                    <UserAvatar user={user} size="lg" />
+                    <UserAvatar user={user} size="md" />
                     <div>
                       <p className="text-sm font-semibold text-gray-800">
                         {user.firstName} {user.lastName}
@@ -310,33 +310,6 @@ export default function Header() {
         </>
       )}
     </>
-  );
-}
-
-function UserAvatar({ user, size = "sm" }) {
-  const sizes = {
-    sm: "w-7 h-7 text-xs",
-    md: "w-9 h-9 text-sm",
-    lg: "w-10 h-10 text-sm",
-  };
-  const cls = sizes[size] || sizes.sm;
-  const url = imageUrl(user?.avatar, "avatars");
-
-  if (url) {
-    return (
-      <img
-        src={url}
-        alt=""
-        className={`${cls} rounded-full object-cover border border-gray-200 flex-shrink-0`}
-      />
-    );
-  }
-
-  return (
-    <div
-      className={`${cls} rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold flex-shrink-0`}>
-      {user?.firstName?.[0]?.toUpperCase() || "?"}
-    </div>
   );
 }
 

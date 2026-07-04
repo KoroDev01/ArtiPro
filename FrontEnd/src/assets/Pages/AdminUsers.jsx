@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import AdminLayout from "../../components/AdminLayout";
+import UserAvatar from "../../components/UserAvatar";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../api";
 import {
@@ -209,9 +210,7 @@ export default function AdminUsers() {
                     onClick={() => setSelectedUser(u)}
                     className="px-6 py-4 flex items-center gap-4 flex-wrap cursor-pointer hover:bg-gray-50 transition">
 
-                    <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold flex-shrink-0">
-                      {u.firstName?.[0]?.toUpperCase() || "?"}
-                    </div>
+                    <UserAvatar user={u} size="md" />
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
@@ -296,9 +295,7 @@ export default function AdminUsers() {
             <div className="px-6 py-5 space-y-5">
 
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xl font-bold flex-shrink-0">
-                  {selectedUser.firstName?.[0]?.toUpperCase() || "?"}
-                </div>
+                <UserAvatar user={selectedUser} size="lg" />
                 <div className="flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <p className="font-bold text-lg text-gray-900">

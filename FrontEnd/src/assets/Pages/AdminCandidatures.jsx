@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Navigate, Link } from "react-router-dom";
 import AdminLayout from "../../components/AdminLayout";
+import UserAvatar from "../../components/UserAvatar";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../api";
 import {
@@ -185,9 +186,7 @@ export default function AdminCandidatures() {
                   className="bg-white rounded-2xl shadow-sm p-6 cursor-pointer hover:shadow-md transition">
                   <div className="flex items-start gap-4 flex-wrap">
 
-                    <div className="w-12 h-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-base font-bold flex-shrink-0">
-                      {pro.firstName?.[0]?.toUpperCase() || "?"}
-                    </div>
+                    <UserAvatar user={pro} size="md" />
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-1">
@@ -294,9 +293,7 @@ export default function AdminCandidatures() {
             <div className="px-6 py-5 space-y-5">
 
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xl font-bold flex-shrink-0">
-                  {selectedPro.firstName?.[0]?.toUpperCase()}
-                </div>
+                <UserAvatar user={selectedPro} size="lg" />
                 <div>
                   <p className="font-bold text-lg text-gray-900">
                     {selectedPro.firstName} {selectedPro.lastName}
