@@ -20,7 +20,8 @@ app.use(
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 14,
       secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      // lax = cookie first-party (frontend + API via proxy Vercel /api) — requis Safari iOS
+      sameSite: process.env.COOKIE_SAME_SITE || "lax",
     },
     store: MongoStore.create({
       client: require("mongoose").connection.getClient(),

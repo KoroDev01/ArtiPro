@@ -37,6 +37,8 @@ async function start() {
 
     require("./config/session.config");
     require("./config/passport.config");
+    const { resolveUserFromToken } = require("./middleware/auth.middleware");
+    app.use(resolveUserFromToken);
 
     app.use(router);
 

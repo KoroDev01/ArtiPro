@@ -10,6 +10,10 @@ const {
   sendVerificationEmail,
   sendPasswordResetEmail,
 } = require("../config/mailer.config.js");
+const { authPayload } = require("../config/token.config.js");
+
+const loginSuccess = (res, user, extra = {}) =>
+  res.status(200).json(authPayload(user, { message: "Login successful", ...extra }));
 exports.sessionNew = (req, res, next) => {
   res.status(200).json({ message: "Sign-in form" });
 };
@@ -35,9 +39,7 @@ exports.sessionCreate = (req, res, next) => {
 
         return req.login(user, (loginErr) => {
           if (loginErr) return next(loginErr);
-          return res.status(200).json({
-            message: "Login successful",
-            user,
+          return loginSuccess(res, user, {
             banned: true,
             banPermanent: false,
             banUntil: user.banUntil,
@@ -65,7 +67,7 @@ exports.sessionCreate = (req, res, next) => {
 
     req.login(user, (err) => {
       if (err) return next(err);
-      res.status(200).json({ message: "Login successful", user });
+      loginSuccess(res, user);
     });
   })(req, res, next);
 };
@@ -95,7 +97,9 @@ exports.verifyEmail = async (req, res, next) => {
 
     req.login(user, (err) => {
       if (err) return next(err);
-      res.status(200).json({ message: "Email vérifié avec succès.", user });
+      res.status(200).json(
+        authPayload(user, { message: "Email vérifié avec succès." }),
+      );
     });
   } catch (e) {
     res.status(400).json({ error: e.message });

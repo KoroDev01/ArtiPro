@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { API_BASE } from "../api";
+import { authHeaders, setToken, clearToken } from "../utils/authStorage";
 
 const AuthContext = createContext(null);
 
@@ -15,6 +16,10 @@ export function AuthProvider({ children }) {
         credentials: "include",
         signal: controller.signal,
         ...options,
+        headers: {
+          ...authHeaders(),
+          ...options.headers,
+        },
       });
       const text = await res.text();
       let data;
@@ -38,6 +43,7 @@ export function AuthProvider({ children }) {
     safeFetch(`${API_BASE}/me`)
       .then(({ res, data }) => {
         if (res.ok && data) setUser(data);
+        else if (res.status === 401) clearToken();
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -85,6 +91,7 @@ export function AuthProvider({ children }) {
       );
     }
 
+    if (data.token) setToken(data.token);
     setUser(data.user);
 
     if (data.banned) {
@@ -118,6 +125,7 @@ export function AuthProvider({ children }) {
 
     if (!res.ok)
       throw new Error(data.error || data.message || "Code invalide.");
+    if (data.token) setToken(data.token);
     if (data.user) setUser(data.user);
     return data;
   };
@@ -137,7 +145,8 @@ export function AuthProvider({ children }) {
   };
 
   const logout = async () => {
-    await safeFetch(`${API_BASE}/auth/signout`);
+    await safeFetch(`${API_BASE}/auth/signout`).catch(() => {});
+    clearToken();
     setUser(null);
   };
 
