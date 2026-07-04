@@ -1,6 +1,8 @@
 const {
   createUserQuerie,
+  generateAndSetVerificationCode,
 } = require("../queries/user.queries.js");
+const { sendVerificationEmail } = require("../config/mailer.config.js");
 const { resolveUploadedFile } = require("../config/upload.config.js");
 const User = require("../database/models/user.model");
 
@@ -12,11 +14,26 @@ const updateUser = (id, data) =>
 exports.userCreate = async (req, res, next) => {
   try {
     const user = await createUserQuerie(req.body);
+    const code = await generateAndSetVerificationCode(user);
 
     res.status(201).json({
-      message: "Compte créé avec succès. Vous pouvez vous connecter.",
+      message: "Compte créé. Vérifiez votre email pour activer votre compte.",
       email: user.email,
+      requiresVerification: true,
     });
+
+    sendVerificationEmail(user.email, code, user.firstName)
+      .then((result) => {
+        if (result?.fallback || result?.skipped) {
+          console.warn(
+            `[mail] Code pour ${user.email} : ${code} (email non envoyé — configurez Brevo sur Railway)`,
+          );
+        }
+      })
+      .catch((mailErr) => {
+        console.error("[mail] Échec envoi:", mailErr.message);
+        console.warn(`[mail] Code pour ${user.email} : ${code}`);
+      });
   } catch (e) {
     handleError(res, e);
   }

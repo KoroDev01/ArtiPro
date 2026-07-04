@@ -9,10 +9,11 @@ export default function VerifyEmail() {
 
   const email = location.state?.email || "";
   const emailWarning = location.state?.emailWarning || "";
+  const initialInfo = location.state?.info || emailWarning;
 
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
-  const [info, setInfo] = useState(emailWarning);
+  const [info, setInfo] = useState(initialInfo);
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
 
