@@ -22,6 +22,7 @@ exports.createUserQuerie = async (body) => {
       role,
       firstName: body.firstName,
       lastName: body.lastName,
+      emailVerified: true,
       ...(role === "pro" && {
         proStatus: "pending",
         companyName: body.companyName,

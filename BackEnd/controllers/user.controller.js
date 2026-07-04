@@ -1,8 +1,6 @@
 const {
   createUserQuerie,
-  generateAndSetVerificationCode,
 } = require("../queries/user.queries.js");
-const { sendVerificationEmail } = require("../config/mailer.config.js");
 const { resolveUploadedFile } = require("../config/upload.config.js");
 const User = require("../database/models/user.model");
 
@@ -14,34 +12,10 @@ const updateUser = (id, data) =>
 exports.userCreate = async (req, res, next) => {
   try {
     const user = await createUserQuerie(req.body);
-    const code = await generateAndSetVerificationCode(user);
-
-    let emailSent = true;
-    let emailWarning = null;
-    try {
-      const result = await sendVerificationEmail(
-        user.email,
-        code,
-        user.firstName,
-      );
-      if (result?.dev && result?.fallback) {
-        emailWarning =
-          "L'email n'a pas pu être envoyé (SMTP indisponible). Consultez le terminal du backend pour le code de vérification.";
-      }
-    } catch (mailErr) {
-      emailSent = false;
-      emailWarning = mailErr.message;
-      console.error("[mail] Échec envoi vérification:", mailErr.message);
-    }
 
     res.status(201).json({
-      message: emailSent
-        ? "Compte créé. Vérifiez votre email pour l'activer."
-        : "Compte créé, mais l'email de vérification n'a pas pu être envoyé.",
+      message: "Compte créé avec succès. Vous pouvez vous connecter.",
       email: user.email,
-      requiresVerification: true,
-      emailSent,
-      ...(emailWarning && { emailWarning }),
     });
   } catch (e) {
     handleError(res, e);

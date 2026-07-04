@@ -11,7 +11,18 @@ const transporter = nodemailer.createTransport({
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
+  connectionTimeout: 8000,
+  greetingTimeout: 8000,
+  socketTimeout: 10000,
 });
+
+const withTimeout = (promise, ms = 10000) =>
+  Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Délai email dépassé")), ms),
+    ),
+  ]);
 
 const logDevCode = (to, code) => {
   console.log("\n📧 [DEV] Code de vérification ArtiPro");
@@ -46,12 +57,17 @@ exports.sendVerificationEmail = async (to, code, firstName) => {
     return { dev: true };
   }
 
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    return { skipped: true };
+  }
+
   try {
-    await transporter.sendMail({
-      from: `"ArtiPro" <${process.env.EMAIL_FROM}>`,
-      to,
-      subject: "Vérifiez votre adresse email - ArtiPro",
-      html: `
+    await withTimeout(
+      transporter.sendMail({
+        from: `"ArtiPro" <${process.env.EMAIL_FROM}>`,
+        to,
+        subject: "Vérifiez votre adresse email - ArtiPro",
+        html: `
       <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
         <h2 style="color:#2563eb;">ArtiPro</h2>
         <p>Bonjour ${firstName || ""},</p>
@@ -63,14 +79,13 @@ exports.sendVerificationEmail = async (to, code, firstName) => {
         <p style="color:#9ca3af; font-size: 12px;">Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.</p>
       </div>
     `,
-    });
+      }),
+    );
     return { sent: true };
   } catch (err) {
-    if (!isProduction && isSmtpBypassError(err)) {
-      console.warn(
-        `[mail] SMTP indisponible en local (${err.message}) — code affiché dans ce terminal.`,
-      );
-      logDevCode(to, code);
+    if (isSmtpBypassError(err) || err.message === "Délai email dépassé") {
+      console.warn(`[mail] Envoi ignoré (${err.message})`);
+      if (!isProduction) logDevCode(to, code);
       return { dev: true, fallback: true };
     }
     throw new Error(formatMailError(err));
