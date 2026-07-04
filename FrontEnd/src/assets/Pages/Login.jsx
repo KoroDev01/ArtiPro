@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
-import LoginImage from "../../assets/img/photo-1678803262992-d79d06dd5d96.jpeg";
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -51,28 +50,19 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <div className="flex w-[1200px] h-[700px]">
-        <div className="w-1/2 flex items-center justify-center">
-          <img
-            src={LoginImage}
-            alt="chantier"
-            className="w-[85%] h-[90%] object-cover rounded-2xl shadow-lg"
-          />
-        </div>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-md">
+        <div className="bg-white rounded-2xl shadow-sm p-8">
+          <Link
+            to="/"
+            className="inline-block bg-blue-600 text-white px-4 py-1.5 rounded-lg mb-6 text-sm font-semibold">
+            ArtiPro
+          </Link>
 
-        <div className="w-1/2 flex items-center justify-center">
-          <div className="bg-white w-[420px] p-10 rounded-2xl shadow-sm">
-            <Link
-              to="/"
-              className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg mb-6 text-sm font-semibold">
-              ArtiPro
-            </Link>
-
-            <h2 className="text-2xl font-semibold mb-2">Bienvenue</h2>
-            <p className="text-gray-500 text-sm mb-6">
-              Connectez-vous pour continuer
-            </p>
+          <h2 className="text-2xl font-bold mb-1">Bienvenue</h2>
+          <p className="text-gray-500 text-sm mb-6">
+            Connectez-vous pour continuer
+          </p>
 
             {location.state?.message && (
               <div className="bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg px-4 py-3 mb-4">
@@ -131,15 +121,14 @@ export default function Login() {
               </button>
             </form>
 
-            <p className="text-center text-sm mt-6 text-gray-600">
-              Pas encore de compte ?{" "}
-              <Link
-                to="/SignIn"
-                className="text-blue-600 font-medium hover:underline">
-                Inscrivez-vous
-              </Link>
-            </p>
-          </div>
+          <p className="text-center text-sm mt-6 text-gray-600">
+            Pas encore de compte ?{" "}
+            <Link
+              to="/SignIn"
+              className="text-blue-600 font-medium hover:underline">
+              Inscrivez-vous
+            </Link>
+          </p>
         </div>
       </div>
     </div>
