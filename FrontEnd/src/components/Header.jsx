@@ -224,17 +224,17 @@ export default function Header() {
               <>
                 <Link
                   to="/Login"
-                  className="hidden sm:block text-sm font-medium text-gray-600 hover:text-blue-600 transition px-3 py-1.5">
+                  className="text-xs sm:text-sm font-medium text-gray-600 hover:text-blue-600 transition px-2 sm:px-3 py-1.5 whitespace-nowrap">
                   Connexion
                 </Link>
                 <Link
                   to="/SignIn"
-                  className="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 px-4 py-1.5 rounded-lg transition">
+                  className="text-xs sm:text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 px-2.5 sm:px-4 py-1.5 rounded-lg transition whitespace-nowrap">
                   Inscription
                 </Link>
                 <button
                   onClick={() => setMenuOpen((v) => !v)}
-                  className="flex sm:hidden items-center justify-center w-9 h-9 rounded-full hover:bg-gray-100 transition"
+                  className="flex lg:hidden items-center justify-center w-9 h-9 rounded-full hover:bg-gray-100 transition"
                   aria-label="Menu">
                   {menuOpen ? <FiX size={20} /> : <FiMenu size={20} />}
                 </button>
