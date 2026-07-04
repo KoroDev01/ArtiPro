@@ -25,10 +25,19 @@ Optionnel mais recommandé :
 ```env
 EMAIL_USER=...
 EMAIL_PASS=...
-EMAIL_FROM=contact@artipro01.fr
+EMAIL_FROM=malifaiz03@gmail.com
+BREVO_API_KEY=xkeysib-...   # clé API (pas la clé SMTP) — recommandé sur Railway
 FRONTEND_URL=https://www.artipro01.fr
 CORS_ORIGINS=https://artipro01.fr,https://www.artipro01.fr
 ```
+
+**Emails non reçus (code visible dans les logs Railway)**  
+→ Le SMTP échoue depuis Railway. Ajoute **`BREVO_API_KEY`** :
+1. Brevo → **SMTP & API** → **Clés API et MCP** → **Générer une clé**
+2. Copie la clé `xkeysib-...` (différente de `xsmtpsib-...` SMTP)
+3. Railway → Variables → `BREVO_API_KEY` = cette clé
+4. `EMAIL_FROM` doit être **exactement** l’expéditeur vérifié chez Brevo (ex. `malifaiz03@gmail.com`)
+5. Redéploie et regarde les logs : `[mail] Brevo API échec` ou `[mail] SMTP échec` indique l’erreur exacte
 
 **Ne pas** mettre `MAIL_DEV_LOG=true` en production.
 
