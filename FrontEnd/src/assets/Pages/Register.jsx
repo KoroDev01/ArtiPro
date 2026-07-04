@@ -6,7 +6,7 @@ import { WILAYAS } from "../../data/wilaya";
 const validatePassword = (pwd) => {
   if (pwd.length < 8) return "Le mot de passe doit contenir au moins 8 caractères.";
   if (!/[0-9]/.test(pwd)) return "Le mot de passe doit contenir au moins un chiffre.";
-  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd)) return "Le mot de passe doit contenir au moins un caractère spécial.";
+  if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(pwd)) return "Le mot de passe doit contenir au moins un caractère spécial.";
   return null;
 };
 
@@ -31,7 +31,6 @@ export default function Register() {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [pwdError, setPwdError] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -48,30 +47,32 @@ export default function Register() {
     setStep(2);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (step === 1) {
-      const pwdErr = validatePassword(formData.password);
-      if (pwdErr) return setError(pwdErr);
-      if (formData.password !== formData.confirmPassword) {
-        return setError("Les mots de passe ne correspondent pas.");
-      }
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (step === 1) {
+    const pwdErr = validatePassword(formData.password);
+    if (pwdErr) return setError(pwdErr);
+    if (formData.password !== formData.confirmPassword) {
+      return setError("Les mots de passe ne correspondent pas.");
     }
-    setError("");
-    setLoading(true);
-    try {
-      await register({ ...formData, role });
-      if (role === "pro") {
-        navigate("/inscription-en-attente");
-      } else {
-        navigate("/");
-      }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }
+  setError("");
+  setLoading(true);
+  try {
+    const data = await register({ ...formData, role });
+    navigate("/verification-email", {
+      state: {
+        email: data.email,
+        role,
+        emailWarning: data.emailWarning || null,
+      },
+    });
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10">
@@ -199,6 +200,7 @@ export default function Register() {
                   required
                   className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                 />
+                <PasswordStrength password={formData.password} />
               </div>
 
               <div>
@@ -349,7 +351,7 @@ function PasswordStrength({ password }) {
   const checks = [
     { ok: password.length >= 8, label: "8 caractères minimum" },
     { ok: /[0-9]/.test(password), label: "Au moins un chiffre" },
-    { ok: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password), label: "Au moins un caractère spécial" },
+    { ok: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password), label: "Au moins un caractère spécial" },
   ];
   const score = checks.filter(c => c.ok).length;
   const colors = ["bg-red-400", "bg-orange-400", "bg-yellow-400", "bg-green-500"];

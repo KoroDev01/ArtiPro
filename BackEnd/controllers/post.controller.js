@@ -1,5 +1,6 @@
 const Post = require("../database/models/post.model");
 const Offer = require("../database/models/offer.model");
+const { resolveUploadedFiles } = require("../config/upload.config");
 
 const handleError = (res, e) => res.status(400).json({ error: e.message });
 
@@ -7,13 +8,14 @@ exports.createPost = async (req, res) => {
   try {
     if (req.user.role !== "client")
       return res.status(403).json({ message: "Only clients can create posts" });
+    const photos = await resolveUploadedFiles(req.files, "posts");
     const post = await Post.create({
       title: req.body.title,
       description: req.body.description,
       category: req.body.category,
       budget: req.body.budget || undefined,
       location: req.body.city ? { city: req.body.city } : undefined,
-      photos: req.files ? req.files.map((f) => f.filename) : [],
+      photos,
       client: req.user._id,
     });
     res.status(201).json(post);

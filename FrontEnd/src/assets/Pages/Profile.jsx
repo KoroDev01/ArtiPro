@@ -4,6 +4,7 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { useAuth } from "../../context/AuthContext";
 import api, { API_BASE } from "../../api";
+import { imageUrl } from "../../utils/imageUrl";
 import { WILAYAS } from "../../data/wilaya";
 import {
   FiUser,
@@ -53,11 +54,6 @@ export default function Profile() {
 
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [avatarError, setAvatarError] = useState("");
-
-  useEffect(() => {
-    if (!user && profileData === null) {
-    }
-  }, [user]);
 
   useEffect(() => {
     if (!user) return;
@@ -203,7 +199,7 @@ export default function Profile() {
               <div className="relative mb-4">
                 {profileData.avatar ? (
                   <img
-                    src={`${API_BASE}${profileData.avatar}`}
+                    src={imageUrl(profileData.avatar, "avatars")}
                     alt={profileData.firstName}
                     className="w-24 h-24 rounded-2xl object-cover border-4 border-white shadow"
                   />

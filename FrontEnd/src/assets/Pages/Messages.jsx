@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Header from "../../components/Header";
 import { useAuth } from "../../context/AuthContext";
 import api, { API_BASE } from "../../api";
+import { imageUrl } from "../../utils/imageUrl";
 import EmptyState from "../../components/EmptyState";
 
 const POLL_INTERVAL = 4000;
@@ -69,7 +70,6 @@ export default function Messages() {
     if (!selectedConv) return;
 
     const postId = selectedConv.post?._id || selectedConv.post;
-    setMessages([]);
     fetchMessages(postId, false);
 
     pollRef.current = setInterval(() => {
@@ -96,7 +96,9 @@ export default function Messages() {
           }
           lastMsgCountRef.current[postId] = msgs.length;
         }
-      } catch {}
+      } catch {
+        /* ignore */
+      }
     }, 8000);
     return () => {
       clearInterval(pollRef.current);
@@ -140,7 +142,9 @@ export default function Messages() {
         ]);
         setContent("");
       }
-    } catch {}
+    } catch {
+      /* ignore */
+    }
     setSending(false);
   };
 
@@ -318,9 +322,7 @@ export default function Messages() {
                   const isMe = msg.sender?._id === user?._id;
                   const senderName =
                     `${msg.sender?.firstName || ""} ${msg.sender?.lastName || ""}`.trim();
-                  const avatarUrl = msg.sender?.avatar
-                    ? `${API_BASE}${msg.sender.avatar}`
-                    : null;
+                  const avatarUrl = imageUrl(msg.sender?.avatar, "avatars");
                   return (
                     <div
                       key={msg._id}
@@ -364,7 +366,7 @@ export default function Messages() {
                         <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold flex-shrink-0 overflow-hidden">
                           {user?.avatar ? (
                             <img
-                              src={`${API_BASE}${user.avatar}`}
+                              src={imageUrl(user.avatar, "avatars")}
                               alt="moi"
                               className="w-full h-full object-cover"
                             />

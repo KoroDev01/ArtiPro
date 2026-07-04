@@ -42,6 +42,7 @@ export default function AdminCategories() {
       const res = await api.get("/categories");
       setCategories(Array.isArray(res.data) ? res.data : []);
     } catch {
+      /* ignore */
     } finally {
       setLoading(false);
     }
@@ -105,6 +106,7 @@ export default function AdminCategories() {
       await api.delete(`/categories/${id}`);
       setCategories((prev) => prev.filter((c) => c._id !== id));
     } catch {
+      /* ignore */
     } finally {
       setDeleteId(null);
     }

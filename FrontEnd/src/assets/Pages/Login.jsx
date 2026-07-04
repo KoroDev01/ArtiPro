@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 import LoginImage from "../../assets/img/photo-1678803262992-d79d06dd5d96.jpeg";
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -73,6 +74,12 @@ export default function Login() {
               Connectez-vous pour continuer
             </p>
 
+            {location.state?.message && (
+              <div className="bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg px-4 py-3 mb-4">
+                {location.state.message}
+              </div>
+            )}
+
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 mb-4">
                 {error}
@@ -106,6 +113,14 @@ export default function Login() {
                   required
                   className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                 />
+              </div>
+
+              <div className="text-right">
+                <Link
+                  to="/mot-de-passe-oublie"
+                  className="text-xs text-blue-600 hover:underline">
+                  Mot de passe oublié ?
+                </Link>
               </div>
 
               <button

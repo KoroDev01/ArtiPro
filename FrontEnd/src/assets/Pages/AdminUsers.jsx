@@ -78,6 +78,7 @@ export default function AdminUsers() {
       );
       setBanTarget(null);
     } catch {
+      /* ignore */
     } finally {
       setBanning(false);
     }
@@ -89,7 +90,9 @@ export default function AdminUsers() {
       setUsers((prev) =>
         prev.map((u) => (u._id === userId ? res.data.user : u)),
       );
-    } catch {}
+    } catch {
+      /* ignore */
+    }
   };
 
   const handleVerify = async (userId) => {
@@ -99,7 +102,9 @@ export default function AdminUsers() {
         prev.map((u) => (u._id === userId ? res.data.user : u)),
       );
       if (selectedUser?._id === userId) setSelectedUser(res.data.user);
-    } catch {}
+    } catch {
+      /* ignore */
+    }
   };
 
   const handleUnverify = async (userId) => {
@@ -109,7 +114,9 @@ export default function AdminUsers() {
         prev.map((u) => (u._id === userId ? res.data.user : u)),
       );
       if (selectedUser?._id === userId) setSelectedUser(res.data.user);
-    } catch {}
+    } catch {
+      /* ignore */
+    }
   };
 
   const getBanLabel = (u) => {

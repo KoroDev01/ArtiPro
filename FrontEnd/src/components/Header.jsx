@@ -41,7 +41,8 @@ export default function Header() {
   const notifRef = useRef(null);
   const pollRef = useRef(null);
 
-  const unread = notifs.filter((n) => !n.read).length;
+  const displayNotifs = user ? notifs : [];
+  const unread = displayNotifs.filter((n) => !n.read).length;
 
   const fetchNotifs = () => {
     if (!user) return;
@@ -52,10 +53,7 @@ export default function Header() {
   };
 
   useEffect(() => {
-    if (!user) {
-      setNotifs([]);
-      return;
-    }
+    if (!user) return;
     fetchNotifs();
     if (user.role === "admin") {
       api
@@ -67,7 +65,7 @@ export default function Header() {
               .length,
           );
         })
-        .catch(() => {});
+        .catch(() => undefined);
     }
     pollRef.current = window.setInterval(fetchNotifs, 15000);
     return () => window.clearInterval(pollRef.current);
@@ -83,9 +81,7 @@ export default function Header() {
     return () => document.removeEventListener("click", handler);
   }, []);
 
-  useEffect(() => {
-    setMenuOpen(false);
-  }, [location.pathname]);
+  const closeMenu = () => setMenuOpen(false);
 
   const handleMarkAllRead = async () => {
     await api.put("/notifications/read-all").catch(() => {});
@@ -145,7 +141,26 @@ export default function Header() {
                 </Link>
                 {user.role === "admin" && (
                   <>
-                    
+                    <Link
+                      to="/admin/candidatures"
+                      className={navLinkCls("/admin/candidatures")}>
+                      Candidatures
+                      {pendingPros > 0 && (
+                        <span className="ml-1.5 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold bg-red-500 text-white rounded-full">
+                          {pendingPros}
+                        </span>
+                      )}
+                    </Link>
+                    <Link
+                      to="/admin/users"
+                      className={navLinkCls("/admin/users")}>
+                      Utilisateurs
+                    </Link>
+                    <Link
+                      to="/admin/categories"
+                      className={navLinkCls("/admin/categories")}>
+                      Catégories
+                    </Link>
                   </>
                 )}
               </>
@@ -172,7 +187,7 @@ export default function Header() {
                   </button>
                   {notifOpen && (
                     <NotifPanel
-                      notifs={notifs}
+                      notifs={displayNotifs}
                       onMarkAll={handleMarkAllRead}
                       onClickNotif={handleClickNotif}
                       onClose={() => setNotifOpen(false)}
@@ -240,20 +255,23 @@ export default function Header() {
               <MobileLink
                 to="/"
                 icon={<FiHome size={16} />}
-                active={isActive("/")}>
+                active={isActive("/")}
+                onNavigate={closeMenu}>
                 Accueil
               </MobileLink>
               <MobileLink
                 to="/find-artisan"
                 icon={<FiSearch size={16} />}
-                active={isActive("/find-artisan")}>
+                active={isActive("/find-artisan")}
+                onNavigate={closeMenu}>
                 Trouver un artisan
               </MobileLink>
               {user && (
                 <MobileLink
                   to="/demandes"
                   icon={<FiFileText size={16} />}
-                  active={isActive("/demandes")}>
+                  active={isActive("/demandes")}
+                  onNavigate={closeMenu}>
                   Demandes
                 </MobileLink>
               )}
@@ -278,24 +296,48 @@ export default function Header() {
                   <MobileLink
                     to="/messages"
                     icon={<FiMessageSquare size={16} />}
-                    active={isActive("/messages")}>
+                    active={isActive("/messages")}
+                    onNavigate={closeMenu}>
                     Messages
                   </MobileLink>
                   <MobileLink
                     to="/dashboard"
                     icon={<FiGrid size={16} />}
-                    active={isActive("/dashboard")}>
+                    active={isActive("/dashboard")}
+                    onNavigate={closeMenu}>
                     Dashboard
                   </MobileLink>
                   <MobileLink
                     to="/profile"
                     icon={<FiUser size={16} />}
-                    active={isActive("/profile")}>
+                    active={isActive("/profile")}
+                    onNavigate={closeMenu}>
                     Mon profil
                   </MobileLink>
                   {user.role === "admin" && (
                     <>
-                      
+                      <MobileLink
+                        to="/admin/candidatures"
+                        icon={<FiBriefcase size={16} />}
+                        active={isActive("/admin/candidatures")}
+                        onNavigate={closeMenu}>
+                        Candidatures
+                        {pendingPros > 0 ? ` (${pendingPros})` : ""}
+                      </MobileLink>
+                      <MobileLink
+                        to="/admin/users"
+                        icon={<FiUsers size={16} />}
+                        active={isActive("/admin/users")}
+                        onNavigate={closeMenu}>
+                        Utilisateurs
+                      </MobileLink>
+                      <MobileLink
+                        to="/admin/categories"
+                        icon={<FiTag size={16} />}
+                        active={isActive("/admin/categories")}
+                        onNavigate={closeMenu}>
+                        Catégories
+                      </MobileLink>
                     </>
                   )}
                   <div className="h-px bg-gray-100 mx-4 my-2" />
@@ -312,13 +354,15 @@ export default function Header() {
                   <MobileLink
                     to="/Login"
                     icon={<FiUser size={16} />}
-                    active={isActive("/Login")}>
+                    active={isActive("/Login")}
+                    onNavigate={closeMenu}>
                     Connexion
                   </MobileLink>
                   <MobileLink
                     to="/SignIn"
                     icon={<FiUser size={16} />}
-                    active={isActive("/SignIn")}>
+                    active={isActive("/SignIn")}
+                    onNavigate={closeMenu}>
                     Inscription
                   </MobileLink>
                 </>
@@ -331,10 +375,11 @@ export default function Header() {
   );
 }
 
-function MobileLink({ to, icon, active, children }) {
+function MobileLink({ to, icon, active, children, onNavigate }) {
   return (
     <Link
       to={to}
+      onClick={onNavigate}
       className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition ${
         active
           ? "text-blue-600 bg-blue-50"

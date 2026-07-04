@@ -4,6 +4,7 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { useAuth } from "../../context/AuthContext";
 import api, { API_BASE } from "../../api";
+import { imageUrl } from "../../utils/imageUrl";
 import {
   FiMapPin,
   FiStar,
@@ -78,16 +79,6 @@ export default function ArtisanProfile() {
   const handleBan = async () => {
     setBanning(true);
     try {
-      const durations = {
-        "30min": 30 * 60 * 1000,
-        "1day": 24 * 60 * 60 * 1000,
-        "1week": 7 * 24 * 60 * 60 * 1000,
-        "2weeks": 14 * 24 * 60 * 60 * 1000,
-      };
-      const banUntil =
-        banDuration === "permanent"
-          ? null
-          : new Date(Date.now() + durations[banDuration]);
       const res = await api.put(`/users/${id}/ban`, { duration: banDuration });
       setArtisan((prev) => ({
         ...prev,
@@ -96,7 +87,9 @@ export default function ArtisanProfile() {
       }));
       setBanSuccess("Compte suspendu avec succès.");
       setShowBanModal(false);
-    } catch {}
+    } catch {
+      /* ignore */
+    }
     setBanning(false);
   };
 
@@ -105,7 +98,9 @@ export default function ArtisanProfile() {
       await api.put(`/users/${id}/unban`);
       setArtisan((prev) => ({ ...prev, isBlocked: false, banUntil: null }));
       setBanSuccess("Compte réactivé.");
-    } catch {}
+    } catch {
+      /* ignore */
+    }
   };
 
   if (loading)
@@ -163,7 +158,7 @@ export default function ArtisanProfile() {
                 <div className="flex flex-col sm:flex-row sm:items-end gap-4 mb-4">
                   {artisan.avatar ? (
                     <img
-                      src={`${API_BASE}${artisan.avatar}`}
+                      src={imageUrl(artisan.avatar, "avatars")}
                       alt={artisan.firstName}
                       className="w-24 h-24 rounded-xl object-cover border-4 border-white shadow"
                     />

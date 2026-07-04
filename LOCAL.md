@@ -98,3 +98,17 @@ Créez des comptes via **Inscription** (`/SignIn`) :
 
 - Le backend doit tourner sur `http://localhost:3000`
 - Dossiers : `BackEnd/public/images/avatars/` et `.../posts/`
+
+**Erreur email à l'inscription (`525 Unauthorized IP`, etc.)**
+
+Brevo n'autorise pas l'envoi SMTP depuis votre IP locale. Solutions :
+
+1. **Recommandé en local** — ajoutez dans `BackEnd/.env` :
+   ```env
+   MAIL_DEV_LOG=true
+   ```
+   Le code de vérification s'affiche dans le terminal backend (pas d'email réel).
+
+2. **Sans cette variable** — si SMTP échoue en local, le compte est quand même créé et le code est affiché automatiquement dans le terminal backend.
+
+3. **Production** — sur [brevo.com](https://app.brevo.com) → *SMTP & API* → autorisez l'IP du serveur (Railway, etc.).

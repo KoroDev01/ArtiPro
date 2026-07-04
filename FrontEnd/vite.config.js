@@ -18,6 +18,7 @@ export default defineConfig({
       "/pros": "http://localhost:3000",
       "/pro": "http://localhost:3000",
       "/notifications": "http://localhost:3000",
+      "/contact": "http://localhost:3000",
       "/images": "http://localhost:3000",
     },
   },

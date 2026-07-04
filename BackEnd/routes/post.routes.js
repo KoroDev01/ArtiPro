@@ -10,7 +10,7 @@ const {
   isAuthenticated,
   isNotBanned,
 } = require("../config/security.config");
-const { uploadPost } = require("../config/multer.config");
+const { uploadPost } = require("../config/upload.config");
 
 router.put(
   "/:postId/complete",
@@ -18,13 +18,7 @@ router.put(
   isNotBanned,
   completePost,
 );
-router.post(
-  "/",
-  isAuthenticated,
-  isNotBanned,
-  uploadPost.array("photos", 3),
-  createPost,
-);
+router.post("/", isAuthenticated, isNotBanned, uploadPost, createPost);
 router.get("/list", getPostList);
 router.get("/:postId", getPostById);
 router.delete("/:postId", isAuthenticated, isNotBanned, deletePost);

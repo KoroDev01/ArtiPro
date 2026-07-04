@@ -63,6 +63,18 @@ export default function Footer() {
             </div>
             <div>
               <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
+                Support
+              </h3>
+              <ul className="space-y-2 text-sm text-gray-300">
+                <li>
+                  <Link to="/contact" className="hover:text-white transition">
+                    Nous contacter
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
                 Légal
               </h3>
               <ul className="space-y-2 text-sm text-gray-300">

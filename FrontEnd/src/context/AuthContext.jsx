@@ -91,10 +91,33 @@ export function AuthProvider({ children }) {
         data.error || data.message || "Erreur lors de l'inscription.",
       );
 
-    if (data.user && formData.role !== "pro") {
-      setUser(data.user);
-    }
+    return data;
+  };
 
+  const verifyEmail = async (email, code) => {
+    const { res, data } = await safeFetch(`${API_BASE}/auth/verify-email`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, code }),
+    });
+
+    if (!res.ok)
+      throw new Error(data.error || data.message || "Code invalide.");
+    if (data.user) setUser(data.user);
+    return data;
+  };
+
+  const resendCode = async (email) => {
+    const { res, data } = await safeFetch(`${API_BASE}/auth/resend-code`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!res.ok)
+      throw new Error(
+        data.error || data.message || "Erreur lors de l'envoi du code.",
+      );
     return data;
   };
 
@@ -104,12 +127,14 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider
+      value={{ user, loading, login, register, logout, verifyEmail, resendCode }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("useAuth hors AuthProvider");

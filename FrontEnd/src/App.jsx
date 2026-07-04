@@ -12,6 +12,7 @@ import Profile from "./assets/Pages/Profile.jsx";
 import Dashboard from "./assets/Pages/Dashboard.jsx";
 import NotFound from "./assets/Pages/NotFound.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import AdminRoute from "./components/AdminRoute.jsx";
 import AdminCategories from "./assets/Pages/AdminCategories.jsx";
 import AdminUsers from "./assets/Pages/AdminUsers.jsx";
 import AdminCandidatures from "./assets/Pages/AdminCandidatures.jsx";
@@ -20,7 +21,10 @@ import BannedPage from "./assets/Pages/BannedPage.jsx";
 import CGU from "./assets/Pages/CGU.jsx";
 import MentionsLegales from "./assets/Pages/MentionsLegales.jsx";
 import Confidentialite from "./assets/Pages/Confidentialite.jsx";
-
+import VerifyEmail from "./assets/Pages/VerifyEmail.jsx";
+import ForgotPassword from "./assets/Pages/ForgotPassword.jsx";
+import ResetPassword from "./assets/Pages/ResetPassword.jsx";
+import Contact from "./assets/Pages/Contact.jsx";
 function App() {
   return (
     <>
@@ -29,8 +33,11 @@ function App() {
         <Route path="/find-artisan" element={<Artisant />} />
         <Route path="/artisan/:id" element={<ProfileArtisants />} />
         <Route path="/Login" element={<Login />} />
+        <Route path="/mot-de-passe-oublie" element={<ForgotPassword />} />
+        <Route path="/reinitialiser-mot-de-passe" element={<ResetPassword />} />
         <Route path="/SignIn" element={<SignIn />} />
-
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/verification-email" element={<VerifyEmail />} />
         <Route
           path="/demandes"
           element={
@@ -75,26 +82,26 @@ function App() {
         <Route
           path="/admin/categories"
           element={
-            <ProtectedRoute>
+            <AdminRoute>
               <AdminCategories />
-            </ProtectedRoute>
+            </AdminRoute>
           }
         />
         <Route
           path="/admin/users"
           element={
-            <ProtectedRoute>
+            <AdminRoute>
               <AdminUsers />
-            </ProtectedRoute>
+            </AdminRoute>
           }
         />
 
         <Route
           path="/admin/candidatures"
           element={
-            <ProtectedRoute>
+            <AdminRoute>
               <AdminCandidatures />
-            </ProtectedRoute>
+            </AdminRoute>
           }
         />
         <Route path="/inscription-en-attente" element={<PendingApproval />} />

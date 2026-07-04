@@ -23,18 +23,14 @@ const {
   isAdmin,
   hasRole,
 } = require("../config/security.config");
-const { uploadAvatar } = require("../config/multer.config");
+const { uploadAvatar } = require("../config/upload.config");
+const { registerLimiter } = require("../config/rateLimit.config");
 
-router.post("/createUser", userCreate);
+router.post("/createUser", registerLimiter, userCreate);
 router.get("/pros/search", searchPros);
 router.get("/me", isAuthenticated, getCurrentUser);
 router.put("/me", isAuthenticated, isNotBanned, updateProfile);
-router.post(
-  "/me/avatar",
-  isAuthenticated,
-  uploadAvatar.single("avatar"),
-  updateAvatar,
-);
+router.post("/me/avatar", isAuthenticated, uploadAvatar, updateAvatar);
 router.get("/users", isAuthenticated, isAdmin, getAllUsers);
 router.get("/pro/:proId", getProById);
 router.put(

@@ -73,7 +73,9 @@ export default function AdminCandidatures() {
     try {
       const res = await api.put(`/users/${proId}/approve`);
       setPros((prev) => prev.map((p) => (p._id === proId ? res.data.user : p)));
-    } catch {}
+    } catch {
+      /* ignore */
+    }
     setProcessing(false);
   };
 
@@ -82,7 +84,9 @@ export default function AdminCandidatures() {
       const res = await api.put(`/users/${proId}/verify`);
       setPros((prev) => prev.map((p) => (p._id === proId ? res.data.user : p)));
       if (selectedPro?._id === proId) setSelectedPro(res.data.user);
-    } catch {}
+    } catch {
+      /* ignore */
+    }
   };
 
   const handleUnverify = async (proId) => {
@@ -90,7 +94,9 @@ export default function AdminCandidatures() {
       const res = await api.put(`/users/${proId}/unverify`);
       setPros((prev) => prev.map((p) => (p._id === proId ? res.data.user : p)));
       if (selectedPro?._id === proId) setSelectedPro(res.data.user);
-    } catch {}
+    } catch {
+      /* ignore */
+    }
   };
 
   const handleReject = async () => {
@@ -105,7 +111,9 @@ export default function AdminCandidatures() {
       );
       setRejectTarget(null);
       setReason("");
-    } catch {}
+    } catch {
+      /* ignore */
+    }
     setProcessing(false);
   };
 

@@ -68,6 +68,18 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    emailVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verificationCode: {
+      type: String,
+      select: false,
+    },
+    verificationCodeExpires: {
+      type: Date,
+      select: false,
+    },
     isBlocked: {
       type: Boolean,
       default: false,
@@ -81,6 +93,8 @@ const userSchema = new Schema(
     },
     proRejectionReason: { type: String, default: null },
     banUntil: { type: Date, default: null },
+    resetPasswordToken: { type: String, select: false },
+    resetPasswordExpires: { type: Date, select: false },
   },
   { timestamps: true },
 );

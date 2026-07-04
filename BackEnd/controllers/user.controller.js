@@ -1,4 +1,9 @@
-const { createUserQuerie } = require("../queries/user.queries.js");
+const {
+  createUserQuerie,
+  generateAndSetVerificationCode,
+} = require("../queries/user.queries.js");
+const { sendVerificationEmail } = require("../config/mailer.config.js");
+const { resolveUploadedFile } = require("../config/upload.config.js");
 const User = require("../database/models/user.model");
 
 const handleError = (res, e) => res.status(400).json({ error: e.message });
@@ -9,11 +14,35 @@ const updateUser = (id, data) =>
 exports.userCreate = async (req, res, next) => {
   try {
     const user = await createUserQuerie(req.body);
-    req.login(user, (err) =>
-      err
-        ? next(err)
-        : res.status(201).json({ message: "User created successfully", user }),
-    );
+    const code = await generateAndSetVerificationCode(user);
+
+    let emailSent = true;
+    let emailWarning = null;
+    try {
+      const result = await sendVerificationEmail(
+        user.email,
+        code,
+        user.firstName,
+      );
+      if (result?.dev && result?.fallback) {
+        emailWarning =
+          "L'email n'a pas pu être envoyé (SMTP indisponible). Consultez le terminal du backend pour le code de vérification.";
+      }
+    } catch (mailErr) {
+      emailSent = false;
+      emailWarning = mailErr.message;
+      console.error("[mail] Échec envoi vérification:", mailErr.message);
+    }
+
+    res.status(201).json({
+      message: emailSent
+        ? "Compte créé. Vérifiez votre email pour l'activer."
+        : "Compte créé, mais l'email de vérification n'a pas pu être envoyé.",
+      email: user.email,
+      requiresVerification: true,
+      emailSent,
+      ...(emailWarning && { emailWarning }),
+    });
   } catch (e) {
     handleError(res, e);
   }
@@ -112,8 +141,9 @@ exports.updateProfile = async (req, res) => {
 exports.updateAvatar = async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+    const avatar = await resolveUploadedFile(req.file, "avatars");
     const user = await User.findById(req.user._id);
-    user.avatar = `/images/avatars/${req.file.filename}`;
+    user.avatar = avatar;
     await user.save();
     res.json({
       message: "Avatar updated",
@@ -168,7 +198,9 @@ exports.banUser = async (req, res) => {
     };
     const { duration } = req.body;
     if (!duration || (duration !== "permanent" && !durations[duration])) {
-      return res.status(400).json({ message: "Durée de bannissement invalide." });
+      return res
+        .status(400)
+        .json({ message: "Durée de bannissement invalide." });
     }
     const banUntil =
       duration === "permanent"

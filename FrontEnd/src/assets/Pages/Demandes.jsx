@@ -7,6 +7,7 @@ import { useToast } from "../../context/ToastContext";
 import EmptyState from "../../components/EmptyState";
 import { WILAYAS } from "../../data/wilaya";
 import api, { API_BASE } from "../../api";
+import { imageUrl } from "../../utils/imageUrl";
 
 const STATUS_LABELS = {
   open: { label: "Ouvert", cls: "bg-green-100 text-green-700" },
@@ -26,6 +27,7 @@ export default function JobRequests() {
   const [tab, setTab] = useState("active");
   const [filterCategory, setFilterCategory] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
+  const [filterCity, setFilterCity] = useState("");
 
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
@@ -56,6 +58,7 @@ export default function JobRequests() {
     if (p.status === "completed") return false;
     if (filterCategory && p.category?._id !== filterCategory) return false;
     if (filterStatus && p.status !== filterStatus) return false;
+    if (filterCity && p.location?.city !== filterCity) return false;
     return true;
   });
 
@@ -194,6 +197,17 @@ export default function JobRequests() {
                 ))}
               </select>
               <select
+                value={filterCity}
+                onChange={(e) => setFilterCity(e.target.value)}
+                className="w-full md:w-auto border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Toutes les wilayas</option>
+                {WILAYAS.map((w) => (
+                  <option key={w} value={w}>
+                    {w}
+                  </option>
+                ))}
+              </select>
+              <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
                 className="w-full md:w-auto border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -250,7 +264,7 @@ export default function JobRequests() {
                       {post.photos.map((photo, i) => (
                         <img
                           key={i}
-                          src={`${API_BASE}/images/posts/${photo}`}
+                          src={imageUrl(photo, "posts")}
                           alt="photo"
                           className="w-24 h-20 object-cover rounded-lg flex-shrink-0"
                         />

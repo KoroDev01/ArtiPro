@@ -6,7 +6,7 @@ const steps = [
     icon: "🔍",
     title: "Recherchez",
     description:
-      "Trouvez des artisans qualifiés par spécialité et par wilaya près de chez vous.",
+      "Explorez le site et découvrez les artisans qualifiés près de chez vous.",
     color: "bg-blue-50 border-blue-200",
     numberColor: "text-blue-600",
   },

@@ -5,6 +5,7 @@ import Footer from "../../components/Footer";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
 import api, { API_BASE } from "../../api";
+import { imageUrl } from "../../utils/imageUrl";
 
 const STATUS_LABELS = {
   open: { label: "Ouvert", cls: "bg-green-100 text-green-700" },
@@ -196,7 +197,7 @@ export default function JobDetails() {
                     {post.photos.map((photo, i) => (
                       <img
                         key={i}
-                        src={`${API_BASE}/images/posts/${photo}`}
+                        src={imageUrl(photo, "posts")}
                         alt="photo"
                         className="w-32 h-24 object-cover rounded-lg flex-shrink-0"
                       />

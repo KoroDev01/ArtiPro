@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import api, { API_BASE } from "../../api";
+import { imageUrl } from "../../utils/imageUrl";
 import EmptyState from "../../components/EmptyState";
 import { WILAYAS } from "../../data/wilaya";
 import {
@@ -57,8 +58,10 @@ export default function Artisant() {
   };
 
   useEffect(() => {
-    setSelectedCity(searchParams.get("city") || "");
-    setSelectedCat(searchParams.get("category") || "");
+    const city = searchParams.get("city") || "";
+    const cat = searchParams.get("category") || "";
+    setSelectedCity(city);
+    setSelectedCat(cat);
   }, [searchParams]);
 
   useEffect(() => {
@@ -302,7 +305,7 @@ export default function Artisant() {
                     <div className="flex-shrink-0">
                       {artisan.avatar ? (
                         <img
-                          src={`${API_BASE}${artisan.avatar}`}
+                          src={imageUrl(artisan.avatar, "avatars")}
                           alt={artisan.firstName}
                           className="w-20 h-20 rounded-2xl object-cover border-2 border-blue-100"
                         />
