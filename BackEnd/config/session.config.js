@@ -23,7 +23,7 @@ app.use(
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     },
     store: MongoStore.create({
-      mongoUrl: process.env.MONGO_URI || "mongodb://localhost:27017/ArtiPro",
+      client: require("mongoose").connection.getClient(),
       ttl: 60 * 60 * 24 * 14,
     }),
   }),
