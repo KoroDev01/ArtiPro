@@ -35,7 +35,7 @@ const STATUS_LABELS = {
 };
 
 export default function Profile() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
 
@@ -158,6 +158,7 @@ export default function Profile() {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setProfileData((prev) => ({ ...prev, avatar: res.data.user.avatar }));
+      updateUser({ avatar: res.data.user.avatar });
     } catch {
       setAvatarError("Impossible de mettre à jour la photo.");
     } finally {

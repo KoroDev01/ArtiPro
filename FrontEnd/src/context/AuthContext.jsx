@@ -150,9 +150,22 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  const updateUser = (patch) => {
+    setUser((prev) => (prev ? { ...prev, ...patch } : prev));
+  };
+
   return (
     <AuthContext.Provider
-      value={{ user, loading, login, register, logout, verifyEmail, resendCode }}>
+      value={{
+        user,
+        loading,
+        login,
+        register,
+        logout,
+        verifyEmail,
+        resendCode,
+        updateUser,
+      }}>
       {children}
     </AuthContext.Provider>
   );
