@@ -20,7 +20,10 @@ exports.getOffersByPost = async (req, res) => {
     const offers = await Offer.find({
       post: req.params.postId,
     })
-      .populate("pro", "firstName lastName ratingAverage")
+      .populate(
+        "pro",
+        "firstName lastName avatar companyName ratingAverage ratingCount isVerified experienceYears location",
+      )
       .sort({ createdAt: -1 });
 
     res.json(offers);
@@ -151,7 +154,10 @@ exports.getMyOffers = async (req, res) => {
 
     const offers = await Offer.find(filter)
       .populate("post", "title status")
-      .populate("pro", "firstName lastName ratingAverage")
+      .populate(
+        "pro",
+        "firstName lastName avatar companyName ratingAverage ratingCount isVerified experienceYears location",
+      )
       .populate("client", "firstName lastName")
       .sort({ createdAt: -1 });
 

@@ -8,6 +8,7 @@ import { useToast } from "../../context/ToastContext";
 import api from "../../api";
 import { imageUrl } from "../../utils/imageUrl";
 import UserAvatar from "../../components/UserAvatar";
+import { FiCheckCircle, FiExternalLink, FiImage } from "react-icons/fi";
 
 const STATUS_LABELS = {
   open: { label: "Ouvert", cls: "bg-green-500/20 text-green-400" },
@@ -20,6 +21,59 @@ const OFFER_STATUS = {
   accepted: { label: "Acceptée", cls: "bg-green-500/20 text-green-400" },
   rejected: { label: "Refusée", cls: "bg-zinc-500/20 text-zinc-400" },
 };
+
+function OfferArtisanPreview({ pro }) {
+  const proId = pro?._id ?? pro;
+  if (!proId) return null;
+
+  return (
+    <div className="mb-4 flex gap-3 border-b border-white/10 pb-4">
+      <Link to={`/artisan/${proId}`} className="flex-shrink-0">
+        <UserAvatar user={pro} size="md" />
+      </Link>
+      <div className="min-w-0 flex-1">
+        <Link
+          to={`/artisan/${proId}`}
+          className="font-medium text-white transition hover:text-blue-400">
+          {pro.firstName} {pro.lastName}
+        </Link>
+        {pro.companyName && (
+          <p className="truncate text-xs text-zinc-500">{pro.companyName}</p>
+        )}
+        <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-400">
+          {(pro.ratingAverage ?? 0) > 0 && (
+            <span className="text-yellow-400">
+              ★ {pro.ratingAverage.toFixed(1)} ({pro.ratingCount ?? 0} avis)
+            </span>
+          )}
+          {pro.isVerified && (
+            <span className="inline-flex items-center gap-1 text-green-400">
+              <FiCheckCircle size={12} /> Vérifié
+            </span>
+          )}
+          {pro.experienceYears > 0 && (
+            <span>{pro.experienceYears} ans d&apos;exp.</span>
+          )}
+          {pro.location?.city && <span>{pro.location.city}</span>}
+        </div>
+      </div>
+      <div className="flex flex-shrink-0 flex-col gap-2 sm:flex-row sm:items-center">
+        <Link
+          to={`/artisan/${proId}`}
+          className="btn-secondary inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs">
+          <FiExternalLink size={13} />
+          Profil
+        </Link>
+        <Link
+          to={`/showroom?artisan=${proId}`}
+          className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-blue-500/30 bg-blue-500/10 px-3 py-1.5 text-xs font-medium text-blue-400 transition hover:bg-blue-500/20">
+          <FiImage size={13} />
+          Réalisations
+        </Link>
+      </div>
+    </div>
+  );
+}
 
 export default function JobDetails() {
   const { id } = useParams();
@@ -416,17 +470,10 @@ export default function JobDetails() {
                         <div
                           key={offer._id}
                           className="border border-white/10 rounded-lg p-4">
+                          <OfferArtisanPreview pro={offer.pro} />
                           <div className="flex justify-between items-start gap-4">
                             <div>
-                              <p className="font-medium text-white">
-                                {offer.pro?.firstName} {offer.pro?.lastName}
-                                {offer.pro?.ratingAverage > 0 && (
-                                  <span className="text-yellow-400 text-sm ml-2">
-                                    ★ {offer.pro.ratingAverage.toFixed(1)}
-                                  </span>
-                                )}
-                              </p>
-                              <p className="text-lg font-semibold text-blue-400 mt-1">
+                              <p className="text-lg font-semibold text-blue-400">
                                 {offer.price?.toLocaleString()} DZD
                               </p>
                               <p className="text-sm text-zinc-400 mt-2">
@@ -434,7 +481,7 @@ export default function JobDetails() {
                               </p>
                             </div>
                             <span
-                              className={`text-xs px-3 py-1 rounded-full font-medium ${offerStatus.cls}`}>
+                              className={`text-xs px-3 py-1 rounded-full font-medium flex-shrink-0 ${offerStatus.cls}`}>
                               {offerStatus.label}
                             </span>
                           </div>
@@ -447,13 +494,6 @@ export default function JobDetails() {
                                 Accepter cette offre
                               </button>
                             )}
-                          {offer.status === "accepted" && (
-                            <Link
-                              to={`/artisan/${offer.pro?._id ?? offer.pro}`}
-                              className="link-accent inline-block mt-3">
-                              Voir le profil de l'artisan →
-                            </Link>
-                          )}
                         </div>
                       );
                     })}

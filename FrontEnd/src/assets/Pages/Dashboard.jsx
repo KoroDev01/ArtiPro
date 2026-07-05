@@ -204,26 +204,47 @@ function ClientDashboard({ user }) {
           <div className="divide-y divide-white/10">
             {offers.slice(0, 5).map((offer) => {
               const s = OFFER_STATUS[offer.status] ?? OFFER_STATUS.pending;
+              const proId = offer.pro?._id ?? offer.pro;
               return (
-                <Link
+                <div
                   key={offer._id}
-                  to={`/demandes/${offer.post?._id?.toString() || offer.post?.toString()}`}
-                  className="flex items-center justify-between py-4 px-2 hover:bg-white/5 rounded-xl transition group">
-                  <div className="flex items-center gap-3 min-w-0">
+                  className="flex items-center justify-between gap-3 py-4 px-2 hover:bg-white/5 rounded-xl transition group">
+                  <Link
+                    to={`/demandes/${offer.post?._id?.toString() || offer.post?.toString()}`}
+                    className="flex min-w-0 flex-1 items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs font-bold flex-shrink-0">
                       {offer.pro?.firstName?.[0]?.toUpperCase() || "?"}
                     </div>
                     <div className="min-w-0">
                       <p className="font-medium text-sm truncate text-white">
-                        {offer.pro?.firstName} —{" "}
+                        {offer.pro?.firstName} {offer.pro?.lastName} —{" "}
                         {offer.post?.title || "Demande"}
                       </p>
                       <p className="text-xs text-zinc-500 mt-0.5 truncate">
                         {offer.message?.slice(0, 60)}…
+                        {(offer.pro?.ratingAverage ?? 0) > 0 && (
+                          <span className="ml-2 text-yellow-400">
+                            ★ {offer.pro.ratingAverage.toFixed(1)}
+                          </span>
+                        )}
                       </p>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2 ml-4 flex-shrink-0">
+                  </Link>
+                  <div className="flex items-center gap-2 ml-2 flex-shrink-0">
+                    {proId && (
+                      <>
+                        <Link
+                          to={`/artisan/${proId}`}
+                          className="hidden sm:inline-flex btn-secondary px-2.5 py-1 text-xs">
+                          Profil
+                        </Link>
+                        <Link
+                          to={`/showroom?artisan=${proId}`}
+                          className="hidden sm:inline-flex text-xs font-medium text-blue-400 hover:underline">
+                          Réalisations
+                        </Link>
+                      </>
+                    )}
                     <span className="text-sm font-bold text-blue-400">
                       {offer.price?.toLocaleString()} DZD
                     </span>
@@ -236,7 +257,7 @@ function ClientDashboard({ user }) {
                       className="text-zinc-600 group-hover:text-blue-400 transition"
                     />
                   </div>
-                </Link>
+                </div>
               );
             })}
           </div>
