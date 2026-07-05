@@ -20,6 +20,7 @@ import {
 
 const NOTIF_ICONS = {
   new_offer: "📬",
+  new_post: "📋",
   offer_accepted: "✅",
   offer_rejected: "❌",
   post_completed: "🏁",

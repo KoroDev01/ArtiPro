@@ -17,6 +17,7 @@ const notificationSchema = new Schema(
         "post_completed",
         "new_review",
         "new_message",
+        "new_post",
       ],
       required: true,
     },

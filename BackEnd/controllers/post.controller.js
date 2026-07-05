@@ -1,6 +1,9 @@
 const Post = require("../database/models/post.model");
 const Offer = require("../database/models/offer.model");
+const User = require("../database/models/user.model");
+const Category = require("../database/models/job_category.model");
 const { resolveUploadedFiles } = require("../config/upload.config");
+const { createNotification } = require("./notification.controller");
 
 const handleError = (res, e) => res.status(400).json({ error: e.message });
 
@@ -18,6 +21,33 @@ exports.createPost = async (req, res) => {
       photos,
       client: req.user._id,
     });
+
+    if (post.category) {
+      const [pros, categoryDoc] = await Promise.all([
+        User.find({
+          role: "pro",
+          proStatus: "approved",
+          isBlocked: false,
+          categories: post.category,
+        }).select("_id"),
+        Category.findById(post.category).select("name"),
+      ]);
+
+      const categoryName = categoryDoc?.name || "votre métier";
+      const postLink = `/demandes/${post._id}`;
+
+      await Promise.all(
+        pros.map((pro) =>
+          createNotification({
+            recipient: pro._id,
+            type: "new_post",
+            message: `Nouvelle demande « ${post.title} » — ${categoryName}`,
+            link: postLink,
+          }),
+        ),
+      );
+    }
+
     res.status(201).json(post);
   } catch (e) {
     handleError(res, e);
