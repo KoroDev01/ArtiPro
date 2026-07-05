@@ -7,6 +7,7 @@ const {
   getAllUsers,
   getCurrentUser,
   getProById,
+  getProApprovalStatus,
   recordProfileView,
   updateProfile,
   updateAvatar,
@@ -25,11 +26,12 @@ const {
   hasRole,
 } = require("../config/security.config");
 const { uploadAvatar } = require("../config/upload.config");
-const { registerLimiter } = require("../config/rateLimit.config");
+const { registerLimiter, authLimiter } = require("../config/rateLimit.config");
 const { resolveUserFromToken } = require("../middleware/auth.middleware");
 
 router.post("/createUser", registerLimiter, userCreate);
 router.get("/pros/search", searchPros);
+router.get("/pros/approval-status", authLimiter, getProApprovalStatus);
 router.get("/me", isAuthenticated, getCurrentUser);
 router.put("/me", isAuthenticated, isNotBanned, updateProfile);
 router.post("/me/avatar", isAuthenticated, uploadAvatar, updateAvatar);

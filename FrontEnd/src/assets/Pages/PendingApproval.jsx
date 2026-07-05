@@ -1,16 +1,58 @@
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import api from "../../api";
+
+const POLL_MS = 15000;
 
 export default function PendingApproval() {
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const state = location.state ?? {};
 
-  const proStatus = user?.proStatus ?? state.proStatus;
-  const proRejectionReason =
-    user?.proRejectionReason ?? state.proRejectionReason;
+  const email = user?.email ?? state.email ?? "";
+  const [proStatus, setProStatus] = useState(
+    user?.proStatus ?? state.proStatus ?? "pending",
+  );
+  const [proRejectionReason, setProRejectionReason] = useState(
+    user?.proRejectionReason ?? state.proRejectionReason ?? null,
+  );
+
   const isRejected = proStatus === "rejected";
+
+  useEffect(() => {
+    if (!email || proStatus === "approved") return;
+
+    const checkApproval = async () => {
+      try {
+        const res = await api.get("/pros/approval-status", {
+          params: { email },
+        });
+        const status = res.data.proStatus;
+
+        if (status === "approved") {
+          if (user) updateUser({ proStatus: "approved" });
+          navigate("/", {
+            replace: true,
+            state: { proApproved: true },
+          });
+          return;
+        }
+
+        if (status === "rejected") {
+          setProStatus("rejected");
+          setProRejectionReason(res.data.proRejectionReason || null);
+        }
+      } catch {
+        /* ignore polling errors */
+      }
+    };
+
+    checkApproval();
+    const timer = window.setInterval(checkApproval, POLL_MS);
+    return () => window.clearInterval(timer);
+  }, [email, proStatus, user, updateUser, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-10">
@@ -59,6 +101,10 @@ export default function PendingApproval() {
               Votre dossier a bien été reçu. Notre équipe va l'examiner et vous
               recevrez une confirmation sous{" "}
               <span className="font-medium text-zinc-300">48h</span>.
+            </p>
+            <p className="text-xs text-zinc-500 mb-6">
+              Cette page se met à jour automatiquement — vous serez redirigé
+              dès que votre compte sera validé.
             </p>
 
             <button

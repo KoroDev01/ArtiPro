@@ -79,6 +79,26 @@ exports.getProById = async (req, res) => {
   }
 };
 
+exports.getProApprovalStatus = async (req, res) => {
+  try {
+    const email = req.query.email?.trim().toLowerCase();
+    if (!email) return res.status(400).json({ message: "Email requis." });
+
+    const user = await User.findOne({ email, role: "pro" }).select(
+      "proStatus proRejectionReason emailVerified",
+    );
+    if (!user) return res.status(404).json({ message: "Compte introuvable." });
+
+    res.json({
+      proStatus: user.proStatus,
+      proRejectionReason: user.proRejectionReason || null,
+      emailVerified: user.emailVerified,
+    });
+  } catch (e) {
+    handleError(res, e);
+  }
+};
+
 exports.recordProfileView = async (req, res) => {
   try {
     const { proId } = req.params;
