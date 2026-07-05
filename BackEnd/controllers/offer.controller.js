@@ -46,6 +46,10 @@ exports.acceptOffer = async (req, res) => {
       });
     }
 
+    if (offer.status !== "pending") {
+      return res.status(400).json({ message: "Cette offre n'est plus en attente." });
+    }
+
     offer.status = "accepted";
     await offer.save();
 
@@ -71,6 +75,49 @@ exports.acceptOffer = async (req, res) => {
       type: "offer_accepted",
       message: `Votre offre a été acceptée !`,
       link: `/demandes/${offer.post.toString()}`,
+    });
+  } catch (e) {
+    res.status(400).json({ error: e.message });
+  }
+};
+
+exports.rejectOffer = async (req, res) => {
+  try {
+    const offer = await Offer.findById(req.params.offerId).populate(
+      "post",
+      "title status",
+    );
+
+    if (!offer) {
+      return res.status(404).json({ message: "Offer not found" });
+    }
+
+    if (offer.client.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        message: "You are not allowed to reject this offer",
+      });
+    }
+
+    if (offer.status !== "pending") {
+      return res.status(400).json({ message: "Cette offre n'est plus en attente." });
+    }
+
+    if (offer.post?.status !== "open") {
+      return res.status(400).json({
+        message: "Impossible de rejeter une offre pour cette demande.",
+      });
+    }
+
+    offer.status = "rejected";
+    await offer.save();
+
+    res.json({ message: "Offer rejected.", offer });
+
+    await createNotification({
+      recipient: offer.pro,
+      type: "offer_rejected",
+      message: `Votre offre pour "${offer.post?.title || "une demande"}" a été refusée.`,
+      link: `/demandes/${offer.post._id.toString()}`,
     });
   } catch (e) {
     res.status(400).json({ error: e.message });

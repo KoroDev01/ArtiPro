@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import api from "../api";
 import { imageUrl } from "../utils/imageUrl";
 import UserAvatar from "./UserAvatar";
+import PhotoPicker from "./PhotoPicker";
 import { PostDetailModal } from "./PortfolioFeed";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -157,10 +158,22 @@ function ArtisanSearch({
   );
 }
 
-export default function ShowroomGallery() {
+export default function ShowroomGallery({
+  publishOpen = false,
+  setPublishOpen,
+  publishRef,
+}) {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const proParam = searchParams.get("artisan");
+
+  const canPost =
+    user?.role === "pro" && user?.proStatus === "approved";
+
+  const [caption, setCaption] = useState("");
+  const [photos, setPhotos] = useState([]);
+  const [publishing, setPublishing] = useState(false);
+  const [publishError, setPublishError] = useState("");
 
   const [selectedPro, setSelectedPro] = useState(null);
   const [proLoading, setProLoading] = useState(false);
@@ -275,8 +288,79 @@ export default function ShowroomGallery() {
     }
   };
 
+  const handlePublish = async (e) => {
+    e.preventDefault();
+    if (!caption.trim()) return;
+    setPublishing(true);
+    setPublishError("");
+    try {
+      const body = new FormData();
+      body.append("caption", caption.trim());
+      photos.forEach((f) => body.append("photos", f));
+      const res = await api.post("/portfolio", body, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setPosts((prev) => [res.data, ...prev]);
+      setCaption("");
+      setPhotos([]);
+      setPublishOpen?.(false);
+    } catch (err) {
+      setPublishError(
+        err.response?.data?.error ||
+          err.response?.data?.message ||
+          "Publication impossible.",
+      );
+    } finally {
+      setPublishing(false);
+    }
+  };
+
   return (
     <div className="space-y-8">
+      {publishOpen && canPost && (
+        <form
+          ref={publishRef}
+          onSubmit={handlePublish}
+          className="dark-card space-y-3 rounded-2xl p-4 sm:p-5">
+          <h3 className="text-sm font-semibold text-white">
+            Publier une réalisation
+          </h3>
+          {publishError && (
+            <p className="alert-error !py-2 text-xs text-red-300">
+              {publishError}
+            </p>
+          )}
+          <textarea
+            value={caption}
+            onChange={(e) => setCaption(e.target.value)}
+            placeholder="Décrivez ce travail réalisé..."
+            rows={3}
+            maxLength={2000}
+            className="input-field resize-none"
+          />
+          <PhotoPicker
+            photos={photos}
+            onChange={setPhotos}
+            max={4}
+            className="glass-panel rounded-xl p-3"
+          />
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => setPublishOpen?.(false)}
+              className="btn-secondary">
+              Annuler
+            </button>
+            <button
+              type="submit"
+              disabled={publishing || !caption.trim()}
+              className="btn-primary disabled:opacity-60">
+              {publishing ? "Publication..." : "Publier"}
+            </button>
+          </div>
+        </form>
+      )}
+
       <ArtisanSearch
         selectedPro={selectedPro}
         onSelect={selectPro}

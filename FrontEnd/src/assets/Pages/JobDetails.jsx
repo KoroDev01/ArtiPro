@@ -182,6 +182,19 @@ export default function JobDetails() {
     }
   };
 
+  const handleRejectOffer = async (offerId) => {
+    if (!confirm("Refuser cette offre ?")) return;
+    try {
+      await api.put(`/offers/${offerId}/reject`);
+      toast.success("Offre refusée.");
+      await loadData();
+    } catch (err) {
+      toast.error(
+        err.response?.data?.message || "Impossible de refuser cette offre.",
+      );
+    }
+  };
+
   const handleComplete = async () => {
     if (!confirm("Marquer cette mission comme terminée ?")) return;
     try {
@@ -488,11 +501,18 @@ export default function JobDetails() {
                           {isOwner &&
                             post.status === "open" &&
                             offer.status === "pending" && (
-                              <button
-                                onClick={() => handleAcceptOffer(offer._id)}
-                                className="mt-3 bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-500 transition">
-                                Accepter cette offre
-                              </button>
+                              <div className="mt-3 flex flex-wrap gap-2">
+                                <button
+                                  onClick={() => handleAcceptOffer(offer._id)}
+                                  className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-500 transition">
+                                  Accepter cette offre
+                                </button>
+                                <button
+                                  onClick={() => handleRejectOffer(offer._id)}
+                                  className="border border-red-500/30 text-red-400 px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-500/10 transition">
+                                  Refuser
+                                </button>
+                              </div>
                             )}
                         </div>
                       );
