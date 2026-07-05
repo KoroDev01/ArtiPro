@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
+import PageBanner from "../../components/PageBanner";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
 import EmptyState from "../../components/EmptyState";
@@ -12,9 +13,9 @@ import { imageUrl } from "../../utils/imageUrl";
 import UserAvatar from "../../components/UserAvatar";
 
 const STATUS_LABELS = {
-  open: { label: "Ouvert", cls: "bg-green-100 text-green-700" },
-  in_progress: { label: "En cours", cls: "bg-blue-100 text-blue-700" },
-  completed: { label: "Terminé", cls: "bg-gray-100 text-gray-500" },
+  open: { label: "Ouvert", cls: "bg-green-500/20 text-green-400" },
+  in_progress: { label: "En cours", cls: "bg-blue-500/20 text-blue-400" },
+  completed: { label: "Terminé", cls: "bg-zinc-500/20 text-zinc-400" },
 };
 
 export default function JobRequests() {
@@ -116,51 +117,29 @@ export default function JobRequests() {
     }
   };
 
-  const handleDelete = async (postId) => {
-    if (!confirm("Supprimer cette demande ?")) return;
-    try {
-      await api.delete(`/posts/${postId}`);
-      setPosts((prev) => prev.filter((p) => p._id !== postId));
-      toast.success("Demande supprimée.");
-    } catch {
-      toast.error("Impossible de supprimer ce post.");
-    }
-  };
-
   return (
-    <>
+    <div className="page-wrap">
       <Header />
 
-      <main className="mt-[72px] bg-gray-50 min-h-screen">
+      <PageBanner
+        title="Demandes de Travaux"
+        subtitle={`${displayed.length} demande${displayed.length !== 1 ? "s" : ""} ${tab === "active" ? "disponible" : "terminée"}${displayed.length !== 1 ? "s" : ""}`}
+        action={
+          user?.role === "client" && !user?.isBlocked ? (
+            <button onClick={() => setShowModal(true)} className="btn-primary">
+              + Nouvelle demande
+            </button>
+          ) : null
+        }
+      />
 
-        <section className="bg-blue-600 text-white px-6 py-10">
-          <div className="max-w-7xl mx-auto flex justify-between items-center flex-wrap gap-4">
-            <div>
-              <h1 className="text-3xl font-bold">Demandes de Travaux</h1>
-              <p className="mt-1 text-blue-100">
-                {displayed.length} demande{displayed.length !== 1 ? "s" : ""}{" "}
-                {tab === "active" ? "disponible" : "terminée"}
-                {displayed.length !== 1 ? "s" : ""}
-              </p>
-            </div>
-            {user?.role === "client" && !user?.isBlocked && (
-              <button
-                onClick={() => setShowModal(true)}
-                className="bg-white text-blue-600 font-semibold px-5 py-2.5 rounded-xl hover:bg-blue-50 transition text-sm">
-                + Nouvelle demande
-              </button>
-            )}
-          </div>
-        </section>
-
-        <section className="max-w-7xl mx-auto px-6 pt-4">
-          <div className="flex gap-1 border-b border-gray-200">
+      <main className="page-main">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 pt-4">
+          <div className="flex gap-1 border-b border-white/10">
             <button
               onClick={() => setTab("active")}
               className={`px-5 py-2.5 text-sm font-medium border-b-2 transition ${
-                tab === "active"
-                  ? "border-blue-600 text-blue-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700"
+                tab === "active" ? "tab-active" : "tab-inactive"
               }`}>
               Demandes actives
             </button>
@@ -168,13 +147,11 @@ export default function JobRequests() {
               <button
                 onClick={() => setTab("completed")}
                 className={`px-5 py-2.5 text-sm font-medium border-b-2 transition ${
-                  tab === "completed"
-                    ? "border-blue-600 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700"
+                  tab === "completed" ? "tab-active" : "tab-inactive"
                 }`}>
                 Mes missions terminées
                 {completedPosts.length > 0 && (
-                  <span className="ml-2 bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">
+                  <span className="ml-2 bg-white/10 text-zinc-400 text-xs px-2 py-0.5 rounded-full">
                     {completedPosts.length}
                   </span>
                 )}
@@ -184,13 +161,13 @@ export default function JobRequests() {
         </section>
 
         {tab === "active" && (
-          <section className="max-w-7xl mx-auto px-6 py-4">
-            <div className="bg-white rounded-xl shadow-sm p-4 flex flex-col md:flex-row gap-3 items-center">
-              <span className="text-gray-400 text-lg">🔍</span>
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-4">
+            <div className="dark-card rounded-xl p-4 flex flex-col md:flex-row gap-3 items-center">
+              <span className="text-zinc-500 text-lg">🔍</span>
               <select
                 value={filterCategory}
                 onChange={(e) => setFilterCategory(e.target.value)}
-                className="w-full md:w-auto border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                className="select-field w-full md:w-auto">
                 <option value="">Toutes les catégories</option>
                 {categories.map((c) => (
                   <option key={c._id} value={c._id}>
@@ -201,7 +178,7 @@ export default function JobRequests() {
               <select
                 value={filterCity}
                 onChange={(e) => setFilterCity(e.target.value)}
-                className="w-full md:w-auto border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                className="select-field w-full md:w-auto">
                 <option value="">Toutes les wilayas</option>
                 {WILAYAS.map((w) => (
                   <option key={w} value={w}>
@@ -212,7 +189,7 @@ export default function JobRequests() {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="w-full md:w-auto border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                className="select-field w-full md:w-auto">
                 <option value="">Tous les statuts</option>
                 <option value="open">Ouvert</option>
                 <option value="in_progress">En cours</option>
@@ -221,11 +198,11 @@ export default function JobRequests() {
           </section>
         )}
 
-        <section className="max-w-7xl mx-auto px-6 pb-12 pt-2">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 pb-12 pt-2">
           {loading && (
-            <p className="text-center py-20 text-gray-400">Chargement...</p>
+            <p className="text-center py-20 text-zinc-500">Chargement...</p>
           )}
-          {error && <p className="text-center py-20 text-red-500">{error}</p>}
+          {error && <p className="text-center py-20 text-red-400">{error}</p>}
           {!loading &&
             !error &&
             displayed.length === 0 &&
@@ -239,7 +216,7 @@ export default function JobRequests() {
                 onCtaClick={() => setShowModal(true)}
               />
             ) : (
-              <div className="text-center py-20 text-gray-400">
+              <div className="text-center py-20 text-zinc-500">
                 <p className="text-4xl mb-3">🏁</p>
                 <p className="text-sm">
                   Aucune mission terminée pour l'instant.
@@ -250,16 +227,12 @@ export default function JobRequests() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {displayed.map((post) => {
               const status = STATUS_LABELS[post.status] ?? STATUS_LABELS.open;
-              const clientId =
-                post.author?._id ?? post.client?._id ?? post.client;
-              const isOwner =
-                user && clientId?.toString() === user._id?.toString();
               const demandeur = post.author ?? post.client;
 
               return (
                 <div
                   key={post._id}
-                  className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col gap-4 hover:shadow-md transition">
+                  className="dark-card rounded-xl p-6 flex flex-col gap-4">
                   {post.photos?.length > 0 && (
                     <div className="flex gap-2 overflow-x-auto">
                       {post.photos.map((photo, i) => (
@@ -275,14 +248,14 @@ export default function JobRequests() {
 
                   <div className="flex justify-between items-start">
                     <div className="flex gap-3 items-center">
-                      <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-lg">
+                      <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center text-lg">
                         🔧
                       </div>
                       <div>
-                        <span className="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">
+                        <span className="text-xs bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full">
                           {post.category?.name ?? "Catégorie"}
                         </span>
-                        <h3 className="font-semibold mt-1">{post.title}</h3>
+                        <h3 className="font-semibold mt-1 text-white">{post.title}</h3>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -290,21 +263,14 @@ export default function JobRequests() {
                         className={`text-xs px-3 py-1 rounded-full font-medium ${status.cls}`}>
                         {status.label}
                       </span>
-                      {isOwner && (
-                        <button
-                          onClick={() => handleDelete(post._id)}
-                          className="text-red-400 hover:text-red-600 text-xs font-medium">
-                          Supprimer
-                        </button>
-                      )}
                     </div>
                   </div>
 
-                  <p className="text-sm text-gray-600 line-clamp-2">
+                  <p className="text-sm text-zinc-400 line-clamp-2">
                     {post.description}
                   </p>
 
-                  <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+                  <div className="flex flex-wrap gap-4 text-sm text-zinc-500">
                     {post.location?.city && (
                       <span>📍 {post.location.city}</span>
                     )}
@@ -316,15 +282,15 @@ export default function JobRequests() {
                     </span>
                   </div>
 
-                  <hr className="border-gray-100" />
+                  <hr className="border-white/10" />
 
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <div className="flex items-center gap-2 text-sm text-zinc-400">
                     <UserAvatar user={demandeur} size="sm" />
                     {demandeur?.firstName} {demandeur?.lastName}
                   </div>
                   <Link
                     to={`/demandes/${post._id?.toString()}`}
-                    className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                    className="link-accent">
                     Voir les détails →
                   </Link>
                 </div>
@@ -335,28 +301,22 @@ export default function JobRequests() {
       </main>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto">
+        <div className="modal-overlay">
+          <div className="modal-panel max-w-lg">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold">Nouvelle demande</h2>
+              <h2 className="text-xl font-semibold text-white">Nouvelle demande</h2>
               <button
                 onClick={() => setShowModal(false)}
-                className="text-gray-400 hover:text-gray-600 text-2xl leading-none">
+                className="text-zinc-500 hover:text-zinc-300 text-2xl leading-none">
                 &times;
               </button>
             </div>
 
-            {formError && (
-              <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 mb-4">
-                {formError}
-              </div>
-            )}
+            {formError && <div className="alert-error mb-4">{formError}</div>}
 
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-gray-700">
-                  Titre
-                </label>
+                <label className="label-field">Titre</label>
                 <input
                   type="text"
                   placeholder="Ex: Fuite d'eau à réparer"
@@ -365,14 +325,12 @@ export default function JobRequests() {
                     setFormData({ ...formData, title: e.target.value })
                   }
                   required
-                  className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="input-field mt-1"
                 />
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-700">
-                  Description
-                </label>
+                <label className="label-field">Description</label>
                 <textarea
                   placeholder="Décrivez votre besoin..."
                   value={formData.description}
@@ -381,22 +339,20 @@ export default function JobRequests() {
                   }
                   required
                   rows={3}
-                  className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none"
+                  className="input-field mt-1 resize-none"
                 />
               </div>
 
               <div className="flex gap-3">
                 <div className="flex-1">
-                  <label className="text-sm font-medium text-gray-700">
-                    Catégorie
-                  </label>
+                  <label className="label-field">Catégorie</label>
                   <select
                     value={formData.category}
                     onChange={(e) =>
                       setFormData({ ...formData, category: e.target.value })
                     }
                     required
-                    className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                    className="select-field mt-1">
                     <option value="">Choisir...</option>
                     {categories.map((c) => (
                       <option key={c._id} value={c._id}>
@@ -406,9 +362,7 @@ export default function JobRequests() {
                   </select>
                 </div>
                 <div className="flex-1">
-                  <label className="text-sm font-medium text-gray-700">
-                    Budget (DZD)
-                  </label>
+                  <label className="label-field">Budget (DZD)</label>
                   <input
                     type="number"
                     placeholder="5000"
@@ -416,21 +370,19 @@ export default function JobRequests() {
                     onChange={(e) =>
                       setFormData({ ...formData, budget: e.target.value })
                     }
-                    className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="input-field mt-1"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-700">
-                  Wilaya
-                </label>
+                <label className="label-field">Wilaya</label>
                 <select
                   value={formData.city}
                   onChange={(e) =>
                     setFormData({ ...formData, city: e.target.value })
                   }
-                  className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                  className="select-field mt-1">
                   <option value="">Choisir une wilaya...</option>
                   {WILAYAS.map((w) => (
                     <option key={w} value={w}>
@@ -451,13 +403,13 @@ export default function JobRequests() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-lg hover:bg-gray-50 transition text-sm font-medium">
+                  className="btn-secondary flex-1">
                   Annuler
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="flex-1 bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition text-sm font-medium disabled:opacity-60">
+                  className="btn-primary flex-1 disabled:opacity-60">
                   {submitting ? "Envoi..." : "Publier"}
                 </button>
               </div>
@@ -467,6 +419,6 @@ export default function JobRequests() {
       )}
 
       <Footer />
-    </>
+    </div>
   );
 }

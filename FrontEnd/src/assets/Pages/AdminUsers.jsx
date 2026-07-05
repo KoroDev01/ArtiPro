@@ -29,9 +29,9 @@ const DURATIONS = [
 ];
 
 const ROLE_LABELS = {
-  client: { label: "Client", cls: "bg-blue-50 text-blue-600" },
-  pro: { label: "Pro", cls: "bg-purple-50 text-purple-600" },
-  admin: { label: "Admin", cls: "bg-orange-50 text-orange-600" },
+  client: { label: "Client", cls: "bg-blue-500/15 text-blue-400" },
+  pro: { label: "Pro", cls: "bg-purple-500/15 text-purple-400" },
+  admin: { label: "Admin", cls: "bg-orange-500/15 text-orange-400" },
 };
 
 export default function AdminUsers() {
@@ -152,10 +152,10 @@ export default function AdminUsers() {
       subtitle={`${users.length} compte${users.length !== 1 ? "s" : ""} — ${banned} suspendu${banned !== 1 ? "s" : ""}`}>
       <div>
 
-        <div className="bg-white rounded-2xl shadow-sm p-4 mb-6 flex flex-col sm:flex-row gap-3">
+        <div className="dark-card rounded-2xl p-4 mb-6 flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <FiSearch
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"
               size={15}
             />
             <input
@@ -163,13 +163,13 @@ export default function AdminUsers() {
               placeholder="Rechercher par nom ou email..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              className="input-field pl-9"
             />
           </div>
           <select
             value={filterRole}
             onChange={(e) => setFilterRole(e.target.value)}
-            className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            className="select-field sm:w-auto">
             <option value="">Tous les rôles</option>
             <option value="client">Client</option>
             <option value="pro">Pro</option>
@@ -177,28 +177,28 @@ export default function AdminUsers() {
           </select>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div className="dark-card rounded-2xl overflow-hidden">
           {loading ? (
-            <div className="divide-y divide-gray-50">
+            <div className="divide-y divide-white/10">
               {[1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
                   className="px-6 py-4 animate-pulse flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-gray-200" />
+                  <div className="w-10 h-10 rounded-full bg-white/10" />
                   <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-gray-200 rounded w-40" />
-                    <div className="h-3 bg-gray-100 rounded w-56" />
+                    <div className="h-4 bg-white/10 rounded w-40" />
+                    <div className="h-3 bg-white/5 rounded w-56" />
                   </div>
                 </div>
               ))}
             </div>
           ) : filtered.length === 0 ? (
-            <div className="text-center py-16 text-gray-400">
+            <div className="text-center py-16 text-zinc-500">
               <p className="text-3xl mb-3">👥</p>
               <p className="text-sm">Aucun utilisateur trouvé.</p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-50">
+            <div className="divide-y divide-white/10">
               {filtered.map((u) => {
                 const role = ROLE_LABELS[u.role] ?? ROLE_LABELS.client;
                 const banLabel = getBanLabel(u);
@@ -208,16 +208,16 @@ export default function AdminUsers() {
                   <div
                     key={u._id}
                     onClick={() => setSelectedUser(u)}
-                    className="px-6 py-4 flex items-center gap-4 flex-wrap cursor-pointer hover:bg-gray-50 transition">
+                    className="px-6 py-4 flex items-center gap-4 flex-wrap cursor-pointer hover:bg-white/5 transition">
 
                     <UserAvatar user={u} size="md" />
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <p className="font-medium text-sm text-gray-800">
+                        <p className="font-medium text-sm text-white">
                           {u.firstName} {u.lastName}
                           {isMe && (
-                            <span className="ml-1 text-xs text-gray-400">
+                            <span className="ml-1 text-xs text-zinc-500">
                               (vous)
                             </span>
                           )}
@@ -227,18 +227,18 @@ export default function AdminUsers() {
                           {role.label}
                         </span>
                         {u.isVerified && (
-                          <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium bg-green-50 text-green-600">
+                          <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium bg-green-500/15 text-green-400">
                             <FiCheckCircle size={10} /> Vérifié
                           </span>
                         )}
                         {u.isBlocked && (
-                          <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium bg-red-50 text-red-600">
+                          <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium bg-red-500/15 text-red-400">
                             <FiClock size={10} />
                             {banLabel}
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-gray-400 mt-0.5 truncate">
+                      <p className="text-xs text-zinc-500 mt-0.5 truncate">
                         {u.email}
                       </p>
                     </div>
@@ -250,7 +250,7 @@ export default function AdminUsers() {
                         {u.isBlocked ? (
                           <button
                             onClick={() => handleUnban(u._id)}
-                            className="flex items-center gap-1.5 text-xs font-medium text-green-600 hover:text-green-700 bg-green-50 hover:bg-green-100 px-3 py-1.5 rounded-lg transition">
+                            className="flex items-center gap-1.5 text-xs font-medium text-green-400 hover:text-green-300 bg-green-500/10 hover:bg-green-500/20 px-3 py-1.5 rounded-lg transition">
                             <FiShieldOff size={13} /> Débannir
                           </button>
                         ) : (
@@ -259,7 +259,7 @@ export default function AdminUsers() {
                               setBanTarget(u);
                               setSelectedDuration("1day");
                             }}
-                            className="flex items-center gap-1.5 text-xs font-medium text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition">
+                            className="flex items-center gap-1.5 text-xs font-medium text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 px-3 py-1.5 rounded-lg transition">
                             <FiShield size={13} /> Bannir
                           </button>
                         )}
@@ -275,30 +275,30 @@ export default function AdminUsers() {
 
       {selectedUser && (
         <div
-          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          className="modal-overlay"
           onClick={() => setSelectedUser(null)}>
           <div
-            className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
+            className="modal-panel max-w-lg"
             onClick={(e) => e.stopPropagation()}>
 
-            <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
-              <h3 className="font-semibold text-gray-900">
+            <div className="flex items-center justify-between pb-5 border-b border-white/10">
+              <h3 className="font-semibold text-white">
                 Profil utilisateur
               </h3>
               <button
                 onClick={() => setSelectedUser(null)}
-                className="text-gray-400 hover:text-gray-600">
+                className="text-zinc-500 hover:text-white">
                 <FiX size={20} />
               </button>
             </div>
 
-            <div className="px-6 py-5 space-y-5">
+            <div className="py-5 space-y-5">
 
               <div className="flex items-center gap-4">
                 <UserAvatar user={selectedUser} size="lg" />
                 <div className="flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="font-bold text-lg text-gray-900">
+                    <p className="font-bold text-lg text-white">
                       {selectedUser.firstName} {selectedUser.lastName}
                     </p>
                     <span
@@ -309,20 +309,20 @@ export default function AdminUsers() {
                       }
                     </span>
                     {selectedUser.isBlocked && (
-                      <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium bg-red-50 text-red-600">
+                      <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium bg-red-500/15 text-red-400">
                         <FiClock size={10} />{" "}
                         {getBanLabel(selectedUser) || "Banni"}
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-gray-400 mt-0.5">
+                  <p className="text-sm text-zinc-500 mt-0.5">
                     {selectedUser.email}
                   </p>
                 </div>
               </div>
 
-              <div className="bg-gray-50 rounded-xl p-4 space-y-2">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
+              <div className="dark-card rounded-xl p-4 space-y-2">
+                <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wide mb-3">
                   Informations
                 </p>
                 <InfoRow
@@ -355,7 +355,7 @@ export default function AdminUsers() {
               </div>
 
               {selectedUser.role === "pro" && (
-                <div className="bg-purple-50 rounded-xl p-4 space-y-2">
+                <div className="dark-card rounded-xl p-4 space-y-2 border-purple-500/20">
                   <p className="text-xs font-semibold text-purple-400 uppercase tracking-wide mb-3">
                     Informations professionnelles
                   </p>
@@ -387,14 +387,14 @@ export default function AdminUsers() {
                   />
                   {selectedUser.categories?.length > 0 && (
                     <div className="flex items-start gap-2 text-sm">
-                      <span className="text-gray-400 w-24 flex-shrink-0">
+                      <span className="text-zinc-500 w-24 flex-shrink-0">
                         Catégories
                       </span>
                       <div className="flex flex-wrap gap-1">
                         {selectedUser.categories.map((cat) => (
                           <span
                             key={cat._id || cat}
-                            className="bg-blue-100 text-blue-600 text-xs px-2 py-0.5 rounded-full">
+                            className="bg-blue-500/15 text-blue-400 text-xs px-2 py-0.5 rounded-full">
                             {cat.name || cat}
                           </span>
                         ))}
@@ -402,7 +402,7 @@ export default function AdminUsers() {
                     </div>
                   )}
                   {selectedUser.description && (
-                    <p className="text-xs text-gray-500 bg-white rounded-lg px-3 py-2 mt-2">
+                    <p className="text-xs text-zinc-400 glass-panel rounded-lg px-3 py-2 mt-2">
                       {selectedUser.description}
                     </p>
                   )}
@@ -411,13 +411,13 @@ export default function AdminUsers() {
             </div>
 
             {selectedUser._id !== user._id && selectedUser.role !== "admin" && (
-              <div className="flex flex-col gap-2 px-6 py-4 border-t border-gray-100">
+              <div className="flex flex-col gap-2 pt-4 border-t border-white/10">
 
                 {selectedUser.role === "pro" &&
                   (selectedUser.isVerified ? (
                     <button
                       onClick={() => handleUnverify(selectedUser._id)}
-                      className="w-full flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2.5 rounded-xl text-sm font-medium transition">
+                      className="btn-secondary w-full">
                       <FiCheckCircle size={14} /> Retirer le badge Vérifié
                     </button>
                   ) : (
@@ -457,23 +457,23 @@ export default function AdminUsers() {
       )}
 
       {banTarget && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+        <div className="modal-overlay">
+          <div className="modal-panel max-w-md">
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-10 h-10 rounded-full bg-red-100 text-red-500 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-red-500/15 text-red-400 flex items-center justify-center">
                 <FiShield size={18} />
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900">
+                <h3 className="font-semibold text-white">
                   Bannir un compte
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-zinc-500">
                   {banTarget.firstName} {banTarget.lastName}
                 </p>
               </div>
             </div>
 
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-zinc-400 mb-4">
               Choisissez la durée de suspension :
             </p>
 
@@ -484,8 +484,8 @@ export default function AdminUsers() {
                   onClick={() => setSelectedDuration(d.value)}
                   className={`flex items-center justify-between px-4 py-3 rounded-xl border-2 text-sm font-medium transition ${
                     selectedDuration === d.value
-                      ? "border-red-500 bg-red-50 text-red-600"
-                      : "border-gray-100 text-gray-700 hover:border-gray-200 hover:bg-gray-50"
+                      ? "border-red-500 bg-red-500/10 text-red-400"
+                      : "border-white/10 text-zinc-300 hover:border-white/20 hover:bg-white/5"
                   }`}>
                   <span>{d.label}</span>
                   {selectedDuration === d.value && (
@@ -498,7 +498,7 @@ export default function AdminUsers() {
             <div className="flex gap-3">
               <button
                 onClick={() => setBanTarget(null)}
-                className="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-xl hover:bg-gray-50 transition text-sm font-medium">
+                className="btn-secondary flex-1">
                 Annuler
               </button>
               <button
@@ -519,9 +519,9 @@ export default function AdminUsers() {
 function InfoRow({ icon, label, value }) {
   return (
     <div className="flex items-center gap-2 text-sm">
-      <span className="text-gray-400 flex-shrink-0">{icon}</span>
-      <span className="text-gray-400 w-24 flex-shrink-0 text-xs">{label}</span>
-      <span className="text-gray-700 font-medium text-xs truncate">
+      <span className="text-zinc-500 flex-shrink-0">{icon}</span>
+      <span className="text-zinc-500 w-24 flex-shrink-0 text-xs">{label}</span>
+      <span className="text-zinc-200 font-medium text-xs truncate">
         {value}
       </span>
     </div>

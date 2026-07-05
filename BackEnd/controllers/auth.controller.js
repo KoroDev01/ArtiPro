@@ -11,6 +11,10 @@ const {
   sendPasswordResetEmail,
 } = require("../config/mailer.config.js");
 const { authPayload } = require("../config/token.config.js");
+const {
+  markProOffline,
+  markProOnline,
+} = require("../utils/proAvailability.js");
 
 const loginSuccess = (res, user, extra = {}) =>
   res.status(200).json(authPayload(user, { message: "Login successful", ...extra }));
@@ -67,12 +71,23 @@ exports.sessionCreate = (req, res, next) => {
 
     req.login(user, (err) => {
       if (err) return next(err);
+      if (user.role === "pro") {
+        User.findByIdAndUpdate(user._id, markProOnline()).catch(() => {});
+        user.lastActiveAt = new Date();
+      }
       loginSuccess(res, user);
     });
   })(req, res, next);
 };
 
-exports.sessionDelete = (req, res, next) => {
+exports.sessionDelete = async (req, res, next) => {
+  const userId = req.user?._id;
+  const isPro = req.user?.role === "pro";
+
+  if (isPro && userId) {
+    await User.findByIdAndUpdate(userId, markProOffline()).catch(() => {});
+  }
+
   req.logout((err) => {
     if (err) return next(err);
     res.status(200).json({ message: "Logout successful" });

@@ -6,7 +6,6 @@ import JobRequests from "./assets/Pages/Demandes.jsx";
 import JobDetails from "./assets/Pages/JobDetails.jsx";
 import Login from "./assets/Pages/Login.jsx";
 import SignIn from "./assets/Pages/Register.jsx";
-import "./App.css";
 import Messages from "./assets/Pages/Messages.jsx";
 import Profile from "./assets/Pages/Profile.jsx";
 import Dashboard from "./assets/Pages/Dashboard.jsx";

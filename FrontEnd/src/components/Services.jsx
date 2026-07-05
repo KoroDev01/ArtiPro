@@ -39,44 +39,43 @@ export default function Services() {
   }, []);
 
   return (
-    <section id="services" className="py-14 sm:py-20 bg-gray-50">
+    <section id="services" className="relative py-16 sm:py-24">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-500/30 to-transparent" />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-10 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
-            Tous les corps de métier
-          </h2>
-          <p className="text-gray-500 text-sm sm:text-base max-w-xl mx-auto">
+        <div className="mb-12 text-center sm:mb-14">
+          <span className="section-eyebrow mb-4">Nos métiers</span>
+          <h2 className="section-title mb-4">Tous les corps de métier</h2>
+          <p className="section-subtitle">
             Des artisans qualifiés et vérifiés dans tous les domaines pour
             répondre à vos besoins.
           </p>
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
             {[...Array(8)].map((_, i) => (
               <div
                 key={i}
-                className="bg-white rounded-2xl p-5 animate-pulse flex flex-col items-center gap-3">
-                <div className="w-10 h-10 bg-gray-200 rounded-full" />
-                <div className="h-3 bg-gray-200 rounded w-3/4" />
+                className="dark-card animate-pulse rounded-2xl p-5 flex flex-col items-center gap-3">
+                <div className="h-11 w-11 rounded-xl bg-white/10" />
+                <div className="h-3 w-3/4 rounded bg-white/10" />
               </div>
             ))}
           </div>
         ) : categories.length === 0 ? (
-          <p className="text-center text-gray-400">
-            Aucune catégorie disponible.
-          </p>
+          <p className="text-center text-zinc-500">Aucune catégorie disponible.</p>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
             {categories.map((cat) => (
               <button
                 key={cat._id}
                 onClick={() => navigate(`/find-artisan?category=${cat._id}`)}
-                className="bg-white rounded-2xl p-4 sm:p-6 flex flex-col items-center gap-2 sm:gap-3 border border-gray-100 hover:border-blue-300 hover:shadow-md hover:bg-blue-50 transition-all duration-200 group cursor-pointer">
-                <span className="text-3xl sm:text-4xl group-hover:scale-110 transition-transform duration-200">
+                className="dark-card group cursor-pointer rounded-2xl p-4 sm:p-6 flex flex-col items-center gap-2.5 sm:gap-3">
+                <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/10 text-2xl transition-transform duration-200 group-hover:scale-110 sm:h-14 sm:w-14 sm:text-3xl">
                   {CATEGORY_ICONS[cat.name] || "🔨"}
                 </span>
-                <h3 className="font-semibold text-xs sm:text-sm text-gray-700 text-center group-hover:text-blue-600 transition-colors leading-tight">
+                <h3 className="text-center text-xs font-semibold leading-tight text-zinc-300 transition-colors group-hover:text-blue-400 sm:text-sm">
                   {cat.name}
                 </h3>
               </button>
@@ -84,10 +83,10 @@ export default function Services() {
           </div>
         )}
 
-        <div className="text-center mt-8 sm:mt-10">
+        <div className="mt-10 text-center sm:mt-12">
           <button
             onClick={() => navigate("/find-artisan")}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-semibold transition text-sm">
+            className="btn-primary">
             Voir tous les artisans →
           </button>
         </div>

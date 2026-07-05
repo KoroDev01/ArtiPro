@@ -1,14 +1,17 @@
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
+import PageBanner from "../../components/PageBanner";
 
 export default function CGU() {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="page-wrap">
       <Header />
-      <main className="flex-1 mt-16 max-w-3xl mx-auto px-4 sm:px-6 py-12 w-full">
-        <div className="bg-white rounded-2xl shadow-sm p-6 sm:p-10">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Conditions Générales d'Utilisation</h1>
-          <p className="text-sm text-gray-400 mb-8">Dernière mise à jour : juin 2026</p>
+      <PageBanner
+        title="Conditions Générales d'Utilisation"
+        subtitle="Dernière mise à jour : juin 2026"
+      />
+      <main className="page-main max-w-3xl mx-auto px-4 sm:px-6 py-8 w-full">
+        <div className="dark-card rounded-2xl p-6 sm:p-10">
 
           <Section title="1. Objet">
             Les présentes Conditions Générales d'Utilisation (CGU) régissent l'accès et l'utilisation de la plateforme ArtiPro, accessible à l'adresse artipro.dz, qui met en relation des clients particuliers avec des artisans professionnels en Algérie.
@@ -59,8 +62,8 @@ export default function CGU() {
 function Section({ title, children }) {
   return (
     <div className="mb-7">
-      <h2 className="text-base font-semibold text-gray-800 mb-2">{title}</h2>
-      <p className="text-sm text-gray-600 leading-relaxed">{children}</p>
+      <h2 className="text-base font-semibold text-white mb-2">{title}</h2>
+      <p className="text-sm text-zinc-400 leading-relaxed">{children}</p>
     </div>
   );
 }

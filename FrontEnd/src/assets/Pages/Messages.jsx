@@ -162,9 +162,9 @@ export default function Messages() {
 
   const statusBadge = (status) => {
     const styles = {
-      pending: "bg-yellow-100 text-yellow-700",
-      accepted: "bg-green-100 text-green-700",
-      rejected: "bg-red-100 text-red-700",
+      pending: "bg-yellow-500/20 text-yellow-400",
+      accepted: "bg-green-500/20 text-green-400",
+      rejected: "bg-red-500/20 text-red-400",
     };
     const labels = {
       pending: "En attente",
@@ -173,20 +173,20 @@ export default function Messages() {
     };
     return (
       <span
-        className={`text-xs px-2 py-0.5 rounded-full font-medium ${styles[status] || "bg-gray-100 text-gray-500"}`}>
+        className={`text-xs px-2 py-0.5 rounded-full font-medium ${styles[status] || "bg-zinc-500/20 text-zinc-400"}`}>
         {labels[status] || status}
       </span>
     );
   };
 
   return (
-    <>
+    <div className="page-wrap">
       <Header />
-      <div className="mt-[72px] h-[calc(100vh-72px)] flex bg-gray-50">
-        <aside className="w-80 bg-white border-r border-gray-200 flex flex-col flex-shrink-0">
-          <div className="p-4 border-b border-gray-100">
-            <h1 className="text-lg font-semibold">Messages</h1>
-            <p className="text-xs text-gray-400 mt-0.5">
+      <div className="mt-16 h-[calc(100vh-64px)] flex">
+        <aside className="w-80 dark-card border-r border-white/10 flex flex-col flex-shrink-0 !rounded-none">
+          <div className="p-4 border-b border-white/10">
+            <h1 className="text-lg font-semibold text-white">Messages</h1>
+            <p className="text-xs text-zinc-500 mt-0.5">
               {conversations.filter((c) => !hiddenConvs.has(c._id)).length}{" "}
               conversation
               {conversations.filter((c) => !hiddenConvs.has(c._id)).length !== 1
@@ -195,7 +195,7 @@ export default function Messages() {
               {hiddenConvs.size > 0 && (
                 <button
                   onClick={() => setHiddenConvs(new Set())}
-                  className="ml-2 text-blue-500 hover:underline text-xs">
+                  className="ml-2 text-blue-400 hover:underline text-xs">
                   ({hiddenConvs.size} masquée{hiddenConvs.size > 1 ? "s" : ""} —
                   restaurer)
                 </button>
@@ -208,8 +208,8 @@ export default function Messages() {
               <div className="space-y-3 p-4">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="animate-pulse space-y-2">
-                    <div className="h-4 bg-gray-200 rounded w-3/4" />
-                    <div className="h-3 bg-gray-100 rounded w-1/2" />
+                    <div className="h-4 bg-white/10 rounded w-3/4" />
+                    <div className="h-3 bg-white/5 rounded w-1/2" />
                   </div>
                 ))}
               </div>
@@ -226,13 +226,13 @@ export default function Messages() {
                 <button
                   key={conv._id}
                   onClick={() => setSelectedConv(conv)}
-                  className={`w-full text-left px-4 py-4 border-b border-gray-50 hover:bg-gray-50 transition ${
+                  className={`w-full text-left px-4 py-4 border-b border-white/10 hover:bg-white/5 transition ${
                     selectedConv?._id === conv._id
-                      ? "bg-blue-50 border-l-4 border-l-blue-500"
+                      ? "bg-blue-500/10 border-l-4 border-l-blue-500"
                       : "border-l-4 border-l-transparent"
                   }`}>
                   <div className="flex justify-between items-start mb-1">
-                    <span className="font-medium text-sm truncate pr-2">
+                    <span className="font-medium text-sm truncate pr-2 text-white">
                       {getInterlocutor(conv)}
                     </span>
                     <div className="flex items-center gap-1.5 flex-shrink-0">
@@ -252,10 +252,10 @@ export default function Messages() {
                       </button>
                     </div>
                   </div>
-                  <p className="text-xs text-gray-500 truncate">
+                  <p className="text-xs text-zinc-500 truncate">
                     {conv.post?.title || "Demande de travaux"}
                   </p>
-                  <p className="text-xs text-blue-600 font-medium mt-1">
+                  <p className="text-xs text-blue-400 font-medium mt-1">
                     {conv.price?.toLocaleString()} DZD
                   </p>
                 </button>
@@ -265,31 +265,31 @@ export default function Messages() {
 
         <main className="flex-1 flex flex-col min-w-0">
           {!selectedConv ? (
-            <div className="flex-1 flex items-center justify-center text-gray-400">
+            <div className="flex-1 flex items-center justify-center text-zinc-500">
               <div className="text-center">
                 <div className="text-5xl mb-4">💬</div>
-                <p className="font-medium text-gray-600">
+                <p className="font-medium text-zinc-300">
                   Sélectionnez une conversation
                 </p>
-                <p className="text-sm mt-1 text-gray-400">
+                <p className="text-sm mt-1 text-zinc-500">
                   Vos échanges apparaissent ici
                 </p>
               </div>
             </div>
           ) : (
             <>
-              <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
+              <div className="dark-card border-b border-white/10 px-6 py-4 flex items-center justify-between flex-shrink-0 !rounded-none">
                 <div>
-                  <h2 className="font-semibold">
+                  <h2 className="font-semibold text-white">
                     {getInterlocutor(selectedConv)}
                   </h2>
-                  <p className="text-xs text-gray-500 mt-0.5">
+                  <p className="text-xs text-zinc-500 mt-0.5">
                     {selectedConv.post?.title}
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
                   {statusBadge(selectedConv.status)}
-                  <span className="text-sm font-semibold text-blue-600">
+                  <span className="text-sm font-semibold text-blue-400">
                     {selectedConv.price?.toLocaleString()} DZD
                   </span>
                 </div>
@@ -302,7 +302,7 @@ export default function Messages() {
                       <div
                         key={i}
                         className={`flex ${i % 2 === 0 ? "justify-end" : "justify-start"} animate-pulse`}>
-                        <div className="h-10 bg-gray-200 rounded-2xl w-48" />
+                        <div className="h-10 bg-white/10 rounded-2xl w-48" />
                       </div>
                     ))}
                   </div>
@@ -310,10 +310,10 @@ export default function Messages() {
                 {!loadingMessages && messages.length === 0 && (
                   <div className="text-center py-12">
                     <div className="text-4xl mb-3">👋</div>
-                    <p className="text-gray-400 text-sm">
+                    <p className="text-zinc-500 text-sm">
                       Aucun message pour le moment.
                     </p>
-                    <p className="text-gray-300 text-xs mt-1">
+                    <p className="text-zinc-600 text-xs mt-1">
                       Commencez la discussion !
                     </p>
                   </div>
@@ -328,7 +328,7 @@ export default function Messages() {
                       key={msg._id}
                       className={`flex items-end gap-2 ${isMe ? "justify-end" : "justify-start"}`}>
                       {!isMe && (
-                        <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold flex-shrink-0 overflow-hidden">
+                        <div className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs font-bold flex-shrink-0 overflow-hidden">
                           {avatarUrl ? (
                             <img
                               src={avatarUrl}
@@ -343,7 +343,7 @@ export default function Messages() {
                       <div
                         className={`max-w-[70%] flex flex-col ${isMe ? "items-end" : "items-start"}`}>
                         {!isMe && (
-                          <span className="text-xs text-gray-500 font-medium mb-1 ml-1">
+                          <span className="text-xs text-zinc-500 font-medium mb-1 ml-1">
                             {senderName || "Utilisateur"}
                           </span>
                         )}
@@ -351,11 +351,11 @@ export default function Messages() {
                           className={`px-4 py-2.5 rounded-2xl text-sm ${
                             isMe
                               ? "bg-blue-600 text-white rounded-br-sm"
-                              : "bg-white border border-gray-200 text-gray-800 rounded-bl-sm shadow-sm"
+                              : "dark-card text-zinc-200 rounded-bl-sm"
                           }`}>
                           {msg.content}
                         </div>
-                        <span className="text-xs text-gray-400 mt-1 mx-1">
+                        <span className="text-xs text-zinc-500 mt-1 mx-1">
                           {new Date(msg.createdAt).toLocaleTimeString("fr-FR", {
                             hour: "2-digit",
                             minute: "2-digit",
@@ -381,19 +381,19 @@ export default function Messages() {
                 <div ref={bottomRef} />
               </div>
 
-              <div className="bg-white border-t border-gray-200 p-4 flex-shrink-0">
+              <div className="dark-card border-t border-white/10 p-4 flex-shrink-0 !rounded-none">
                 <form onSubmit={handleSend} className="flex gap-3 items-center">
                   <input
                     type="text"
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                     placeholder="Écrivez votre message..."
-                    className="flex-1 border border-gray-200 rounded-full px-5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="input-field flex-1 !rounded-full"
                   />
                   <button
                     type="submit"
                     disabled={sending || !content.trim()}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-full text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed">
+                    className="btn-primary !rounded-full disabled:opacity-50 disabled:cursor-not-allowed">
                     {sending ? "..." : "Envoyer"}
                   </button>
                 </form>
@@ -402,6 +402,6 @@ export default function Messages() {
           )}
         </main>
       </div>
-    </>
+    </div>
   );
 }

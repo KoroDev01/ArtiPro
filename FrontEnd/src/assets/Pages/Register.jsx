@@ -75,28 +75,28 @@ const handleSubmit = async (e) => {
 };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10">
+    <div className="min-h-screen flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-sm p-8">
+        <div className="glass-panel rounded-2xl p-8">
           <Link
             to="/"
-            className="inline-block bg-blue-600 text-white px-4 py-1.5 rounded-lg mb-6 text-sm font-semibold">
+            className="inline-block bg-white text-zinc-900 rounded-lg px-4 py-1.5 mb-6 font-bold">
             ArtiPro
           </Link>
 
-          <h2 className="text-2xl font-bold mb-1">Créer un compte</h2>
-          <p className="text-gray-500 text-sm mb-6">
+          <h2 className="text-2xl font-bold text-white mb-1">Créer un compte</h2>
+          <p className="text-zinc-400 text-sm mb-6">
             Inscrivez-vous pour commencer à utiliser la plateforme
           </p>
 
-          <div className="flex bg-gray-100 rounded-full p-1 mb-6">
+          <div className="flex bg-white/5 border border-white/10 rounded-full p-1 mb-6">
             <button
               type="button"
               onClick={() => {
                 setRole("client");
                 setStep(1);
               }}
-              className={`flex-1 rounded-full py-2 text-sm transition ${role === "client" ? "bg-white shadow font-medium" : "text-gray-500"}`}>
+              className={`flex-1 rounded-full py-2 text-sm transition ${role === "client" ? "bg-white/10 text-white font-medium" : "text-zinc-400"}`}>
               Client
             </button>
             <button
@@ -105,7 +105,7 @@ const handleSubmit = async (e) => {
                 setRole("pro");
                 setStep(1);
               }}
-              className={`flex-1 rounded-full py-2 text-sm transition ${role === "pro" ? "bg-white shadow font-medium" : "text-gray-500"}`}>
+              className={`flex-1 rounded-full py-2 text-sm transition ${role === "pro" ? "bg-white/10 text-white font-medium" : "text-zinc-400"}`}>
               Artisan
             </button>
           </div>
@@ -113,17 +113,17 @@ const handleSubmit = async (e) => {
           {role === "pro" && (
             <div className="flex items-center gap-2 mb-6">
               <div
-                className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold ${step === 1 ? "bg-blue-600 text-white" : "bg-green-100 text-green-600"}`}>
+                className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold ${step === 1 ? "bg-blue-600 text-white" : "bg-emerald-500/20 text-emerald-400"}`}>
                 {step > 1 ? "✓" : "1"}
               </div>
               <div
-                className={`flex-1 h-0.5 ${step > 1 ? "bg-blue-600" : "bg-gray-200"}`}
+                className={`flex-1 h-0.5 ${step > 1 ? "bg-blue-600" : "bg-white/10"}`}
               />
               <div
-                className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold ${step === 2 ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-400"}`}>
+                className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold ${step === 2 ? "bg-blue-600 text-white" : "bg-white/10 text-zinc-500"}`}>
                 2
               </div>
-              <span className="text-xs text-gray-400 ml-1">
+              <span className="text-xs text-zinc-400 ml-1">
                 {step === 1
                   ? "Informations personnelles"
                   : "Informations professionnelles"}
@@ -132,7 +132,7 @@ const handleSubmit = async (e) => {
           )}
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 mb-4">
+            <div className="alert-error mb-4">
               {error}
             </div>
           )}
@@ -143,7 +143,7 @@ const handleSubmit = async (e) => {
               className="space-y-4">
               <div className="flex gap-3">
                 <div className="flex-1">
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="label-field">
                     Prénom
                   </label>
                   <input
@@ -153,11 +153,11 @@ const handleSubmit = async (e) => {
                     value={formData.firstName}
                     onChange={handleChange}
                     required
-                    className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="input-field mt-1"
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="label-field">
                     Nom
                   </label>
                   <input
@@ -167,13 +167,13 @@ const handleSubmit = async (e) => {
                     value={formData.lastName}
                     onChange={handleChange}
                     required
-                    className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="input-field mt-1"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-700">
+                <label className="label-field">
                   Email
                 </label>
                 <input
@@ -183,12 +183,12 @@ const handleSubmit = async (e) => {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="input-field mt-1"
                 />
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-700">
+                <label className="label-field">
                   Mot de passe
                 </label>
                 <input
@@ -198,13 +198,13 @@ const handleSubmit = async (e) => {
                   value={formData.password}
                   onChange={handleChange}
                   required
-                  className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="input-field mt-1"
                 />
                 <PasswordStrength password={formData.password} />
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-700">
+                <label className="label-field">
                   Confirmer le mot de passe
                 </label>
                 <input
@@ -214,14 +214,14 @@ const handleSubmit = async (e) => {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   required
-                  className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="input-field mt-1"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-blue-600 text-white py-2.5 rounded-lg mt-2 hover:bg-blue-700 transition font-medium text-sm disabled:opacity-60">
+                className="btn-primary w-full mt-2 disabled:opacity-60">
                 {role === "pro"
                   ? "Continuer →"
                   : loading
@@ -233,13 +233,13 @@ const handleSubmit = async (e) => {
 
           {step === 2 && role === "pro" && (
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 text-sm text-blue-700 mb-2">
+              <div className="rounded-xl border border-blue-500/30 bg-blue-500/10 px-4 py-3 text-sm text-blue-300 mb-2">
                 🔍 Votre candidature sera examinée par notre équipe avant
                 activation.
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-700">
+                <label className="label-field">
                   Nom de l'entreprise
                 </label>
                 <input
@@ -248,12 +248,12 @@ const handleSubmit = async (e) => {
                   placeholder="Ex: Plomberie Dupont"
                   value={formData.companyName}
                   onChange={handleChange}
-                  className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="input-field mt-1"
                 />
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-700">
+                <label className="label-field">
                   Numéro RC / SIRET
                 </label>
                 <input
@@ -262,13 +262,13 @@ const handleSubmit = async (e) => {
                   placeholder="Numéro d'enregistrement"
                   value={formData.siret}
                   onChange={handleChange}
-                  className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="input-field mt-1"
                 />
               </div>
 
               <div className="flex gap-3">
                 <div className="flex-1">
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="label-field">
                     Années d'expérience
                   </label>
                   <input
@@ -279,18 +279,18 @@ const handleSubmit = async (e) => {
                     max="60"
                     value={formData.experienceYears}
                     onChange={handleChange}
-                    className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="input-field mt-1"
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="label-field">
                     Wilaya
                   </label>
                   <select
                     name="city"
                     value={formData.city}
                     onChange={handleChange}
-                    className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                    className="select-field mt-1">
                     <option value="">Choisir...</option>
                     {WILAYAS.map((w) => (
                       <option key={w} value={w}>
@@ -302,7 +302,7 @@ const handleSubmit = async (e) => {
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-700">
+                <label className="label-field">
                   Description de vos services
                 </label>
                 <textarea
@@ -311,7 +311,7 @@ const handleSubmit = async (e) => {
                   value={formData.description}
                   onChange={handleChange}
                   rows={3}
-                  className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none"
+                  className="input-field mt-1 resize-none"
                 />
               </div>
 
@@ -319,24 +319,22 @@ const handleSubmit = async (e) => {
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-lg hover:bg-gray-50 transition text-sm font-medium">
+                  className="btn-secondary flex-1">
                   ← Retour
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition font-medium text-sm disabled:opacity-60">
+                  className="btn-primary flex-1 disabled:opacity-60">
                   {loading ? "Envoi..." : "Envoyer ma candidature"}
                 </button>
               </div>
             </form>
           )}
 
-          <p className="text-center text-sm mt-6 text-gray-600">
+          <p className="text-center text-sm mt-6 text-zinc-400">
             Déjà un compte ?{" "}
-            <Link
-              to="/Login"
-              className="text-blue-600 font-medium hover:underline">
+            <Link to="/Login" className="link-accent">
               Connectez-vous
             </Link>
           </p>
@@ -354,19 +352,19 @@ function PasswordStrength({ password }) {
     { ok: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password), label: "Au moins un caractère spécial" },
   ];
   const score = checks.filter(c => c.ok).length;
-  const colors = ["bg-red-400", "bg-orange-400", "bg-yellow-400", "bg-green-500"];
+  const colors = ["bg-red-400", "bg-orange-400", "bg-yellow-400", "bg-emerald-500"];
   const labels = ["", "Faible", "Moyen", "Fort"];
   return (
     <div className="mt-2 space-y-1.5">
       <div className="flex gap-1">
         {[0,1,2].map(i => (
-          <div key={i} className={`h-1 flex-1 rounded-full transition-all ${i < score ? colors[score] : "bg-gray-200"}`} />
+          <div key={i} className={`h-1 flex-1 rounded-full transition-all ${i < score ? colors[score] : "bg-white/10"}`} />
         ))}
       </div>
-      {score > 0 && <p className={`text-xs font-medium ${score === 3 ? "text-green-600" : score === 2 ? "text-yellow-600" : "text-red-500"}`}>{labels[score]}</p>}
+      {score > 0 && <p className={`text-xs font-medium ${score === 3 ? "text-emerald-400" : score === 2 ? "text-yellow-400" : "text-red-400"}`}>{labels[score]}</p>}
       <div className="space-y-0.5">
         {checks.map((check) => (
-          <p key={check.label} className={`text-xs flex items-center gap-1 ${check.ok ? "text-green-600" : "text-gray-400"}`}>
+          <p key={check.label} className={`text-xs flex items-center gap-1 ${check.ok ? "text-emerald-400" : "text-zinc-500"}`}>
             {check.ok ? "✓" : "○"} {check.label}
           </p>
         ))}

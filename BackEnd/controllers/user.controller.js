@@ -6,6 +6,10 @@ const { sendVerificationEmail } = require("../config/mailer.config.js");
 const { resolveUploadedFile } = require("../config/upload.config.js");
 const User = require("../database/models/user.model");
 const ProfileView = require("../database/models/profileView.model");
+const {
+  ONLINE_WINDOW_MS,
+  withProPresence,
+} = require("../utils/proAvailability");
 
 const profileViewCount = (proId) =>
   ProfileView.countDocuments({ pro: proId });
@@ -69,7 +73,7 @@ exports.getProById = async (req, res) => {
       .populate("categories", "name");
     if (!user) return res.status(404).json({ message: "User not found" });
     const views = await profileViewCount(user._id);
-    res.json({ ...user.toObject(), profileViewCount: views });
+    res.json(withProPresence({ ...user.toObject(), profileViewCount: views }));
   } catch (e) {
     handleError(res, e);
   }
@@ -132,11 +136,16 @@ exports.searchPros = async (req, res) => {
     };
     if (category) filter.categories = category;
     if (city) filter["location.city"] = city;
-    if (available === "true") filter.availability = true;
+    if (available === "true") {
+      filter.availability = true;
+      filter.lastActiveAt = {
+        $gte: new Date(Date.now() - ONLINE_WINDOW_MS),
+      };
+    }
     const pros = await User.find(filter)
       .populate("categories", "name")
       .select("-password");
-    res.json(pros);
+    res.json(pros.map(withProPresence));
   } catch (e) {
     handleError(res, e);
   }

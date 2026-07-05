@@ -50,35 +50,35 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10">
+    <div className="min-h-screen flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-sm p-8">
+        <div className="glass-panel rounded-2xl p-8">
           <Link
             to="/"
-            className="inline-block bg-blue-600 text-white px-4 py-1.5 rounded-lg mb-6 text-sm font-semibold">
+            className="inline-block bg-white text-zinc-900 rounded-lg px-4 py-1.5 mb-6 font-bold">
             ArtiPro
           </Link>
 
-          <h2 className="text-2xl font-bold mb-1">Bienvenue</h2>
-          <p className="text-gray-500 text-sm mb-6">
+          <h2 className="text-2xl font-bold text-white mb-1">Bienvenue</h2>
+          <p className="text-zinc-400 text-sm mb-6">
             Connectez-vous pour continuer
           </p>
 
             {location.state?.message && (
-              <div className="bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg px-4 py-3 mb-4">
+              <div className="alert-success mb-4">
                 {location.state.message}
               </div>
             )}
 
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 mb-4">
+              <div className="alert-error mb-4">
                 {error}
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-gray-700">
+                <label className="label-field">
                   Email
                 </label>
                 <input
@@ -87,12 +87,12 @@ export default function Login() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="input-field mt-1"
                 />
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-700">
+                <label className="label-field">
                   Mot de passe
                 </label>
                 <input
@@ -101,14 +101,14 @@ export default function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="input-field mt-1"
                 />
               </div>
 
               <div className="text-right">
                 <Link
                   to="/mot-de-passe-oublie"
-                  className="text-xs text-blue-600 hover:underline">
+                  className="link-accent text-xs">
                   Mot de passe oublié ?
                 </Link>
               </div>
@@ -116,16 +116,14 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-blue-600 text-white py-2.5 rounded-lg mt-2 hover:bg-blue-700 transition font-medium text-sm disabled:opacity-60 disabled:cursor-not-allowed">
+                className="btn-primary w-full mt-2 disabled:opacity-60 disabled:cursor-not-allowed">
                 {loading ? "Connexion en cours..." : "Se connecter"}
               </button>
             </form>
 
-          <p className="text-center text-sm mt-6 text-gray-600">
+          <p className="text-center text-sm mt-6 text-zinc-400">
             Pas encore de compte ?{" "}
-            <Link
-              to="/SignIn"
-              className="text-blue-600 font-medium hover:underline">
+            <Link to="/SignIn" className="link-accent">
               Inscrivez-vous
             </Link>
           </p>

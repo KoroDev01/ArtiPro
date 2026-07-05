@@ -54,6 +54,10 @@ const userSchema = new Schema(
       type: Boolean,
       default: true,
     },
+    lastActiveAt: {
+      type: Date,
+      default: null,
+    },
 
     ratingAverage: {
       type: Number,

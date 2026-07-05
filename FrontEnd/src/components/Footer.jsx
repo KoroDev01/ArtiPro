@@ -1,109 +1,111 @@
 import { Link } from "react-router-dom";
 import { FaFacebookF, FaInstagram, FaLinkedin } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
+import { FiArrowUpRight } from "react-icons/fi";
+
+const SOCIAL = [
+  { icon: FaFacebookF, href: "#", label: "Facebook" },
+  { icon: FaXTwitter, href: "#", label: "X" },
+  { icon: FaInstagram, href: "#", label: "Instagram" },
+  { icon: FaLinkedin, href: "#", label: "LinkedIn" },
+];
+
+const LINKS = {
+  Plateforme: [
+    { to: "/find-artisan", label: "Trouver un artisan" },
+    { to: "/demandes", label: "Publier une demande" },
+    { to: "/SignIn", label: "Devenir artisan" },
+  ],
+  Support: [{ to: "/contact", label: "Nous contacter" }],
+  Légal: [
+    { to: "/mentions-legales", label: "Mentions légales" },
+    { to: "/confidentialite", label: "Confidentialité" },
+    { to: "/cgu", label: "CGU" },
+  ],
+};
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
-        <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-8">
+    <footer className="site-footer relative mt-auto text-white">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-400/35 to-transparent" />
 
-          <div className="flex flex-col items-center sm:items-start gap-3 text-center sm:text-left">
-            <Link
-              to="/"
-              className="bg-blue-600 text-white font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-blue-700 transition">
-              ArtiPro
-            </Link>
-            <p className="text-gray-400 text-sm max-w-xs">
-              La plateforme qui connecte les particuliers aux meilleurs artisans
-              d'Algérie.
-            </p>
+      <div className="max-w-7xl mx-auto px-4 pb-8 pt-14 sm:px-6 sm:pb-10 sm:pt-16 lg:px-8">
+        <div className="site-footer-inner rounded-3xl p-6 sm:p-8 lg:p-10">
+          <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-16">
+            {/* Brand */}
+            <div className="flex flex-col items-center gap-5 text-center lg:max-w-sm lg:items-start lg:text-left">
+              <Link to="/" className="group inline-flex items-center gap-3">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 text-sm font-bold text-white shadow-lg shadow-blue-600/25 transition group-hover:scale-105">
+                  A
+                </span>
+                <span className="text-xl font-bold tracking-tight text-white">
+                  ArtiPro
+                </span>
+              </Link>
 
-            <div className="flex items-center gap-3 mt-1">
-              {[
-                { icon: <FaFacebookF size={14} />, href: "#" },
-                { icon: <FaXTwitter size={14} />, href: "#" },
-                { icon: <FaInstagram size={14} />, href: "#" },
-                { icon: <FaLinkedin size={14} />, href: "#" },
-              ].map((s, i) => (
-                <a
-                  key={i}
-                  href={s.href}
-                  className="w-8 h-8 rounded-full bg-gray-800 hover:bg-blue-600 flex items-center justify-center text-gray-400 hover:text-white transition">
-                  {s.icon}
-                </a>
+              <p className="text-sm leading-relaxed text-zinc-400">
+                La plateforme qui connecte les particuliers aux meilleurs
+                artisans d&apos;Algérie — simplement, rapidement, en toute
+                confiance.
+              </p>
+
+              <div className="flex items-center gap-2.5">
+                {SOCIAL.map(({ icon: Icon, href, label }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    aria-label={label}
+                    className="footer-social">
+                    <Icon size={15} />
+                  </a>
+                ))}
+              </div>
+
+              <Link
+                to="/find-artisan"
+                className="btn-primary hidden text-sm sm:inline-flex lg:mt-1">
+                Trouver un artisan
+                <FiArrowUpRight size={15} />
+              </Link>
+            </div>
+
+            {/* Links */}
+            <div className="grid w-full grid-cols-2 gap-8 sm:grid-cols-3 sm:gap-10 lg:w-auto lg:min-w-[420px]">
+              {Object.entries(LINKS).map(([title, items]) => (
+                <div key={title}>
+                  <h3 className="mb-4 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-blue-300/80">
+                    <span className="h-1 w-1 rounded-full bg-blue-400" />
+                    {title}
+                  </h3>
+                  <ul className="space-y-3">
+                    {items.map((item) => (
+                      <li key={item.to}>
+                        <Link to={item.to} className="footer-link group">
+                          <span className="h-px w-0 bg-blue-400 transition-all duration-200 group-hover:w-3" />
+                          {item.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               ))}
             </div>
           </div>
 
-          <div className="flex flex-wrap justify-center sm:justify-end gap-x-10 gap-y-6">
-            <div>
-              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
-                Plateforme
-              </h3>
-              <ul className="space-y-2 text-sm text-gray-300">
-                <li>
-                  <Link
-                    to="/find-artisan"
-                    className="hover:text-white transition">
-                    Trouver un artisan
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/demandes" className="hover:text-white transition">
-                    Publier une demande
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/SignIn" className="hover:text-white transition">
-                    Devenir artisan
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
-                Support
-              </h3>
-              <ul className="space-y-2 text-sm text-gray-300">
-                <li>
-                  <Link to="/contact" className="hover:text-white transition">
-                    Nous contacter
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
-                Légal
-              </h3>
-              <ul className="space-y-2 text-sm text-gray-300">
-                <li>
-                  <Link
-                    to="/mentions-legales"
-                    className="hover:text-white transition">
-                    Mentions légales
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/confidentialite"
-                    className="hover:text-white transition">
-                    Confidentialité
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/cgu" className="hover:text-white transition">
-                    CGU
-                  </Link>
-                </li>
-              </ul>
+          {/* Bottom bar */}
+          <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 sm:flex-row">
+            <p className="text-xs text-zinc-500">
+              © {new Date().getFullYear()} ArtiPro. Tous droits réservés.
+            </p>
+            <div className="flex items-center gap-4 text-xs text-zinc-500">
+              <span className="flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400/80" />
+                Artisans vérifiés
+              </span>
+              <span className="hidden h-3 w-px bg-white/10 sm:block" />
+              <span className="hidden sm:inline">Algérie 🇩🇿</span>
             </div>
           </div>
-        </div>
-
-        <div className="mt-8 pt-6 border-t border-gray-800 text-center text-xs text-gray-500">
-          © {new Date().getFullYear()} ArtiPro. Tous droits réservés.
         </div>
       </div>
     </footer>

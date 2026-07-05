@@ -19,17 +19,17 @@ import {
 const STATUS = {
   pending: {
     label: "En attente",
-    cls: "bg-yellow-50 text-yellow-600",
+    cls: "bg-yellow-500/15 text-yellow-400",
     icon: <FiClock size={12} />,
   },
   approved: {
     label: "Approuvé",
-    cls: "bg-green-50 text-green-600",
+    cls: "bg-green-500/15 text-green-400",
     icon: <FiCheckCircle size={12} />,
   },
   rejected: {
     label: "Refusé",
-    cls: "bg-red-50 text-red-600",
+    cls: "bg-red-500/15 text-red-400",
     icon: <FiXCircle size={12} />,
   },
 };
@@ -142,7 +142,7 @@ export default function AdminCandidatures() {
               className={`px-4 py-2 rounded-full text-sm font-medium transition ${
                 filterStatus === f.value
                   ? "bg-blue-600 text-white"
-                  : "bg-white text-gray-600 border border-gray-200 hover:border-blue-300"
+                  : "dark-card text-zinc-400 hover:text-white"
               }`}>
               {f.label}
               {f.value === "pending" && pendingCount > 0 && (
@@ -159,18 +159,18 @@ export default function AdminCandidatures() {
             [1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="bg-white rounded-2xl shadow-sm p-6 animate-pulse">
+                className="dark-card rounded-2xl p-6 animate-pulse">
                 <div className="flex gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gray-200" />
+                  <div className="w-12 h-12 rounded-full bg-white/10" />
                   <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-gray-200 rounded w-48" />
-                    <div className="h-3 bg-gray-100 rounded w-64" />
+                    <div className="h-4 bg-white/10 rounded w-48" />
+                    <div className="h-3 bg-white/5 rounded w-64" />
                   </div>
                 </div>
               </div>
             ))
           ) : filtered.length === 0 ? (
-            <div className="bg-white rounded-2xl shadow-sm text-center py-16 text-gray-400">
+            <div className="dark-card rounded-2xl text-center py-16 text-zinc-500">
               <p className="text-3xl mb-3">📋</p>
               <p className="text-sm">
                 Aucune candidature dans cette catégorie.
@@ -183,14 +183,14 @@ export default function AdminCandidatures() {
                 <div
                   key={pro._id}
                   onClick={() => setSelectedPro(pro)}
-                  className="bg-white rounded-2xl shadow-sm p-6 cursor-pointer hover:shadow-md transition">
+                  className="dark-card rounded-2xl p-6 cursor-pointer transition">
                   <div className="flex items-start gap-4 flex-wrap">
 
                     <UserAvatar user={pro} size="md" />
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-1">
-                        <p className="font-semibold text-gray-900">
+                        <p className="font-semibold text-white">
                           {pro.firstName} {pro.lastName}
                         </p>
                         <span
@@ -198,9 +198,9 @@ export default function AdminCandidatures() {
                           {st.icon} {st.label}
                         </span>
                       </div>
-                      <p className="text-xs text-gray-400 mb-3">{pro.email}</p>
+                      <p className="text-xs text-zinc-500 mb-3">{pro.email}</p>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-600">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-zinc-400">
                         {pro.companyName && (
                           <span className="flex items-center gap-1.5">
                             🏢 <span>{pro.companyName}</span>
@@ -225,14 +225,14 @@ export default function AdminCandidatures() {
                       </div>
 
                       {pro.description && (
-                        <p className="mt-3 text-sm text-gray-500 bg-gray-50 rounded-lg px-3 py-2 leading-relaxed">
+                        <p className="mt-3 text-sm text-zinc-400 glass-panel rounded-lg px-3 py-2 leading-relaxed">
                           {pro.description}
                         </p>
                       )}
 
                       {pro.proStatus === "rejected" &&
                         pro.proRejectionReason && (
-                          <div className="mt-3 bg-red-50 border border-red-100 rounded-lg px-3 py-2 text-sm text-red-600">
+                          <div className="mt-3 alert-error">
                             <span className="font-medium">
                               Motif du refus :
                             </span>{" "}
@@ -258,7 +258,7 @@ export default function AdminCandidatures() {
                             setReason("");
                           }}
                           disabled={processing}
-                          className="flex items-center gap-1.5 bg-red-50 hover:bg-red-100 text-red-500 px-4 py-2 rounded-xl text-sm font-medium transition disabled:opacity-60">
+                          className="flex items-center gap-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 px-4 py-2 rounded-xl text-sm font-medium transition disabled:opacity-60">
                           <FiX size={14} /> Refuser
                         </button>
                       </div>
@@ -273,34 +273,34 @@ export default function AdminCandidatures() {
 
       {selectedPro && (
         <div
-          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          className="modal-overlay"
           onClick={() => setSelectedPro(null)}>
           <div
-            className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
+            className="modal-panel max-w-lg"
             onClick={(e) => e.stopPropagation()}>
 
-            <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
-              <h3 className="font-semibold text-gray-900">
+            <div className="flex items-center justify-between pb-5 border-b border-white/10">
+              <h3 className="font-semibold text-white">
                 Dossier de candidature
               </h3>
               <button
                 onClick={() => setSelectedPro(null)}
-                className="text-gray-400 hover:text-gray-600">
+                className="text-zinc-500 hover:text-white">
                 <FiX size={20} />
               </button>
             </div>
 
-            <div className="px-6 py-5 space-y-5">
+            <div className="py-5 space-y-5">
 
               <div className="flex items-center gap-4">
                 <UserAvatar user={selectedPro} size="lg" />
                 <div>
-                  <p className="font-bold text-lg text-gray-900">
+                  <p className="font-bold text-lg text-white">
                     {selectedPro.firstName} {selectedPro.lastName}
                   </p>
-                  <p className="text-sm text-gray-400">{selectedPro.email}</p>
+                  <p className="text-sm text-zinc-500">{selectedPro.email}</p>
                   {selectedPro.phone && (
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm text-zinc-500">
                       📞 {selectedPro.phone}
                     </p>
                   )}
@@ -312,8 +312,8 @@ export default function AdminCandidatures() {
                 </span>
               </div>
 
-              <div className="bg-gray-50 rounded-xl p-4 space-y-2">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
+              <div className="dark-card rounded-xl p-4 space-y-2">
+                <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wide mb-3">
                   Informations professionnelles
                 </p>
                 {selectedPro.companyName && (
@@ -357,10 +357,10 @@ export default function AdminCandidatures() {
 
               {selectedPro.description && (
                 <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                  <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wide mb-2">
                     Description
                   </p>
-                  <p className="text-sm text-gray-600 leading-relaxed bg-gray-50 rounded-xl p-4">
+                  <p className="text-sm text-zinc-400 leading-relaxed dark-card rounded-xl p-4">
                     {selectedPro.description}
                   </p>
                 </div>
@@ -368,17 +368,17 @@ export default function AdminCandidatures() {
 
               {selectedPro.proStatus === "rejected" &&
                 selectedPro.proRejectionReason && (
-                  <div className="bg-red-50 border border-red-100 rounded-xl p-4">
+                  <div className="alert-error">
                     <p className="text-xs font-semibold text-red-400 uppercase tracking-wide mb-1">
                       Motif du refus
                     </p>
-                    <p className="text-sm text-red-700">
+                    <p className="text-sm text-red-300">
                       {selectedPro.proRejectionReason}
                     </p>
                   </div>
                 )}
 
-              <p className="text-xs text-gray-400 text-center">
+              <p className="text-xs text-zinc-500 text-center">
                 Candidature soumise le{" "}
                 {new Date(selectedPro.createdAt).toLocaleDateString("fr-FR", {
                   day: "numeric",
@@ -388,12 +388,12 @@ export default function AdminCandidatures() {
               </p>
             </div>
 
-            <div className="flex flex-col gap-2 px-6 py-4 border-t border-gray-100">
+            <div className="flex flex-col gap-2 pt-4 border-t border-white/10">
 
               {selectedPro.isVerified ? (
                 <button
                   onClick={() => handleUnverify(selectedPro._id)}
-                  className="w-full flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2.5 rounded-xl text-sm font-medium transition">
+                  className="btn-secondary w-full">
                   <FiCheckCircle size={14} /> Retirer le badge Vérifié
                 </button>
               ) : (
@@ -422,7 +422,7 @@ export default function AdminCandidatures() {
                       setReason("");
                     }}
                     disabled={processing}
-                    className="flex-1 flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-500 py-2.5 rounded-xl text-sm font-medium transition disabled:opacity-60">
+                    className="flex-1 flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 py-2.5 rounded-xl text-sm font-medium transition disabled:opacity-60">
                     <FiX size={14} /> Refuser
                   </button>
                 </div>
@@ -433,38 +433,38 @@ export default function AdminCandidatures() {
       )}
 
       {rejectTarget && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+        <div className="modal-overlay">
+          <div className="modal-panel max-w-md">
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-10 h-10 rounded-full bg-red-100 text-red-500 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-red-500/15 text-red-400 flex items-center justify-center">
                 <FiXCircle size={18} />
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900">
+                <h3 className="font-semibold text-white">
                   Refuser la candidature
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-zinc-500">
                   {rejectTarget.firstName} {rejectTarget.lastName}
                 </p>
               </div>
             </div>
 
-            <label className="text-sm font-medium text-gray-700 block mb-2">
+            <label className="text-sm font-medium text-zinc-300 block mb-2">
               Motif du refus{" "}
-              <span className="text-gray-400 font-normal">(optionnel)</span>
+              <span className="text-zinc-500 font-normal">(optionnel)</span>
             </label>
             <textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="Ex: Dossier incomplet, informations insuffisantes..."
               rows={3}
-              className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-400 text-sm resize-none mb-5"
+              className="input-field resize-none mb-5"
             />
 
             <div className="flex gap-3">
               <button
                 onClick={() => setRejectTarget(null)}
-                className="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-xl hover:bg-gray-50 transition text-sm font-medium">
+                className="btn-secondary flex-1">
                 Annuler
               </button>
               <button
@@ -486,8 +486,8 @@ function InfoRow({ icon, label, value }) {
   return (
     <div className="flex items-start gap-2 text-sm">
       <span className="flex-shrink-0">{icon}</span>
-      <span className="text-gray-400 w-24 flex-shrink-0">{label}</span>
-      <span className="text-gray-700 font-medium">{value}</span>
+      <span className="text-zinc-500 w-24 flex-shrink-0">{label}</span>
+      <span className="text-zinc-200 font-medium">{value}</span>
     </div>
   );
 }

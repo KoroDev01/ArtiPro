@@ -1,14 +1,17 @@
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
+import PageBanner from "../../components/PageBanner";
 
 export default function Confidentialite() {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="page-wrap">
       <Header />
-      <main className="flex-1 mt-16 max-w-3xl mx-auto px-4 sm:px-6 py-12 w-full">
-        <div className="bg-white rounded-2xl shadow-sm p-6 sm:p-10">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Politique de Confidentialité</h1>
-          <p className="text-sm text-gray-400 mb-8">Dernière mise à jour : juin 2026</p>
+      <PageBanner
+        title="Politique de Confidentialité"
+        subtitle="Dernière mise à jour : juin 2026"
+      />
+      <main className="page-main max-w-3xl mx-auto px-4 sm:px-6 py-8 w-full">
+        <div className="dark-card rounded-2xl p-6 sm:p-10">
 
           <Section title="1. Introduction">
             ArtiPro accorde une grande importance à la protection de vos données personnelles. Cette politique explique quelles données nous collectons, comment nous les utilisons et quels sont vos droits.
@@ -55,8 +58,8 @@ export default function Confidentialite() {
 function Section({ title, children }) {
   return (
     <div className="mb-7">
-      <h2 className="text-base font-semibold text-gray-800 mb-2">{title}</h2>
-      <p className="text-sm text-gray-600 leading-relaxed">{children}</p>
+      <h2 className="text-base font-semibold text-white mb-2">{title}</h2>
+      <p className="text-sm text-zinc-400 leading-relaxed">{children}</p>
     </div>
   );
 }

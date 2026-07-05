@@ -50,35 +50,28 @@ export default function EmptyState({ preset, icon, title, description, cta, onCt
 
   return (
     <div className={`flex flex-col items-center justify-center text-center py-16 px-6 ${className}`}>
-
       <div className="relative mb-5">
-        <div className="w-20 h-20 rounded-2xl bg-gray-100 flex items-center justify-center text-4xl">
+        <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-4xl">
           {_icon}
         </div>
-        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
-          <span className="text-xs">✦</span>
+        <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-blue-500/20 border border-blue-500/30">
+          <span className="text-xs text-blue-300">✦</span>
         </div>
       </div>
 
-      <h3 className="font-semibold text-gray-800 text-base mb-2">{_title}</h3>
+      <h3 className="mb-2 text-base font-semibold text-white">{_title}</h3>
 
       {_description && (
-        <p className="text-sm text-gray-400 max-w-xs leading-relaxed mb-5">{_description}</p>
+        <p className="mb-5 max-w-xs text-sm leading-relaxed text-zinc-500">{_description}</p>
       )}
 
       {_cta && (
         _cta.action === "modal" ? (
-          <button
-            onClick={onCtaClick}
-            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-xl transition"
-          >
+          <button onClick={onCtaClick} className="btn-primary">
             {_cta.label}
           </button>
         ) : (
-          <Link
-            to={_cta.to}
-            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-xl transition"
-          >
+          <Link to={_cta.to} className="btn-primary">
             {_cta.label}
           </Link>
         )

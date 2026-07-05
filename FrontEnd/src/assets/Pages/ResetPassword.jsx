@@ -48,9 +48,9 @@ export default function ResetPassword() {
   if (!token) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
-        <p className="text-gray-500 text-center">
+        <p className="text-zinc-400 text-center">
           Lien invalide.{" "}
-          <Link to="/mot-de-passe-oublie" className="text-blue-600 underline">
+          <Link to="/mot-de-passe-oublie" className="link-accent">
             Demander un nouveau lien
           </Link>
         </p>
@@ -59,41 +59,51 @@ export default function ResetPassword() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-sm p-8">
-        <h1 className="text-2xl font-bold mb-1">Nouveau mot de passe</h1>
-        <p className="text-gray-500 text-sm mb-6">Choisissez un mot de passe sécurisé.</p>
+    <div className="min-h-screen flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-md">
+        <div className="glass-panel rounded-2xl p-8">
+          <Link
+            to="/"
+            className="inline-block bg-white text-zinc-900 rounded-lg px-4 py-1.5 mb-6 font-bold">
+            ArtiPro
+          </Link>
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 mb-4">
-            {error}
-          </div>
-        )}
+          <h1 className="text-2xl font-bold text-white mb-1">Nouveau mot de passe</h1>
+          <p className="text-zinc-400 text-sm mb-6">Choisissez un mot de passe sécurisé.</p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="password"
-            placeholder="Nouveau mot de passe"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-          />
-          <input
-            type="password"
-            placeholder="Confirmer le mot de passe"
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-            required
-            className="w-full p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition font-medium text-sm disabled:opacity-60">
-            {loading ? "Enregistrement..." : "Enregistrer"}
-          </button>
-        </form>
+          {error && <div className="alert-error mb-4">{error}</div>}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="label-field">Nouveau mot de passe</label>
+              <input
+                type="password"
+                placeholder="Nouveau mot de passe"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="input-field mt-1"
+              />
+            </div>
+            <div>
+              <label className="label-field">Confirmer le mot de passe</label>
+              <input
+                type="password"
+                placeholder="Confirmer le mot de passe"
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+                required
+                className="input-field mt-1"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary w-full disabled:opacity-60">
+              {loading ? "Enregistrement..." : "Enregistrer"}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

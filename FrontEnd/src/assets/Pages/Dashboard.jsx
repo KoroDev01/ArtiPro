@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
+import PageBanner from "../../components/PageBanner";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../api";
 import {
@@ -22,15 +23,15 @@ import {
 } from "react-icons/fi";
 
 const STATUS_LABELS = {
-  open: { label: "Ouvert", cls: "bg-green-100 text-green-700" },
-  in_progress: { label: "En cours", cls: "bg-blue-100 text-blue-700" },
-  completed: { label: "Terminé", cls: "bg-gray-100 text-gray-500" },
+  open: { label: "Ouvert", cls: "bg-green-500/20 text-green-400" },
+  in_progress: { label: "En cours", cls: "bg-blue-500/20 text-blue-400" },
+  completed: { label: "Terminé", cls: "bg-zinc-500/20 text-zinc-400" },
 };
 
 const OFFER_STATUS = {
-  pending: { label: "En attente", cls: "bg-yellow-100 text-yellow-700" },
-  accepted: { label: "Acceptée", cls: "bg-green-100 text-green-700" },
-  rejected: { label: "Refusée", cls: "bg-red-100 text-red-700" },
+  pending: { label: "En attente", cls: "bg-yellow-500/20 text-yellow-400" },
+  accepted: { label: "Acceptée", cls: "bg-green-500/20 text-green-400" },
+  rejected: { label: "Refusée", cls: "bg-red-500/20 text-red-400" },
 };
 
 export default function Dashboard() {
@@ -54,21 +55,19 @@ export default function Dashboard() {
   }, [user]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="page-wrap">
       <Header />
-      <main className="flex-1 mt-[72px] max-w-6xl mx-auto px-4 md:px-6 py-8 w-full">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">
-            {user?.role === "admin"
-              ? "Dashboard admin"
-              : isPro
-                ? "Dashboard artisan"
-                : "Dashboard client"}
-          </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Bonjour {user?.firstName}, voici un aperçu de votre activité.
-          </p>
-        </div>
+      <PageBanner
+        title={
+          user?.role === "admin"
+            ? "Dashboard admin"
+            : isPro
+              ? "Dashboard artisan"
+              : "Dashboard client"
+        }
+        subtitle={`Bonjour ${user?.firstName}, voici un aperçu de votre activité.`}
+      />
+      <main className="page-main flex-1 max-w-6xl mx-auto px-4 md:px-6 py-8 w-full">
         {user?.role === "admin" ? (
           <AdminDashboard pendingPros={pendingPros} />
         ) : isPro ? (
@@ -142,9 +141,7 @@ function ClientDashboard({ user }) {
         title="Mes demandes"
         count={posts.length}
         action={
-          <Link
-            to="/demandes"
-            className="text-sm text-blue-600 hover:underline">
+          <Link to="/demandes" className="link-accent">
             + Nouvelle demande
           </Link>
         }>
@@ -155,7 +152,7 @@ function ClientDashboard({ user }) {
             cta={{ label: "Publier une demande", to: "/demandes" }}
           />
         ) : (
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-white/10">
             {posts.map((post) => {
               const s = STATUS_LABELS[post.status] ?? STATUS_LABELS.open;
               const postOffers = offers.filter(
@@ -165,10 +162,10 @@ function ClientDashboard({ user }) {
                 <Link
                   key={post._id}
                   to={`/demandes/${post._id?.toString()}`}
-                  className="flex items-center justify-between py-4 px-2 hover:bg-gray-50 rounded-xl transition group">
+                  className="flex items-center justify-between py-4 px-2 hover:bg-white/5 rounded-xl transition group">
                   <div className="min-w-0">
-                    <p className="font-medium text-sm truncate">{post.title}</p>
-                    <div className="flex items-center gap-3 mt-1 text-xs text-gray-400">
+                    <p className="font-medium text-sm truncate text-white">{post.title}</p>
+                    <div className="flex items-center gap-3 mt-1 text-xs text-zinc-500">
                       {post.location?.city && (
                         <span className="flex items-center gap-0.5">
                           <FiMapPin size={10} /> {post.location.city}
@@ -178,7 +175,7 @@ function ClientDashboard({ user }) {
                         {new Date(post.createdAt).toLocaleDateString("fr-FR")}
                       </span>
                       {postOffers.length > 0 && (
-                        <span className="flex items-center gap-0.5 text-blue-500 font-medium">
+                        <span className="flex items-center gap-0.5 text-blue-400 font-medium">
                           <FiBriefcase size={10} /> {postOffers.length} offre
                           {postOffers.length > 1 ? "s" : ""}
                         </span>
@@ -192,7 +189,7 @@ function ClientDashboard({ user }) {
                     </span>
                     <FiChevronRight
                       size={14}
-                      className="text-gray-300 group-hover:text-blue-400 transition"
+                      className="text-zinc-600 group-hover:text-blue-400 transition"
                     />
                   </div>
                 </Link>
@@ -204,30 +201,30 @@ function ClientDashboard({ user }) {
 
       {offers.length > 0 && (
         <Section title="Offres reçues récemment" count={offers.length}>
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-white/10">
             {offers.slice(0, 5).map((offer) => {
               const s = OFFER_STATUS[offer.status] ?? OFFER_STATUS.pending;
               return (
                 <Link
                   key={offer._id}
                   to={`/demandes/${offer.post?._id?.toString() || offer.post?.toString()}`}
-                  className="flex items-center justify-between py-4 px-2 hover:bg-gray-50 rounded-xl transition group">
+                  className="flex items-center justify-between py-4 px-2 hover:bg-white/5 rounded-xl transition group">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-9 h-9 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                    <div className="w-9 h-9 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs font-bold flex-shrink-0">
                       {offer.pro?.firstName?.[0]?.toUpperCase() || "?"}
                     </div>
                     <div className="min-w-0">
-                      <p className="font-medium text-sm truncate">
+                      <p className="font-medium text-sm truncate text-white">
                         {offer.pro?.firstName} —{" "}
                         {offer.post?.title || "Demande"}
                       </p>
-                      <p className="text-xs text-gray-400 mt-0.5 truncate">
+                      <p className="text-xs text-zinc-500 mt-0.5 truncate">
                         {offer.message?.slice(0, 60)}…
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 ml-4 flex-shrink-0">
-                    <span className="text-sm font-bold text-blue-600">
+                    <span className="text-sm font-bold text-blue-400">
                       {offer.price?.toLocaleString()} DZD
                     </span>
                     <span
@@ -236,7 +233,7 @@ function ClientDashboard({ user }) {
                     </span>
                     <FiChevronRight
                       size={14}
-                      className="text-gray-300 group-hover:text-blue-400 transition"
+                      className="text-zinc-600 group-hover:text-blue-400 transition"
                     />
                   </div>
                 </Link>
@@ -308,15 +305,15 @@ function ProDashboard({ user }) {
       </div>
 
       {inProgress > 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-center gap-3">
-          <FiTrendingUp className="text-blue-600 flex-shrink-0" size={20} />
-          <p className="text-sm text-blue-700 font-medium">
-            Vous avez <span className="font-bold">{inProgress}</span> mission
+        <div className="dark-card rounded-2xl border-blue-500/30 p-4 flex items-center gap-3">
+          <FiTrendingUp className="text-blue-400 flex-shrink-0" size={20} />
+          <p className="text-sm text-blue-300 font-medium">
+            Vous avez <span className="font-bold text-white">{inProgress}</span> mission
             {inProgress > 1 ? "s" : ""} en cours.
           </p>
           <Link
             to="/messages"
-            className="ml-auto text-sm text-blue-600 hover:underline flex items-center gap-1 flex-shrink-0">
+            className="ml-auto link-accent flex items-center gap-1 flex-shrink-0">
             <FiMessageSquare size={14} /> Messagerie
           </Link>
         </div>
@@ -326,9 +323,7 @@ function ProDashboard({ user }) {
         title="Mes offres envoyées"
         count={offers.length}
         action={
-          <Link
-            to="/demandes"
-            className="text-sm text-blue-600 hover:underline">
+          <Link to="/demandes" className="link-accent">
             Parcourir les demandes
           </Link>
         }>
@@ -339,7 +334,7 @@ function ProDashboard({ user }) {
             cta={{ label: "Parcourir les demandes", to: "/demandes" }}
           />
         ) : (
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-white/10">
             {offers.map((offer) => {
               const s = OFFER_STATUS[offer.status] ?? OFFER_STATUS.pending;
               const ps = offer.post?.status
@@ -349,17 +344,17 @@ function ProDashboard({ user }) {
                 <Link
                   key={offer._id}
                   to={`/demandes/${offer.post?._id?.toString() || offer.post?.toString()}`}
-                  className="flex items-center justify-between py-4 px-2 hover:bg-gray-50 rounded-xl transition group">
+                  className="flex items-center justify-between py-4 px-2 hover:bg-white/5 rounded-xl transition group">
                   <div className="min-w-0">
-                    <p className="font-medium text-sm truncate">
+                    <p className="font-medium text-sm truncate text-white">
                       {offer.post?.title || "Demande"}
                     </p>
-                    <p className="text-xs text-gray-400 mt-0.5 truncate">
+                    <p className="text-xs text-zinc-500 mt-0.5 truncate">
                       {offer.message?.slice(0, 60)}…
                     </p>
                   </div>
                   <div className="flex items-center gap-2 ml-4 flex-shrink-0">
-                    <span className="text-sm font-bold text-blue-600">
+                    <span className="text-sm font-bold text-blue-400">
                       {offer.price?.toLocaleString()} DZD
                     </span>
                     <span
@@ -374,7 +369,7 @@ function ProDashboard({ user }) {
                     )}
                     <FiChevronRight
                       size={14}
-                      className="text-gray-300 group-hover:text-blue-400 transition"
+                      className="text-zinc-600 group-hover:text-blue-400 transition"
                     />
                   </div>
                 </Link>
@@ -391,7 +386,7 @@ function ProDashboard({ user }) {
           reviews.length > 0 && (
             <Link
               to={`/artisan/${user._id?.toString()}`}
-              className="text-sm text-blue-600 hover:underline">
+              className="link-accent">
               Voir mon profil public
             </Link>
           )
@@ -401,19 +396,19 @@ function ProDashboard({ user }) {
         ) : (
           <div className="space-y-3">
             {reviews.slice(0, 5).map((review) => (
-              <div key={review._id} className="bg-gray-50 rounded-xl p-4">
+              <div key={review._id} className="dark-card rounded-xl p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-xs font-bold flex-shrink-0">
                       {review.client?.firstName?.[0]?.toUpperCase() || (
                         <FiUser size={12} />
                       )}
                     </div>
                     <div>
-                      <p className="text-sm font-medium">
+                      <p className="text-sm font-medium text-white">
                         {review.client?.firstName} {review.client?.lastName}
                       </p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-zinc-500">
                         {new Date(review.createdAt).toLocaleDateString("fr-FR")}
                       </p>
                     </div>
@@ -421,7 +416,7 @@ function ProDashboard({ user }) {
                   <Stars rating={review.rating} />
                 </div>
                 {review.comment && (
-                  <p className="text-sm text-gray-600 mt-3 leading-relaxed">
+                  <p className="text-sm text-zinc-400 mt-3 leading-relaxed">
                     {review.comment}
                   </p>
                 )}
@@ -440,17 +435,17 @@ function AdminDashboard({ pendingPros }) {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Link
           to="/admin/candidatures"
-          className="bg-white rounded-2xl shadow-sm p-6 flex items-center gap-4 hover:shadow-md transition group">
-          <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl flex-shrink-0">
+          className="dark-card rounded-2xl p-6 flex items-center gap-4 group">
+          <div className="w-12 h-12 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-xl flex-shrink-0">
             <FiBriefcase />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="font-semibold text-gray-800 group-hover:text-blue-600 transition">
+            <p className="font-semibold text-white group-hover:text-blue-400 transition">
               Candidatures
             </p>
-            <p className="text-sm text-gray-400 mt-0.5">
+            <p className="text-sm text-zinc-500 mt-0.5">
               {pendingPros > 0 ? (
-                <span className="text-red-500 font-medium">
+                <span className="text-red-400 font-medium">
                   {pendingPros} en attente
                 </span>
               ) : (
@@ -460,43 +455,43 @@ function AdminDashboard({ pendingPros }) {
           </div>
           <FiChevronRight
             size={16}
-            className="text-gray-300 group-hover:text-blue-400 transition flex-shrink-0"
+            className="text-zinc-600 group-hover:text-blue-400 transition flex-shrink-0"
           />
         </Link>
 
         <Link
           to="/admin/users"
-          className="bg-white rounded-2xl shadow-sm p-6 flex items-center gap-4 hover:shadow-md transition group">
-          <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl flex-shrink-0">
+          className="dark-card rounded-2xl p-6 flex items-center gap-4 group">
+          <div className="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-xl flex-shrink-0">
             <FiUsers />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="font-semibold text-gray-800 group-hover:text-purple-600 transition">
+            <p className="font-semibold text-white group-hover:text-purple-400 transition">
               Utilisateurs
             </p>
-            <p className="text-sm text-gray-400 mt-0.5">Gérer les comptes</p>
+            <p className="text-sm text-zinc-500 mt-0.5">Gérer les comptes</p>
           </div>
           <FiChevronRight
             size={16}
-            className="text-gray-300 group-hover:text-purple-400 transition flex-shrink-0"
+            className="text-zinc-600 group-hover:text-purple-400 transition flex-shrink-0"
           />
         </Link>
 
         <Link
           to="/admin/categories"
-          className="bg-white rounded-2xl shadow-sm p-6 flex items-center gap-4 hover:shadow-md transition group">
-          <div className="w-12 h-12 rounded-xl bg-green-50 text-green-600 flex items-center justify-center text-xl flex-shrink-0">
+          className="dark-card rounded-2xl p-6 flex items-center gap-4 group">
+          <div className="w-12 h-12 rounded-xl bg-green-500/20 text-green-400 flex items-center justify-center text-xl flex-shrink-0">
             <FiTag />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="font-semibold text-gray-800 group-hover:text-green-600 transition">
+            <p className="font-semibold text-white group-hover:text-green-400 transition">
               Catégories
             </p>
-            <p className="text-sm text-gray-400 mt-0.5">Gérer les métiers</p>
+            <p className="text-sm text-zinc-500 mt-0.5">Gérer les métiers</p>
           </div>
           <FiChevronRight
             size={16}
-            className="text-gray-300 group-hover:text-green-400 transition flex-shrink-0"
+            className="text-zinc-600 group-hover:text-green-400 transition flex-shrink-0"
           />
         </Link>
       </div>
@@ -505,23 +500,23 @@ function AdminDashboard({ pendingPros }) {
 }
 
 const COLOR_MAP = {
-  blue: "bg-blue-50 text-blue-600",
-  amber: "bg-amber-50 text-amber-600",
-  green: "bg-green-50 text-green-600",
-  purple: "bg-purple-50 text-purple-600",
-  yellow: "bg-yellow-50 text-yellow-600",
+  blue: "bg-blue-500/20 text-blue-400",
+  amber: "bg-amber-500/20 text-amber-400",
+  green: "bg-green-500/20 text-green-400",
+  purple: "bg-purple-500/20 text-purple-400",
+  yellow: "bg-yellow-500/20 text-yellow-400",
 };
 
 function StatCard({ icon, color, label, value }) {
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-5 flex items-center gap-4">
+    <div className="dark-card rounded-2xl p-5 flex items-center gap-4">
       <div
         className={`w-11 h-11 rounded-xl flex items-center justify-center text-lg flex-shrink-0 ${COLOR_MAP[color]}`}>
         {icon}
       </div>
       <div>
-        <p className="text-2xl font-bold text-gray-900">{value}</p>
-        <p className="text-xs text-gray-500 mt-0.5">{label}</p>
+        <p className="text-2xl font-bold text-white">{value}</p>
+        <p className="text-xs text-zinc-500 mt-0.5">{label}</p>
       </div>
     </div>
   );
@@ -529,12 +524,12 @@ function StatCard({ icon, color, label, value }) {
 
 function Section({ title, count, action, children }) {
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-6">
+    <div className="dark-card rounded-2xl p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-semibold text-lg">
+        <h2 className="font-semibold text-lg text-white">
           {title}
           {count !== undefined && (
-            <span className="text-sm font-normal text-gray-400 ml-2">
+            <span className="text-sm font-normal text-zinc-500 ml-2">
               ({count})
             </span>
           )}
@@ -550,11 +545,9 @@ function Empty({ icon, text, cta }) {
   return (
     <div className="text-center py-10">
       <p className="text-3xl mb-3">{icon}</p>
-      <p className="text-gray-400 text-sm">{text}</p>
+      <p className="text-zinc-500 text-sm">{text}</p>
       {cta && (
-        <Link
-          to={cta.to}
-          className="mt-3 inline-block text-sm text-blue-600 hover:underline font-medium">
+        <Link to={cta.to} className="link-accent mt-3 inline-block">
           {cta.label} →
         </Link>
       )}
@@ -568,7 +561,7 @@ function Stars({ rating }) {
       {[1, 2, 3, 4, 5].map((s) => (
         <span
           key={s}
-          className={`text-base ${s <= rating ? "text-yellow-400" : "text-gray-200"}`}>
+          className={`text-base ${s <= rating ? "text-yellow-400" : "text-zinc-700"}`}>
           ★
         </span>
       ))}
@@ -581,11 +574,11 @@ function DashboardSkeleton() {
     <div className="space-y-6 animate-pulse">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="h-24 bg-gray-200 rounded-2xl" />
+          <div key={i} className="h-24 bg-white/10 rounded-2xl" />
         ))}
       </div>
-      <div className="h-64 bg-gray-200 rounded-2xl" />
-      <div className="h-48 bg-gray-200 rounded-2xl" />
+      <div className="h-64 bg-white/10 rounded-2xl" />
+      <div className="h-48 bg-white/10 rounded-2xl" />
     </div>
   );
 }

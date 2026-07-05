@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
+import PageBanner from "../../components/PageBanner";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
 import api from "../../api";
@@ -9,15 +10,15 @@ import { imageUrl } from "../../utils/imageUrl";
 import UserAvatar from "../../components/UserAvatar";
 
 const STATUS_LABELS = {
-  open: { label: "Ouvert", cls: "bg-green-100 text-green-700" },
-  in_progress: { label: "En cours", cls: "bg-blue-100 text-blue-700" },
-  completed: { label: "Terminé", cls: "bg-gray-100 text-gray-500" },
+  open: { label: "Ouvert", cls: "bg-green-500/20 text-green-400" },
+  in_progress: { label: "En cours", cls: "bg-blue-500/20 text-blue-400" },
+  completed: { label: "Terminé", cls: "bg-zinc-500/20 text-zinc-400" },
 };
 
 const OFFER_STATUS = {
-  pending: { label: "En attente", cls: "bg-yellow-100 text-yellow-700" },
-  accepted: { label: "Acceptée", cls: "bg-green-100 text-green-700" },
-  rejected: { label: "Refusée", cls: "bg-gray-100 text-gray-500" },
+  pending: { label: "En attente", cls: "bg-yellow-500/20 text-yellow-400" },
+  accepted: { label: "Acceptée", cls: "bg-green-500/20 text-green-400" },
+  rejected: { label: "Refusée", cls: "bg-zinc-500/20 text-zinc-400" },
 };
 
 export default function JobDetails() {
@@ -160,33 +161,50 @@ export default function JobDetails() {
     }
   };
 
+  const handleDelete = async () => {
+    if (
+      !confirm(
+        "Supprimer cette demande ? Cette action est irréversible. Les offres en attente seront annulées.",
+      )
+    ) {
+      return;
+    }
+    try {
+      await api.delete(`/posts/${id}`);
+      toast.success("Demande supprimée.");
+      navigate("/demandes");
+    } catch (err) {
+      toast.error(
+        err.response?.data?.message || "Impossible de supprimer cette demande.",
+      );
+    }
+  };
+
   return (
-    <>
+    <div className="page-wrap">
       <Header />
-      <main className="mt-[72px] bg-gray-50 min-h-screen">
-        <section className="max-w-4xl mx-auto px-6 py-8">
-          <Link
-            to="/demandes"
-            className="text-sm text-blue-600 hover:text-blue-800 font-medium mb-6 inline-block">
+      <main className="page-main">
+        <section className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-8">
+          <Link to="/demandes" className="link-accent mb-6 inline-block">
             ← Retour aux demandes
           </Link>
 
           {loading && (
-            <p className="text-center py-20 text-gray-400">Chargement...</p>
+            <p className="text-center py-20 text-zinc-500">Chargement...</p>
           )}
           {error && (
-            <p className="text-center py-20 text-red-500">{error}</p>
+            <p className="text-center py-20 text-red-400">{error}</p>
           )}
 
           {!loading && !error && post && (
             <div className="space-y-6">
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <div className="dark-card rounded-xl p-6">
                 <div className="flex justify-between items-start gap-4 flex-wrap">
                   <div>
-                    <span className="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">
+                    <span className="text-xs bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full">
                       {post.category?.name ?? "Catégorie"}
                     </span>
-                    <h1 className="text-2xl font-bold mt-2">{post.title}</h1>
+                    <h1 className="text-2xl font-bold mt-2 text-white">{post.title}</h1>
                   </div>
                   <span
                     className={`text-xs px-3 py-1 rounded-full font-medium ${status.cls}`}>
@@ -210,7 +228,7 @@ export default function JobDetails() {
                         onClick={() =>
                           setLightboxPhoto(imageUrl(photo, "posts"))
                         }
-                        className="group relative overflow-hidden rounded-xl border border-gray-100 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
                         <img
                           src={imageUrl(photo, "posts")}
                           alt={`Photo ${i + 1}`}
@@ -226,11 +244,11 @@ export default function JobDetails() {
                   </div>
                 )}
 
-                <p className="text-gray-600 mt-4 whitespace-pre-wrap">
+                <p className="text-zinc-400 mt-4 whitespace-pre-wrap">
                   {post.description}
                 </p>
 
-                <div className="flex flex-wrap gap-4 text-sm text-gray-500 mt-4">
+                <div className="flex flex-wrap gap-4 text-sm text-zinc-500 mt-4">
                   {post.location?.city && (
                     <span>📍 {post.location.city}</span>
                   )}
@@ -243,19 +261,19 @@ export default function JobDetails() {
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2 text-sm text-gray-600 mt-4 pt-4 border-t border-gray-100">
+                <div className="flex items-center gap-2 text-sm text-zinc-400 mt-4 pt-4 border-t border-white/10">
                   <UserAvatar user={post.author} size="sm" />
                   {post.author?.firstName} {post.author?.lastName}
                 </div>
               </div>
 
               {isOwner && post.status === "in_progress" && (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                  <h2 className="font-semibold mb-3">Mission en cours</h2>
+                <div className="dark-card rounded-xl p-6">
+                  <h2 className="font-semibold mb-3 text-white">Mission en cours</h2>
                   {acceptedOffer && (
-                    <p className="text-sm text-gray-600 mb-4">
+                    <p className="text-sm text-zinc-400 mb-4">
                       Artisan sélectionné :{" "}
-                      <strong>
+                      <strong className="text-white">
                         {acceptedOffer.pro?.firstName}{" "}
                         {acceptedOffer.pro?.lastName}
                       </strong>{" "}
@@ -264,20 +282,18 @@ export default function JobDetails() {
                   )}
                   <button
                     onClick={handleComplete}
-                    className="bg-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-green-700 transition">
+                    className="bg-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-green-500 transition">
                     Marquer comme terminée
                   </button>
                 </div>
               )}
 
               {isOwner && post.status === "completed" && !existingReview && (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                  <h2 className="font-semibold mb-4">Laisser un avis</h2>
+                <div className="dark-card rounded-xl p-6">
+                  <h2 className="font-semibold mb-4 text-white">Laisser un avis</h2>
                   <form onSubmit={handleSubmitReview} className="space-y-4">
                     <div>
-                      <label className="text-sm font-medium text-gray-700">
-                        Note
-                      </label>
+                      <label className="label-field">Note</label>
                       <select
                         value={reviewForm.rating}
                         onChange={(e) =>
@@ -286,7 +302,7 @@ export default function JobDetails() {
                             rating: Number(e.target.value),
                           })
                         }
-                        className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg text-sm">
+                        className="select-field mt-1">
                         {[5, 4, 3, 2, 1].map((n) => (
                           <option key={n} value={n}>
                             {n} étoile{n > 1 ? "s" : ""}
@@ -295,9 +311,7 @@ export default function JobDetails() {
                       </select>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-700">
-                        Commentaire
-                      </label>
+                      <label className="label-field">Commentaire</label>
                       <textarea
                         value={reviewForm.comment}
                         onChange={(e) =>
@@ -308,14 +322,14 @@ export default function JobDetails() {
                         }
                         required
                         rows={3}
-                        className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg text-sm resize-none"
+                        className="input-field mt-1 resize-none"
                         placeholder="Décrivez votre expérience..."
                       />
                     </div>
                     <button
                       type="submit"
                       disabled={submittingReview}
-                      className="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700 transition disabled:opacity-60">
+                      className="btn-primary disabled:opacity-60">
                       {submittingReview ? "Envoi..." : "Publier l'avis"}
                     </button>
                   </form>
@@ -323,7 +337,7 @@ export default function JobDetails() {
               )}
 
               {existingReview && (
-                <div className="bg-green-50 border border-green-100 rounded-xl p-4 text-sm text-green-700">
+                <div className="alert-success">
                   Vous avez laissé un avis ({existingReview.rating}/5) pour
                   cette mission.
                 </div>
@@ -333,18 +347,14 @@ export default function JobDetails() {
                 post.status === "open" &&
                 !myOffer &&
                 !user?.isBlocked && (
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                    <h2 className="font-semibold mb-4">Proposer une offre</h2>
+                  <div className="dark-card rounded-xl p-6">
+                    <h2 className="font-semibold mb-4 text-white">Proposer une offre</h2>
                     {offerError && (
-                      <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 mb-4">
-                        {offerError}
-                      </div>
+                      <div className="alert-error mb-4">{offerError}</div>
                     )}
                     <form onSubmit={handleSubmitOffer} className="space-y-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-700">
-                          Prix (DZD)
-                        </label>
+                        <label className="label-field">Prix (DZD)</label>
                         <input
                           type="number"
                           value={offerForm.price}
@@ -356,13 +366,11 @@ export default function JobDetails() {
                           }
                           required
                           min="1"
-                          className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg text-sm"
+                          className="input-field mt-1"
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">
-                          Message
-                        </label>
+                        <label className="label-field">Message</label>
                         <textarea
                           value={offerForm.message}
                           onChange={(e) =>
@@ -373,14 +381,14 @@ export default function JobDetails() {
                           }
                           required
                           rows={3}
-                          className="w-full mt-1 p-2.5 border border-gray-200 rounded-lg text-sm resize-none"
+                          className="input-field mt-1 resize-none"
                           placeholder="Présentez votre proposition..."
                         />
                       </div>
                       <button
                         type="submit"
                         disabled={submittingOffer}
-                        className="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700 transition disabled:opacity-60">
+                        className="btn-primary disabled:opacity-60">
                         {submittingOffer ? "Envoi..." : "Envoyer l'offre"}
                       </button>
                     </form>
@@ -388,7 +396,7 @@ export default function JobDetails() {
                 )}
 
               {myOffer && (
-                <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-sm text-blue-700">
+                <div className="rounded-xl border border-blue-500/30 bg-blue-500/10 p-4 text-sm text-blue-300">
                   Vous avez déjà envoyé une offre pour cette demande (
                   {myOffer.price?.toLocaleString()} DZD) — statut :{" "}
                   {OFFER_STATUS[myOffer.status]?.label ?? myOffer.status}
@@ -396,8 +404,8 @@ export default function JobDetails() {
               )}
 
               {(isOwner || isPro) && offers.length > 0 && (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                  <h2 className="font-semibold mb-4">
+                <div className="dark-card rounded-xl p-6">
+                  <h2 className="font-semibold mb-4 text-white">
                     Offres reçues ({offers.length})
                   </h2>
                   <div className="space-y-4">
@@ -407,21 +415,21 @@ export default function JobDetails() {
                       return (
                         <div
                           key={offer._id}
-                          className="border border-gray-100 rounded-lg p-4">
+                          className="border border-white/10 rounded-lg p-4">
                           <div className="flex justify-between items-start gap-4">
                             <div>
-                              <p className="font-medium">
+                              <p className="font-medium text-white">
                                 {offer.pro?.firstName} {offer.pro?.lastName}
                                 {offer.pro?.ratingAverage > 0 && (
-                                  <span className="text-yellow-500 text-sm ml-2">
+                                  <span className="text-yellow-400 text-sm ml-2">
                                     ★ {offer.pro.ratingAverage.toFixed(1)}
                                   </span>
                                 )}
                               </p>
-                              <p className="text-lg font-semibold text-blue-600 mt-1">
+                              <p className="text-lg font-semibold text-blue-400 mt-1">
                                 {offer.price?.toLocaleString()} DZD
                               </p>
-                              <p className="text-sm text-gray-600 mt-2">
+                              <p className="text-sm text-zinc-400 mt-2">
                                 {offer.message}
                               </p>
                             </div>
@@ -435,14 +443,14 @@ export default function JobDetails() {
                             offer.status === "pending" && (
                               <button
                                 onClick={() => handleAcceptOffer(offer._id)}
-                                className="mt-3 bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition">
+                                className="mt-3 bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-500 transition">
                                 Accepter cette offre
                               </button>
                             )}
                           {offer.status === "accepted" && (
                             <Link
                               to={`/artisan/${offer.pro?._id ?? offer.pro}`}
-                              className="inline-block mt-3 text-sm text-blue-600 hover:text-blue-800 font-medium">
+                              className="link-accent inline-block mt-3">
                               Voir le profil de l'artisan →
                             </Link>
                           )}
@@ -454,16 +462,39 @@ export default function JobDetails() {
               )}
 
               {!user && (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 text-center">
-                  <p className="text-gray-600 text-sm mb-4">
+                <div className="dark-card rounded-xl p-6 text-center">
+                  <p className="text-zinc-400 text-sm mb-4">
                     Connectez-vous pour proposer une offre ou gérer cette
                     demande.
                   </p>
                   <button
                     onClick={() => navigate("/Login")}
-                    className="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700 transition">
+                    className="btn-primary">
                     Se connecter
                   </button>
+                </div>
+              )}
+
+              {isOwner && user?.role === "client" && (
+                <div className="dark-card rounded-xl border-red-500/20 p-6">
+                  <h2 className="font-semibold text-white mb-1">
+                    Gérer la demande
+                  </h2>
+                  <p className="text-sm text-zinc-500 mb-4">
+                    {post.status === "open"
+                      ? "Vous pouvez supprimer cette demande tant qu'aucune offre n'a été acceptée."
+                      : post.status === "in_progress"
+                        ? "La mission est en cours. La suppression annulera les offres en attente."
+                        : "Cette mission est terminée."}
+                  </p>
+                  {post.status !== "completed" && (
+                    <button
+                      type="button"
+                      onClick={handleDelete}
+                      className="border border-red-500/30 text-red-400 hover:bg-red-500/10 px-5 py-2.5 rounded-lg text-sm font-medium transition">
+                      Supprimer la demande
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -478,7 +509,7 @@ export default function JobDetails() {
           <button
             type="button"
             onClick={() => setLightboxPhoto(null)}
-            className="absolute top-4 right-4 text-white text-3xl leading-none hover:text-gray-300"
+            className="absolute top-4 right-4 text-white text-3xl leading-none hover:text-zinc-300"
             aria-label="Fermer">
             ×
           </button>
@@ -492,6 +523,6 @@ export default function JobDetails() {
       )}
 
       <Footer />
-    </>
+    </div>
   );
 }

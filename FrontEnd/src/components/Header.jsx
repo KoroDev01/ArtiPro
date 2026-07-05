@@ -85,43 +85,58 @@ export default function Header() {
   };
 
   const isActive = (path) => location.pathname === path;
+  const isHome = location.pathname === "/";
 
-  const navLinkCls = (path) =>
-    `text-sm font-medium transition-colors ${
-      isActive(path) ? "text-blue-600" : "text-gray-600 hover:text-blue-600"
+  const headerCls = isHome
+    ? "bg-white/10 backdrop-blur-2xl border-b border-white/15"
+    : "bg-slate-900/50 backdrop-blur-2xl border-b border-white/10";
+
+  const logoCls = isHome
+    ? "bg-white text-zinc-900 hover:bg-zinc-100"
+    : "bg-blue-600 text-white hover:bg-blue-500";
+
+  const navCls = (path) => {
+    if (isHome) {
+      return `text-sm font-medium transition-colors ${
+        isActive(path) ? "text-white" : "text-white/75 hover:text-white"
+      }`;
+    }
+    return `text-sm font-medium transition-colors ${
+      isActive(path) ? "text-blue-400" : "text-zinc-400 hover:text-white"
     }`;
+  };
 
   return (
     <>
       {user?.isBlocked && <BanBanner user={user} />}
 
       <header
-        className={`fixed left-0 right-0 h-16 bg-white border-b border-gray-100 shadow-sm z-50 ${user?.isBlocked ? "top-[44px]" : "top-0"}`}>
+        className={`fixed left-0 right-0 h-16 z-50 ${headerCls} ${user?.isBlocked ? "top-[44px]" : "top-0"}`}>
         <div className="max-w-7xl mx-auto h-full px-4 md:px-6 flex items-center justify-between gap-4">
           <Link
             to="/"
-            className="flex-shrink-0 bg-blue-600 text-white font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-blue-700 transition">
+            className={`flex-shrink-0 rounded-lg px-4 py-1.5 text-sm font-bold transition ${logoCls}`}>
             ArtiPro
           </Link>
 
           <nav className="hidden lg:flex items-center gap-6">
-            <Link to="/" className={navLinkCls("/")}>
+            <Link to="/" className={navCls("/")}>
               Accueil
             </Link>
-            <Link to="/find-artisan" className={navLinkCls("/find-artisan")}>
+            <Link to="/find-artisan" className={navCls("/find-artisan")}>
               Trouver un artisan
             </Link>
             {user && (
-              <Link to="/demandes" className={navLinkCls("/demandes")}>
+              <Link to="/demandes" className={navCls("/demandes")}>
                 Demandes
               </Link>
             )}
             {user && (
               <>
-                <Link to="/messages" className={navLinkCls("/messages")}>
+                <Link to="/messages" className={navCls("/messages")}>
                   Messages
                 </Link>
-                <Link to="/dashboard" className={navLinkCls("/dashboard")}>
+                <Link to="/dashboard" className={navCls("/dashboard")}>
                   Dashboard
                 </Link>
               </>
@@ -137,9 +152,14 @@ export default function Header() {
                       e.stopPropagation();
                       setNotifOpen((v) => !v);
                     }}
-                    className="relative flex items-center justify-center w-9 h-9 rounded-full hover:bg-gray-100 transition"
+                    className={`relative flex items-center justify-center w-9 h-9 rounded-full transition ${
+                      isHome ? "hover:bg-white/10" : "hover:bg-white/5"
+                    }`}
                     aria-label="Notifications">
-                    <FiBell size={18} className="text-gray-600" />
+                    <FiBell
+                      size={18}
+                      className={isHome ? "text-white" : "text-zinc-300"}
+                    />
                     {unread > 0 && (
                       <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
                         {unread > 9 ? "9+" : unread}
@@ -158,9 +178,14 @@ export default function Header() {
 
                 <Link
                   to="/profile"
-                  className="hidden lg:flex items-center gap-2 pl-1.5 pr-3 py-1.5 rounded-full border border-gray-200 hover:bg-gray-50 transition">
+                  className={`hidden lg:flex items-center gap-2 pl-1.5 pr-3 py-1.5 rounded-full border transition ${
+                    isHome
+                      ? "border-white/20 hover:bg-white/10"
+                      : "border-white/10 hover:bg-white/5"
+                  }`}>
                   <UserAvatar user={user} size="sm" />
-                  <span className="text-sm font-medium text-gray-700">
+                  <span
+                    className={`text-sm font-medium ${isHome ? "text-white" : "text-zinc-200"}`}>
                     {user.firstName}
                   </span>
                 </Link>
@@ -174,35 +199,59 @@ export default function Header() {
 
                 <button
                   onClick={logout}
-                  className="hidden cursor-alias lg:flex items-center gap-1.5 text-sm text-red-500 hover:text-red-600 font-medium px-3 py-1.5 rounded-lg hover:bg-red-50 transition">
+                  className={`hidden cursor-alias lg:flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg transition ${
+                    isHome
+                      ? "text-red-300 hover:text-red-200 hover:bg-white/10"
+                      : "text-red-400 hover:text-red-300 hover:bg-white/5"
+                  }`}>
                   <FiLogOut size={15} />
                   Déconnexion
                 </button>
 
                 <button
                   onClick={() => setMenuOpen((v) => !v)}
-                  className="flex lg:hidden items-center justify-center w-9 h-9 rounded-full hover:bg-gray-100 transition"
+                  className={`flex lg:hidden items-center justify-center w-9 h-9 rounded-full transition ${
+                    isHome ? "hover:bg-white/10" : "hover:bg-white/5"
+                  }`}
                   aria-label="Menu">
-                  {menuOpen ? <FiX size={20} /> : <FiMenu size={20} />}
+                  {menuOpen ? (
+                    <FiX size={20} className={isHome ? "text-white" : "text-zinc-200"} />
+                  ) : (
+                    <FiMenu size={20} className={isHome ? "text-white" : "text-zinc-200"} />
+                  )}
                 </button>
               </>
             ) : (
               <>
                 <Link
                   to="/Login"
-                  className="text-xs sm:text-sm font-medium text-gray-600 hover:text-blue-600 transition px-2 sm:px-3 py-1.5 whitespace-nowrap">
+                  className={`text-xs sm:text-sm font-medium transition px-2 sm:px-3 py-1.5 whitespace-nowrap ${
+                    isHome
+                      ? "text-white/90 hover:text-white"
+                      : "text-zinc-400 hover:text-white"
+                  }`}>
                   Connexion
                 </Link>
                 <Link
                   to="/SignIn"
-                  className="text-xs sm:text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 px-2.5 sm:px-4 py-1.5 rounded-lg transition whitespace-nowrap">
+                  className={`text-xs sm:text-sm font-medium px-2.5 sm:px-4 py-1.5 rounded-lg transition whitespace-nowrap ${
+                    isHome
+                      ? "text-white border border-white/30 hover:bg-white/10"
+                      : "bg-blue-600 text-white hover:bg-blue-500"
+                  }`}>
                   Inscription
                 </Link>
                 <button
                   onClick={() => setMenuOpen((v) => !v)}
-                  className="flex lg:hidden items-center justify-center w-9 h-9 rounded-full hover:bg-gray-100 transition"
+                  className={`flex lg:hidden items-center justify-center w-9 h-9 rounded-full transition ${
+                    isHome ? "hover:bg-white/10" : "hover:bg-white/5"
+                  }`}
                   aria-label="Menu">
-                  {menuOpen ? <FiX size={20} /> : <FiMenu size={20} />}
+                  {menuOpen ? (
+                    <FiX size={20} className={isHome ? "text-white" : "text-zinc-200"} />
+                  ) : (
+                    <FiMenu size={20} className={isHome ? "text-white" : "text-zinc-200"} />
+                  )}
                 </button>
               </>
             )}
@@ -216,7 +265,7 @@ export default function Header() {
             className="fixed inset-0 bg-black/30 z-40 lg:hidden"
             onClick={() => setMenuOpen(false)}
           />
-          <div className="fixed top-16 left-0 right-0 bg-white z-40 lg:hidden shadow-lg border-t border-gray-100 max-h-[calc(100vh-64px)] overflow-y-auto">
+          <div className="fixed top-16 left-0 right-0 z-40 lg:hidden glass-panel !shadow-none max-h-[calc(100vh-64px)] overflow-y-auto border-t border-white/10">
             <nav className="flex flex-col py-3">
               <MobileLink
                 to="/"
@@ -244,19 +293,19 @@ export default function Header() {
 
               {user ? (
                 <>
-                  <div className="h-px bg-gray-100 mx-4 my-2" />
+                  <div className="h-px bg-white/10 mx-4 my-2" />
                   <div className="px-4 py-2 flex items-center gap-3">
                     <UserAvatar user={user} size="md" />
                     <div>
-                      <p className="text-sm font-semibold text-gray-800">
+                      <p className="text-sm font-semibold text-white">
                         {user.firstName} {user.lastName}
                       </p>
-                      <p className="text-xs text-gray-400 capitalize">
+                      <p className="text-xs text-zinc-500 capitalize">
                         {user.role}
                       </p>
                     </div>
                   </div>
-                  <div className="h-px bg-gray-100 mx-4 my-2" />
+                  <div className="h-px bg-white/10 mx-4 my-2" />
                   <MobileLink
                     to="/messages"
                     icon={<FiMessageSquare size={16} />}
@@ -278,7 +327,7 @@ export default function Header() {
                     onNavigate={closeMenu}>
                     Mon profil
                   </MobileLink>
-                  <div className="h-px bg-gray-100 mx-4 my-2" />
+                  <div className="h-px bg-white/10 mx-4 my-2" />
                   <button
                     onClick={logout}
                     className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-500 hover:bg-red-50 transition">
@@ -288,7 +337,7 @@ export default function Header() {
                 </>
               ) : (
                 <>
-                  <div className="h-px bg-gray-100 mx-4 my-2" />
+                  <div className="h-px bg-white/10 mx-4 my-2" />
                   <MobileLink
                     to="/Login"
                     icon={<FiUser size={16} />}
@@ -320,10 +369,10 @@ function MobileLink({ to, icon, active, children, onNavigate }) {
       onClick={onNavigate}
       className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition ${
         active
-          ? "text-blue-600 bg-blue-50"
-          : "text-gray-700 hover:bg-gray-50 hover:text-blue-600"
+          ? "text-blue-400 bg-white/10"
+          : "text-zinc-300 hover:bg-white/5 hover:text-white"
       }`}>
-      <span className={active ? "text-blue-600" : "text-gray-400"}>{icon}</span>
+      <span className={active ? "text-blue-400" : "text-zinc-500"}>{icon}</span>
       {children}
     </Link>
   );
@@ -334,27 +383,27 @@ function NotifPanel({ notifs, onMarkAll, onClickNotif, onClose }) {
   return (
     <div
       onClick={(e) => e.stopPropagation()}
-      className="absolute right-0 top-12 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-        <span className="font-semibold text-sm">Notifications</span>
+      className="absolute right-0 top-12 w-80 glass-panel rounded-2xl z-50 overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+        <span className="font-semibold text-sm text-white">Notifications</span>
         <div className="flex items-center gap-2">
           {unread > 0 && (
             <button
               onClick={onMarkAll}
-              className="text-xs text-blue-600 hover:underline flex items-center gap-1">
+              className="text-xs text-blue-400 hover:underline flex items-center gap-1">
               <FiCheck size={12} /> Tout lire
             </button>
           )}
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600">
+            className="text-zinc-500 hover:text-zinc-300">
             <FiX size={16} />
           </button>
         </div>
       </div>
       <div className="max-h-80 overflow-y-auto">
         {notifs.length === 0 ? (
-          <div className="text-center py-10 text-gray-400 text-sm">
+          <div className="text-center py-10 text-zinc-500 text-sm">
             <p className="text-2xl mb-2">🔔</p>
             Aucune notification
           </div>
@@ -363,16 +412,16 @@ function NotifPanel({ notifs, onMarkAll, onClickNotif, onClose }) {
             <button
               key={notif._id}
               onClick={() => onClickNotif(notif)}
-              className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-gray-50 transition border-b border-gray-50 last:border-0 ${!notif.read ? "bg-blue-50/60" : ""}`}>
+              className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-white/5 transition border-b border-white/5 last:border-0 ${!notif.read ? "bg-blue-500/10" : ""}`}>
               <span className="text-lg flex-shrink-0 mt-0.5">
                 {NOTIF_ICONS[notif.type] || "🔔"}
               </span>
               <div className="min-w-0 flex-1">
                 <p
-                  className={`text-sm leading-snug ${!notif.read ? "font-medium text-gray-800" : "text-gray-600"}`}>
+                  className={`text-sm leading-snug ${!notif.read ? "font-medium text-white" : "text-zinc-400"}`}>
                   {notif.message}
                 </p>
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs text-zinc-500 mt-1">
                   {new Date(notif.createdAt).toLocaleDateString("fr-FR", {
                     day: "numeric",
                     month: "short",

@@ -157,7 +157,7 @@ function PostDetailModal({
                 comments.map((c) => (
                   <div key={c._id} className="flex gap-2">
                     <UserAvatar user={c.author} size="xs" />
-                    <div className="flex-1 min-w-0 bg-gray-50 rounded-xl px-3 py-2">
+                    <div className="flex-1 min-w-0 rounded-xl border border-white/10 bg-white/5 px-3 py-2">
                       <p className="text-xs font-semibold text-gray-800">
                         {c.author?.firstName} {c.author?.lastName}
                       </p>
@@ -340,14 +340,14 @@ export default function PortfolioFeed({ proId, canPost = false }) {
     return (
       <div className="space-y-4 animate-pulse">
         {[1, 2].map((i) => (
-          <div key={i} className="bg-gray-50 rounded-xl h-48" />
+          <div key={i} className="dark-card rounded-xl h-48" />
         ))}
       </div>
     );
   }
 
   if (error) {
-    return <p className="text-center text-red-500 text-sm py-8">{error}</p>;
+    return <p className="text-center text-red-400 text-sm py-8">{error}</p>;
   }
 
   return (
@@ -355,12 +355,12 @@ export default function PortfolioFeed({ proId, canPost = false }) {
       {canPost && (
         <form
           onSubmit={handlePublish}
-          className="bg-blue-50 border border-blue-100 rounded-xl p-4 space-y-3">
-          <h3 className="font-semibold text-sm text-blue-900">
+          className="dark-card rounded-xl p-4 space-y-3">
+          <h3 className="font-semibold text-sm text-white">
             Partager une réalisation
           </h3>
           {publishError && (
-            <p className="text-xs text-red-600 bg-red-50 rounded-lg px-3 py-2">
+            <p className="text-xs text-red-300 alert-error !py-2">
               {publishError}
             </p>
           )}
@@ -370,19 +370,19 @@ export default function PortfolioFeed({ proId, canPost = false }) {
             placeholder="Décrivez ce travail réalisé..."
             rows={3}
             maxLength={2000}
-            className="w-full p-3 border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            className="input-field resize-none"
           />
           <PhotoPicker
             photos={photos}
             onChange={setPhotos}
             max={4}
-            className="bg-white rounded-xl p-3 border border-gray-100"
+            className="glass-panel rounded-xl p-3"
           />
           <div className="flex justify-end">
             <button
               type="submit"
               disabled={publishing || !caption.trim()}
-              className="bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-60">
+              className="btn-primary disabled:opacity-60">
               {publishing ? "Publication..." : "Publier"}
             </button>
           </div>
@@ -390,7 +390,7 @@ export default function PortfolioFeed({ proId, canPost = false }) {
       )}
 
       {posts.length === 0 ? (
-        <div className="text-center py-12 text-gray-400">
+        <div className="text-center py-12 text-zinc-500">
           <p className="text-3xl mb-2">🛠️</p>
           <p className="text-sm">
             {canPost
@@ -408,14 +408,14 @@ export default function PortfolioFeed({ proId, canPost = false }) {
           return (
             <article
               key={post._id}
-              className="border border-gray-100 rounded-xl overflow-hidden bg-white hover:shadow-md transition-shadow">
+              className="dark-card rounded-xl overflow-hidden">
               <button
                 type="button"
                 onClick={() => openPost(post)}
                 className="w-full text-left group">
                 {post.photos?.length > 0 && (
                   <div
-                    className={`relative grid gap-0.5 bg-gray-100 ${
+                    className={`relative grid gap-0.5 bg-black/40 ${
                       post.photos.length === 1
                         ? "grid-cols-1"
                         : "grid-cols-2"
@@ -448,17 +448,17 @@ export default function PortfolioFeed({ proId, canPost = false }) {
                 )}
 
                 <div className="p-4">
-                  <p className="text-sm text-gray-700 whitespace-pre-wrap line-clamp-3">
+                  <p className="text-sm text-zinc-300 whitespace-pre-wrap line-clamp-3">
                     {post.caption}
                   </p>
-                  <p className="text-xs text-blue-600 font-medium mt-2 group-hover:underline">
+                  <p className="text-xs link-accent mt-2 group-hover:underline">
                     Voir en détail →
                   </p>
                 </div>
               </button>
 
               <div className="px-4 pb-4">
-                <p className="text-xs text-gray-400 mb-3">
+                <p className="text-xs text-zinc-500 mb-3">
                   {new Date(post.createdAt).toLocaleDateString("fr-FR", {
                     day: "numeric",
                     month: "long",
@@ -466,14 +466,14 @@ export default function PortfolioFeed({ proId, canPost = false }) {
                   })}
                 </p>
 
-                <div className="flex items-center gap-4 pt-3 border-t border-gray-50">
+                <div className="flex items-center gap-4 pt-3 border-t border-white/10">
                   <button
                     type="button"
                     onClick={() => (user ? handleLike(post._id) : null)}
                     className={`flex items-center gap-1.5 text-sm font-medium transition ${
                       post.likedByMe
-                        ? "text-red-500"
-                        : "text-gray-500 hover:text-red-500"
+                        ? "text-red-400"
+                        : "text-zinc-400 hover:text-red-400"
                     }`}>
                     <FiHeart
                       size={18}
@@ -484,7 +484,7 @@ export default function PortfolioFeed({ proId, canPost = false }) {
                   <button
                     type="button"
                     onClick={() => toggleComments(post._id)}
-                    className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-blue-600 transition">
+                    className="flex items-center gap-1.5 text-sm font-medium text-zinc-400 hover:text-blue-400 transition">
                     <FiMessageCircle size={18} />
                     {post.commentCount || 0}
                   </button>
@@ -492,7 +492,7 @@ export default function PortfolioFeed({ proId, canPost = false }) {
                     <button
                       type="button"
                       onClick={() => handleDelete(post._id)}
-                      className="ml-auto text-gray-400 hover:text-red-500 transition">
+                      className="ml-auto text-zinc-500 hover:text-red-400 transition">
                       <FiTrash2 size={16} />
                     </button>
                   )}
@@ -503,11 +503,11 @@ export default function PortfolioFeed({ proId, canPost = false }) {
                     {(comments[post._id] || []).map((c) => (
                       <div key={c._id} className="flex gap-2">
                         <UserAvatar user={c.author} size="xs" />
-                        <div className="flex-1 min-w-0 bg-gray-50 rounded-xl px-3 py-2">
-                          <p className="text-xs font-semibold text-gray-800">
+                        <div className="flex-1 min-w-0 glass-panel rounded-xl px-3 py-2">
+                          <p className="text-xs font-semibold text-white">
                             {c.author?.firstName} {c.author?.lastName}
                           </p>
-                          <p className="text-sm text-gray-600 mt-0.5">
+                          <p className="text-sm text-zinc-400 mt-0.5">
                             {c.text}
                           </p>
                         </div>
@@ -528,7 +528,7 @@ export default function PortfolioFeed({ proId, canPost = false }) {
                             }
                             placeholder="Écrire un commentaire..."
                             maxLength={500}
-                            className="flex-1 text-sm border border-gray-200 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="input-field !rounded-full"
                             onKeyDown={(e) => {
                               if (e.key === "Enter") {
                                 e.preventDefault();
@@ -539,13 +539,13 @@ export default function PortfolioFeed({ proId, canPost = false }) {
                           <button
                             type="button"
                             onClick={() => handleComment(post._id)}
-                            className="text-blue-600 hover:text-blue-700 p-2">
+                            className="text-blue-400 hover:text-blue-300 p-2">
                             <FiSend size={16} />
                           </button>
                         </div>
                       </div>
                     ) : (
-                      <p className="text-xs text-gray-400 text-center">
+                      <p className="text-xs text-zinc-500 text-center">
                         Connectez-vous pour commenter.
                       </p>
                     )}

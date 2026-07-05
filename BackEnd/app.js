@@ -38,7 +38,9 @@ async function start() {
     require("./config/session.config");
     require("./config/passport.config");
     const { resolveUserFromToken } = require("./middleware/auth.middleware");
+    const { touchProActivity } = require("./middleware/proActivity.middleware");
     app.use(resolveUserFromToken);
+    app.use(touchProActivity);
 
     app.use(router);
 
