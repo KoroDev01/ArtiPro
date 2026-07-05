@@ -15,7 +15,7 @@ import {
   FiMaximize2,
 } from "react-icons/fi";
 
-function PostDetailModal({
+export function PostDetailModal({
   post,
   user,
   comments,

@@ -3,19 +3,18 @@ import { LuBadgeCheck } from "react-icons/lu";
 import { IoDocumentText } from "react-icons/io5";
 import { TbClockHour3Filled } from "react-icons/tb";
 import {
-  FiSearch,
+  FiGrid,
   FiFileText,
-  FiCompass,
   FiArrowRight,
 } from "react-icons/fi";
 import heroBg from "../assets/img/anna-claire-schellenberg-gU4UkWep8sY-unsplash.jpg";
 
 const NAV_ITEMS = [
   {
-    icon: FiSearch,
-    title: "Trouver un artisan",
-    description: "Parcourez les profils vérifiés près de chez vous",
-    to: "/find-artisan",
+    icon: FiGrid,
+    title: "Réalisations",
+    description: "Parcourez les travaux réalisés par nos artisans",
+    to: "/showroom",
     iconBg: "from-blue-500 to-blue-600",
     iconRing: "ring-blue-400/30",
     primary: true,
@@ -28,14 +27,7 @@ const NAV_ITEMS = [
     iconBg: "from-indigo-500 to-violet-600",
     iconRing: "ring-violet-400/30",
   },
-  {
-    icon: FiCompass,
-    title: "Explorer les métiers",
-    description: "Plomberie, électricité, peinture…",
-    scrollTo: "services",
-    iconBg: "from-sky-500 to-cyan-600",
-    iconRing: "ring-cyan-400/30",
-  },
+
 ];
 
 const BADGES = [

@@ -30,6 +30,73 @@ exports.listByPro = async (req, res) => {
   }
 };
 
+exports.listShowroom = async (req, res) => {
+  try {
+    const User = require("../database/models/user.model");
+    const { pro: proId } = req.query;
+
+    const approvedProIds = await User.find({
+      role: "pro",
+      proStatus: "approved",
+      isBlocked: false,
+    }).distinct("_id");
+
+    const filter = { pro: { $in: approvedProIds } };
+    if (proId) {
+      const allowed = approvedProIds.some((id) => id.toString() === proId);
+      if (!allowed) return res.json([]);
+      filter.pro = proId;
+    }
+
+    const posts = await PortfolioPost.find(filter)
+      .sort({ createdAt: -1 })
+      .limit(proId ? 100 : 60)
+      .populate("pro", "firstName lastName avatar companyName location");
+
+    const userId = req.user?._id;
+    const formatted = await Promise.all(posts.map((p) => formatPost(p, userId)));
+    res.json(formatted);
+  } catch (e) {
+    handleError(res, e);
+  }
+};
+
+exports.searchShowroomPros = async (req, res) => {
+  try {
+    const User = require("../database/models/user.model");
+    const q = req.query.q?.trim() || "";
+
+    const proIdsWithPosts = await PortfolioPost.distinct("pro");
+    if (!proIdsWithPosts.length) return res.json([]);
+
+    const filter = {
+      _id: { $in: proIdsWithPosts },
+      role: "pro",
+      proStatus: "approved",
+      isBlocked: false,
+    };
+
+    if (q.length >= 2) {
+      const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const regex = new RegExp(escaped, "i");
+      filter.$or = [
+        { firstName: regex },
+        { lastName: regex },
+        { companyName: regex },
+      ];
+    }
+
+    const pros = await User.find(filter)
+      .select("firstName lastName avatar companyName location")
+      .sort({ firstName: 1, lastName: 1 })
+      .limit(q.length >= 2 ? 12 : 30);
+
+    res.json(pros);
+  } catch (e) {
+    handleError(res, e);
+  }
+};
+
 exports.create = async (req, res) => {
   try {
     if (req.user.role !== "pro") {

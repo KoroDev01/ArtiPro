@@ -4,15 +4,27 @@ import { FaXTwitter } from "react-icons/fa6";
 import { FiArrowUpRight } from "react-icons/fi";
 
 const SOCIAL = [
-  { icon: FaFacebookF, href: "#", label: "Facebook" },
-  { icon: FaXTwitter, href: "#", label: "X" },
-  { icon: FaInstagram, href: "#", label: "Instagram" },
-  { icon: FaLinkedin, href: "#", label: "LinkedIn" },
+  {
+    icon: FaFacebookF,
+    href: "https://www.facebook.com/outlast.rust.9/",
+    label: "Facebook",
+  },
+  { icon: FaXTwitter, href: "https://x.com/KoroSukuna", label: "X" },
+  {
+    icon: FaInstagram,
+    href: "https://www.instagram.com/_fm28s/",
+    label: "Instagram",
+  },
+  {
+    icon: FaLinkedin,
+    href: "https://www.linkedin.com/in/faiz-abdelhakim-mali-4255932ab/",
+    label: "LinkedIn",
+  },
 ];
 
 const LINKS = {
   Plateforme: [
-    { to: "/find-artisan", label: "Trouver un artisan" },
+    { to: "/showroom", label: "Réalisations" },
     { to: "/demandes", label: "Publier une demande" },
     { to: "/SignIn", label: "Devenir artisan" },
   ],
@@ -62,9 +74,9 @@ export default function Footer() {
               </div>
 
               <Link
-                to="/find-artisan"
+                to="/showroom"
                 className="btn-primary hidden text-sm sm:inline-flex lg:mt-1">
-                Trouver un artisan
+                Voir les réalisations
                 <FiArrowUpRight size={15} />
               </Link>
             </div>

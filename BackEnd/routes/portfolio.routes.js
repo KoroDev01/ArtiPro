@@ -1,6 +1,8 @@
 const router = require("express").Router();
 const {
   listByPro,
+  listShowroom,
+  searchShowroomPros,
   create,
   remove,
   toggleLike,
@@ -16,6 +18,8 @@ const { uploadPortfolio } = require("../config/upload.config");
 
 router.use(resolveUserFromToken);
 
+router.get("/showroom/pros", searchShowroomPros);
+router.get("/showroom", listShowroom);
 router.get("/pro/:proId", listByPro);
 router.get("/:postId/comments", listComments);
 

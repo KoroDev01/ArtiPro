@@ -1,6 +1,6 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Acceuil from "./assets/Pages/Accuill.jsx";
-import Artisant from "./assets/Pages/Artisants.jsx";
+import Showroom from "./assets/Pages/Showroom.jsx";
 import ProfileArtisants from "./assets/Pages/ProfileArtisants.jsx";
 import JobRequests from "./assets/Pages/Demandes.jsx";
 import JobDetails from "./assets/Pages/JobDetails.jsx";
@@ -29,7 +29,8 @@ function App() {
     <>
       <Routes>
         <Route path="/" element={<Acceuil />} />
-        <Route path="/find-artisan" element={<Artisant />} />
+        <Route path="/showroom" element={<Showroom />} />
+        <Route path="/find-artisan" element={<Navigate to="/showroom" replace />} />
         <Route path="/artisan/:id" element={<ProfileArtisants />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/mot-de-passe-oublie" element={<ForgotPassword />} />

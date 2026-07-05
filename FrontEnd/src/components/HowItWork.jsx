@@ -89,9 +89,9 @@ export default function HowItWork() {
                 Publier une demande
               </button>
               <button
-                onClick={() => navigate("/find-artisan")}
+                onClick={() => navigate("/showroom")}
                 className="btn-ghost-light">
-                Trouver un artisan
+                Voir les réalisations
               </button>
             </div>
           </div>

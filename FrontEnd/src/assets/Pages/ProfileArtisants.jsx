@@ -175,9 +175,9 @@ export default function ArtisanProfile() {
 
       <main className="page-main max-w-7xl mx-auto px-4 md:px-6 py-8 w-full">
         <Link
-          to="/find-artisan"
+          to="/showroom"
           className="link-accent mb-6 inline-flex items-center gap-1">
-          <FiArrowLeft /> Retour aux artisans
+          <FiArrowLeft /> Retour aux réalisations
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

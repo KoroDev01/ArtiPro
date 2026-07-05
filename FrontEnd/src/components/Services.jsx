@@ -19,27 +19,20 @@ export default function Services() {
         </div>
       </div>
 
-      <div className="services-illustration mb-10 w-full px-4 sm:mb-12 sm:px-6 lg:px-8">
-        <div className="glass-panel relative mx-auto w-full max-w-md overflow-hidden rounded-2xl">
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-blue-600/20 via-transparent to-violet-600/10" />
-          <div className="relative p-2">
-            <div className="aspect-[16/9] overflow-hidden rounded-xl ring-1 ring-white/10">
-              <img
-                src={tradesIllustration}
-                alt="Illustration des différents corps de métier artisanaux"
-                className="h-full w-full object-cover object-center"
-                loading="lazy"
-              />
-            </div>
-          </div>
-        </div>
+      <div className="services-illustration mb-10 flex justify-center px-4 sm:mb-12 sm:px-6 lg:px-8">
+        <img
+          src={tradesIllustration}
+          alt="Illustration des différents corps de métier artisanaux"
+          className="w-full max-w-md rounded-xl"
+          loading="lazy"
+        />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 text-center sm:px-6 lg:px-8">
         <button
-          onClick={() => navigate("/find-artisan")}
+          onClick={() => navigate("/showroom")}
           className="btn-primary">
-          Voir tous les artisans →
+          Voir les réalisations →
         </button>
       </div>
     </section>

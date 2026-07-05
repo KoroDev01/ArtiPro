@@ -21,7 +21,7 @@ const PRESETS = {
     icon: "💬",
     title: "Aucune conversation",
     description: "Vos échanges avec les artisans apparaîtront ici une fois qu'une offre aura été envoyée.",
-    cta: { label: "Trouver un artisan", to: "/find-artisan" },
+    cta: { label: "Voir les réalisations", to: "/showroom" },
   },
   messages_pro: {
     icon: "💬",

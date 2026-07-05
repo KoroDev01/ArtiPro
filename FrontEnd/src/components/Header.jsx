@@ -123,8 +123,8 @@ export default function Header() {
             <Link to="/" className={navCls("/")}>
               Accueil
             </Link>
-            <Link to="/find-artisan" className={navCls("/find-artisan")}>
-              Trouver un artisan
+            <Link to="/showroom" className={navCls("/showroom")}>
+              Réalisations
             </Link>
             {user && (
               <Link to="/demandes" className={navCls("/demandes")}>
@@ -275,11 +275,11 @@ export default function Header() {
                 Accueil
               </MobileLink>
               <MobileLink
-                to="/find-artisan"
-                icon={<FiSearch size={16} />}
-                active={isActive("/find-artisan")}
+                to="/showroom"
+                icon={<FiGrid size={16} />}
+                active={isActive("/showroom")}
                 onNavigate={closeMenu}>
-                Trouver un artisan
+                Réalisations
               </MobileLink>
               {user && (
                 <MobileLink
