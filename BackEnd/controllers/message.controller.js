@@ -6,12 +6,13 @@ const { createNotification } = require("./notification.controller");
 
 exports.sendMessage = async (req, res) => {
   try {
-    const { postId, receiverId, content } = req.body;
+    const { postId, content } = req.body;
 
     const post = await Post.findById(postId);
     if (!post) return res.status(404).json({ message: "Post not found" });
 
-    const isClient = post.client.toString() === req.user._id.toString();
+    const senderId = req.user._id.toString();
+    const isClient = post.client.toString() === senderId;
     const proOffer =
       req.user.role === "pro"
         ? await Offer.findOne({ post: postId, pro: req.user._id })
@@ -21,6 +22,29 @@ exports.sendMessage = async (req, res) => {
       return res.status(403).json({ message: "Not allowed" });
     }
 
+    let receiverId;
+    if (isClient) {
+      const proId = req.body.receiverId;
+      if (!proId) {
+        return res.status(400).json({ message: "Destinataire requis." });
+      }
+      const offer = await Offer.findOne({
+        post: postId,
+        client: req.user._id,
+        pro: proId,
+      });
+      if (!offer) {
+        return res.status(403).json({ message: "Not allowed" });
+      }
+      receiverId = offer.pro.toString();
+    } else {
+      receiverId = post.client.toString();
+    }
+
+    if (receiverId === senderId) {
+      return res.status(400).json({ message: "Destinataire invalide." });
+    }
+
     const message = await Message.create({
       post: postId,
       sender: req.user._id,
@@ -28,10 +52,12 @@ exports.sendMessage = async (req, res) => {
       content,
     });
 
+    const sender = await User.findById(req.user._id).select("firstName");
+
     await createNotification({
       recipient: receiverId,
       type: "new_message",
-      message: `Nouveau message de ${req.user.firstName} : "${content.slice(0, 50)}${content.length > 50 ? "…" : ""}"`,
+      message: `Nouveau message de ${sender?.firstName || "un utilisateur"} : "${content.slice(0, 50)}${content.length > 50 ? "…" : ""}"`,
       link: `/messages`,
     });
 

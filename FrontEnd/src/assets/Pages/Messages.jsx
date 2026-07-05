@@ -7,6 +7,18 @@ import EmptyState from "../../components/EmptyState";
 
 const POLL_INTERVAL = 4000;
 
+function resolveReceiverId(conv, user) {
+  const proId = conv.pro?._id ?? conv.pro;
+  const clientId = conv.client?._id ?? conv.client;
+  const myId = user?._id?.toString();
+
+  if (myId && proId?.toString() === myId) return clientId;
+  if (myId && clientId?.toString() === myId) return proId;
+  if (user?.role === "client") return proId;
+  if (user?.role === "pro") return clientId;
+  return proId || clientId;
+}
+
 export default function Messages() {
   const { user } = useAuth();
 
@@ -115,12 +127,10 @@ export default function Messages() {
     if (!content.trim() || !selectedConv) return;
     setSending(true);
 
-    const receiverId =
-      user?.role === "client"
-        ? selectedConv.pro?._id
-        : selectedConv.client?._id;
-
+    const receiverId = resolveReceiverId(selectedConv, user);
     const postId = selectedConv.post?._id || selectedConv.post;
+
+    if (!receiverId) return;
 
     try {
       const res = await api.post("/messages", {
@@ -319,7 +329,8 @@ export default function Messages() {
                   </div>
                 )}
                 {messages.map((msg) => {
-                  const isMe = msg.sender?._id === user?._id;
+                  const isMe =
+                    msg.sender?._id?.toString() === user?._id?.toString();
                   const senderName =
                     `${msg.sender?.firstName || ""} ${msg.sender?.lastName || ""}`.trim();
                   const avatarUrl = imageUrl(msg.sender?.avatar, "avatars");
