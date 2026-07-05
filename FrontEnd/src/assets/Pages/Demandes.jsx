@@ -5,9 +5,11 @@ import Footer from "../../components/Footer";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
 import EmptyState from "../../components/EmptyState";
+import PhotoPicker from "../../components/PhotoPicker";
 import { WILAYAS } from "../../data/wilaya";
-import api, { API_BASE } from "../../api";
+import api from "../../api";
 import { imageUrl } from "../../utils/imageUrl";
+import UserAvatar from "../../components/UserAvatar";
 
 const STATUS_LABELS = {
   open: { label: "Ouvert", cls: "bg-green-100 text-green-700" },
@@ -248,12 +250,11 @@ export default function JobRequests() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {displayed.map((post) => {
               const status = STATUS_LABELS[post.status] ?? STATUS_LABELS.open;
-              const initials =
-                post.author?.firstName?.[0]?.toUpperCase() ?? "?";
               const clientId =
                 post.author?._id ?? post.client?._id ?? post.client;
               const isOwner =
                 user && clientId?.toString() === user._id?.toString();
+              const demandeur = post.author ?? post.client;
 
               return (
                 <div
@@ -318,10 +319,8 @@ export default function JobRequests() {
                   <hr className="border-gray-100" />
 
                   <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">
-                      {initials}
-                    </div>
-                    {post.author?.firstName} {post.author?.lastName}
+                    <UserAvatar user={demandeur} size="sm" />
+                    {demandeur?.firstName} {demandeur?.lastName}
                   </div>
                   <Link
                     to={`/demandes/${post._id?.toString()}`}
@@ -441,26 +440,12 @@ export default function JobRequests() {
                 </select>
               </div>
 
-              <div>
-                <label className="text-sm font-medium text-gray-700">
-                  Photos (max 3)
-                </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={(e) =>
-                    setPhotos(Array.from(e.target.files).slice(0, 3))
-                  }
-                  className="w-full mt-1 text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-600 file:text-sm file:font-medium hover:file:bg-blue-100"
-                />
-                {photos.length > 0 && (
-                  <p className="text-xs text-gray-400 mt-1">
-                    {photos.length} photo{photos.length > 1 ? "s" : ""}{" "}
-                    sélectionnée{photos.length > 1 ? "s" : ""}
-                  </p>
-                )}
-              </div>
+              <PhotoPicker
+                photos={photos}
+                onChange={setPhotos}
+                max={3}
+                label="Photos"
+              />
 
               <div className="flex gap-3 pt-2">
                 <button

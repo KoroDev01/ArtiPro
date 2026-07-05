@@ -5,6 +5,7 @@ import Footer from "../../components/Footer";
 import { useAuth } from "../../context/AuthContext";
 import api, { API_BASE } from "../../api";
 import { imageUrl } from "../../utils/imageUrl";
+import PortfolioFeed from "../../components/PortfolioFeed";
 import { WILAYAS } from "../../data/wilaya";
 import {
   FiUser,
@@ -288,6 +289,12 @@ export default function Profile() {
                     <span>Missions acceptées</span>
                     <span className="font-medium">
                       {myOffers.filter((o) => o.status === "accepted").length}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-gray-600">
+                    <span>Visites du profil</span>
+                    <span className="font-medium">
+                      {profileData.profileViewCount ?? 0}
                     </span>
                   </div>
                   <div className="flex justify-between text-gray-600">
@@ -702,6 +709,20 @@ export default function Profile() {
                     })}
                   </div>
                 )}
+              </div>
+            )}
+
+            {isPro && (
+              <div className="bg-white rounded-2xl shadow-sm p-6">
+                <div className="flex justify-between items-center mb-5">
+                  <h2 className="font-semibold text-lg">Mes réalisations</h2>
+                  <Link
+                    to={`/artisan/${user._id}`}
+                    className="text-sm text-blue-600 hover:underline">
+                    Voir mon profil public →
+                  </Link>
+                </div>
+                <PortfolioFeed proId={user._id} canPost />
               </div>
             )}
 

@@ -5,6 +5,10 @@ const {
 const { sendVerificationEmail } = require("../config/mailer.config.js");
 const { resolveUploadedFile } = require("../config/upload.config.js");
 const User = require("../database/models/user.model");
+const ProfileView = require("../database/models/profileView.model");
+
+const profileViewCount = (proId) =>
+  ProfileView.countDocuments({ pro: proId });
 
 const handleError = (res, e) => res.status(400).json({ error: e.message });
 
@@ -48,7 +52,11 @@ exports.getCurrentUser = async (req, res) => {
     const user = await User.findById(req.user._id)
       .select("-password")
       .populate("categories", "name");
-    res.json(user);
+    const data = user.toObject();
+    if (user.role === "pro") {
+      data.profileViewCount = await profileViewCount(user._id);
+    }
+    res.json(data);
   } catch (e) {
     handleError(res, e);
   }
@@ -60,7 +68,44 @@ exports.getProById = async (req, res) => {
       .select("-password")
       .populate("categories", "name");
     if (!user) return res.status(404).json({ message: "User not found" });
-    res.json(user);
+    const views = await profileViewCount(user._id);
+    res.json({ ...user.toObject(), profileViewCount: views });
+  } catch (e) {
+    handleError(res, e);
+  }
+};
+
+exports.recordProfileView = async (req, res) => {
+  try {
+    const { proId } = req.params;
+    const pro = await User.findById(proId);
+    if (!pro || pro.role !== "pro") {
+      return res.status(404).json({ message: "Artisan introuvable." });
+    }
+
+    const viewerId = req.user?._id?.toString();
+    if (viewerId === proId) {
+      const count = await profileViewCount(proId);
+      return res.json({ profileViewCount: count });
+    }
+
+    const guestId = req.body?.guestId?.trim();
+    if (viewerId) {
+      await ProfileView.updateOne(
+        { pro: proId, viewer: viewerId },
+        { $setOnInsert: { pro: proId, viewer: viewerId } },
+        { upsert: true },
+      );
+    } else if (guestId) {
+      await ProfileView.updateOne(
+        { pro: proId, guestId },
+        { $setOnInsert: { pro: proId, guestId } },
+        { upsert: true },
+      );
+    }
+
+    const count = await profileViewCount(proId);
+    res.json({ profileViewCount: count });
   } catch (e) {
     handleError(res, e);
   }

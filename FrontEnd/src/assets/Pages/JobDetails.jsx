@@ -4,8 +4,9 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
-import api, { API_BASE } from "../../api";
+import api from "../../api";
 import { imageUrl } from "../../utils/imageUrl";
+import UserAvatar from "../../components/UserAvatar";
 
 const STATUS_LABELS = {
   open: { label: "Ouvert", cls: "bg-green-100 text-green-700" },
@@ -37,6 +38,7 @@ export default function JobDetails() {
 
   const [reviewForm, setReviewForm] = useState({ rating: 5, comment: "" });
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [lightboxPhoto, setLightboxPhoto] = useState(null);
 
   const clientId =
     post?.author?._id ?? post?.client?._id ?? post?.client ?? null;
@@ -193,14 +195,33 @@ export default function JobDetails() {
                 </div>
 
                 {post.photos?.length > 0 && (
-                  <div className="flex gap-2 overflow-x-auto mt-4">
+                  <div
+                    className={`mt-5 grid gap-3 ${
+                      post.photos.length === 1
+                        ? "grid-cols-1"
+                        : post.photos.length === 2
+                          ? "grid-cols-1 sm:grid-cols-2"
+                          : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                    }`}>
                     {post.photos.map((photo, i) => (
-                      <img
+                      <button
                         key={i}
-                        src={imageUrl(photo, "posts")}
-                        alt="photo"
-                        className="w-32 h-24 object-cover rounded-lg flex-shrink-0"
-                      />
+                        type="button"
+                        onClick={() =>
+                          setLightboxPhoto(imageUrl(photo, "posts"))
+                        }
+                        className="group relative overflow-hidden rounded-xl border border-gray-100 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <img
+                          src={imageUrl(photo, "posts")}
+                          alt={`Photo ${i + 1}`}
+                          className={`w-full object-cover transition group-hover:scale-[1.02] ${
+                            post.photos.length === 1
+                              ? "h-56 sm:h-72 md:h-80"
+                              : "h-44 sm:h-52 md:h-56"
+                          }`}
+                        />
+                        <span className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition" />
+                      </button>
                     ))}
                   </div>
                 )}
@@ -223,9 +244,7 @@ export default function JobDetails() {
                 </div>
 
                 <div className="flex items-center gap-2 text-sm text-gray-600 mt-4 pt-4 border-t border-gray-100">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">
-                    {post.author?.firstName?.[0]?.toUpperCase() ?? "?"}
-                  </div>
+                  <UserAvatar user={post.author} size="sm" />
                   {post.author?.firstName} {post.author?.lastName}
                 </div>
               </div>
@@ -451,6 +470,27 @@ export default function JobDetails() {
           )}
         </section>
       </main>
+
+      {lightboxPhoto && (
+        <div
+          className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4"
+          onClick={() => setLightboxPhoto(null)}>
+          <button
+            type="button"
+            onClick={() => setLightboxPhoto(null)}
+            className="absolute top-4 right-4 text-white text-3xl leading-none hover:text-gray-300"
+            aria-label="Fermer">
+            ×
+          </button>
+          <img
+            src={lightboxPhoto}
+            alt="Agrandissement"
+            className="max-w-full max-h-[90vh] object-contain rounded-lg"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
+
       <Footer />
     </>
   );

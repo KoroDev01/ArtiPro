@@ -5,6 +5,8 @@ import Footer from "../../components/Footer";
 import { useAuth } from "../../context/AuthContext";
 import api, { API_BASE } from "../../api";
 import { imageUrl } from "../../utils/imageUrl";
+import PortfolioFeed from "../../components/PortfolioFeed";
+import { getGuestViewerId } from "../../utils/viewerId";
 import {
   FiMapPin,
   FiStar,
@@ -14,6 +16,8 @@ import {
   FiBriefcase,
   FiMessageSquare,
   FiArrowLeft,
+  FiGrid,
+  FiEye,
 } from "react-icons/fi";
 
 export default function ArtisanProfile() {
@@ -61,6 +65,24 @@ export default function ArtisanProfile() {
         .catch(() => {});
     }
   }, [id, user?._id, user?.role]);
+
+  useEffect(() => {
+    if (!id || loading) return;
+    const key = `viewed_pro_${id}`;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, "1");
+
+    api
+      .post(`/pro/${id}/view`, { guestId: getGuestViewerId() })
+      .then((res) => {
+        setArtisan((prev) =>
+          prev
+            ? { ...prev, profileViewCount: res.data.profileViewCount }
+            : prev,
+        );
+      })
+      .catch(() => {});
+  }, [id, loading]);
 
   const Stars = ({ rating = 0, size = "sm" }) => {
     const sz = size === "lg" ? "text-xl" : "text-sm";
@@ -136,6 +158,8 @@ export default function ArtisanProfile() {
 
   const initials =
     `${artisan.firstName?.[0] ?? ""}${artisan.lastName?.[0] ?? ""}`.toUpperCase();
+  const isOwnProfile =
+    user && (user._id === id || user._id?.toString() === id?.toString());
   const available = artisan.availability !== false;
 
   return (
@@ -214,6 +238,11 @@ export default function ArtisanProfile() {
                           {artisan.experienceYears} ans d'exp.
                         </span>
                       )}
+                      <span className="flex items-center gap-1">
+                        <FiEye className="text-blue-400" />
+                        {artisan.profileViewCount ?? 0} visite
+                        {(artisan.profileViewCount ?? 0) !== 1 ? "s" : ""}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -228,7 +257,15 @@ export default function ArtisanProfile() {
                   ))}
                 </div>
 
-                <div className="flex gap-1 border-b border-gray-100">
+                <div className="mb-6 pt-2 border-t border-gray-100">
+                  <h2 className="font-semibold text-base mb-4 flex items-center gap-2">
+                    <FiGrid className="text-blue-500" />
+                    Réalisations
+                  </h2>
+                  <PortfolioFeed proId={id} canPost={isOwnProfile} />
+                </div>
+
+                <div className="flex gap-1 border-b border-gray-100 overflow-x-auto">
                   {[
                     { key: "about", label: "À propos", icon: <FiUser /> },
                     {
@@ -278,6 +315,11 @@ export default function ArtisanProfile() {
                         icon="📋"
                         title="Avis reçus"
                         value={`${artisan.ratingCount ?? 0}`}
+                      />
+                      <InfoCard
+                        icon="👁️"
+                        title="Visites profil"
+                        value={`${artisan.profileViewCount ?? 0}`}
                       />
                       {artisan.siret && (
                         <InfoCard

@@ -28,7 +28,7 @@ exports.getPostList = async (req, res) => {
   try {
     const posts = await Post.find()
       .populate("category", "name")
-      .populate("client", "firstName lastName email")
+      .populate("client", "firstName lastName email avatar")
       .sort({ createdAt: -1 });
     res.json(posts.map((p) => ({ ...p.toObject(), author: p.client })));
   } catch (e) {
@@ -40,7 +40,7 @@ exports.getPostById = async (req, res) => {
   try {
     const post = await Post.findById(req.params.postId)
       .populate("category", "name")
-      .populate("client", "firstName lastName email");
+      .populate("client", "firstName lastName email avatar");
     if (!post) return res.status(404).json({ message: "Post not found" });
     res.json({ ...post.toObject(), author: post.client });
   } catch (e) {

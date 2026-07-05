@@ -174,7 +174,7 @@ export default function Header() {
 
                 <button
                   onClick={logout}
-                  className="hidden lg:flex items-center gap-1.5 text-sm text-red-500 hover:text-red-600 font-medium px-3 py-1.5 rounded-lg hover:bg-red-50 transition">
+                  className="hidden cursor-alias lg:flex items-center gap-1.5 text-sm text-red-500 hover:text-red-600 font-medium px-3 py-1.5 rounded-lg hover:bg-red-50 transition">
                   <FiLogOut size={15} />
                   Déconnexion
                 </button>

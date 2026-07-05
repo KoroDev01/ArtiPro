@@ -77,3 +77,9 @@ exports.uploadPost = multer({
   fileFilter,
   limits,
 }).array("photos", 3);
+
+exports.uploadPortfolio = multer({
+  storage: storageFor("portfolio"),
+  fileFilter,
+  limits,
+}).array("photos", 4);
