@@ -13,11 +13,11 @@
 
 ## Pages principales
 
-- Accueil : https://arti-pro.vercel.app/
-- Réalisations artisans (showroom) : https://arti-pro.vercel.app/showroom
-- Inscription artisan : https://arti-pro.vercel.app/SignIn
-- Contact : https://arti-pro.vercel.app/contact
-- Conditions d'utilisation : https://arti-pro.vercel.app/cgu
+- Accueil : https://artipro01.fr/
+- Réalisations artisans (showroom) : https://artipro01.fr/showroom
+- Inscription artisan : https://artipro01.fr/SignIn
+- Contact : https://artipro01.fr/contact
+- Conditions d'utilisation : https://artipro01.fr/cgu
 
 ## Comment ça marche (clients)
 
@@ -45,4 +45,4 @@ Le site expose des schémas Schema.org (Organization, WebSite, Service, FAQPage)
 
 ## Sitemap
 
-https://arti-pro.vercel.app/sitemap.xml
+https://artipro01.fr/sitemap.xml

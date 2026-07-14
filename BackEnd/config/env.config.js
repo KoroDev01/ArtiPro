@@ -77,5 +77,11 @@ exports.corsOriginCheck = (origin, callback) => {
   callback(null, false);
 };
 
-exports.getFrontendUrl = () =>
-  process.env.FRONTEND_URL?.replace(/\/$/, "") || "http://localhost:5173";
+exports.getFrontendUrl = () => {
+  if (process.env.FRONTEND_URL?.trim()) {
+    return process.env.FRONTEND_URL.replace(/\/$/, "");
+  }
+  return process.env.NODE_ENV === "production"
+    ? "https://artipro01.fr"
+    : "http://localhost:5173";
+};

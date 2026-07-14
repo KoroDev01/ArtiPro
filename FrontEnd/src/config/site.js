@@ -1,6 +1,6 @@
 /** URL publique du site (Vercel ou domaine custom). */
 export const SITE_URL = (
-  import.meta.env.VITE_SITE_URL || "https://arti-pro.vercel.app"
+  import.meta.env.VITE_SITE_URL || "https://artipro01.fr"
 ).replace(/\/$/, "");
 
 export const SITE_NAME = "ArtiPro";

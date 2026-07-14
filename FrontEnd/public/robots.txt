@@ -35,8 +35,8 @@ Disallow: /mot-de-passe-oublie
 Disallow: /inscription-en-attente
 Disallow: /compte-suspendu
 
-Sitemap: https://arti-pro.vercel.app/sitemap.xml
+Sitemap: https://artipro01.fr/sitemap.xml
 
 # Fichier d'aide pour les LLM
 # https://llmstxt.org/
-# https://arti-pro.vercel.app/llms.txt
+# https://artipro01.fr/llms.txt
