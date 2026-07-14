@@ -1,0 +1,42 @@
+User-agent: *
+Allow: /
+
+# Crawlers IA — autoriser l'indexation pour ChatGPT, Gemini, Perplexity, etc.
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# Pages privées / compte
+Disallow: /admin/
+Disallow: /dashboard
+Disallow: /messages
+Disallow: /profile
+Disallow: /demandes/
+Disallow: /verification-email
+Disallow: /reinitialiser-mot-de-passe
+Disallow: /mot-de-passe-oublie
+Disallow: /inscription-en-attente
+Disallow: /compte-suspendu
+
+Sitemap: https://arti-pro.vercel.app/sitemap.xml
+
+# Fichier d'aide pour les LLM
+# https://llmstxt.org/
+# https://arti-pro.vercel.app/llms.txt

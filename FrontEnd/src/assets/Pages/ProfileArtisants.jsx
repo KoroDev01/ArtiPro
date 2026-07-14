@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
@@ -164,8 +165,21 @@ export default function ArtisanProfile() {
   const available =
     artisan.effectiveAvailability ?? artisan.availability !== false;
 
+  const artisanTitle = `${artisan.firstName} ${artisan.lastName}`;
+  const artisanCity = artisan.location?.city || "Algérie";
+  const artisanCats =
+    artisan.categories?.map((c) => c.name).join(", ") || "artisan";
+  const seoTitle = `${artisanTitle} — ${artisanCats} à ${artisanCity} | ArtiPro`;
+  const seoDesc = `Profil de ${artisanTitle}, artisan ${artisanCats} en Algérie${artisan.companyName ? ` (${artisan.companyName})` : ""}. Réalisations, avis et contact sur ArtiPro.`;
+
   return (
     <div className="page-wrap">
+      <Helmet>
+        <title>{seoTitle}</title>
+        <meta name="description" content={seoDesc} />
+        <meta property="og:title" content={seoTitle} />
+        <meta property="og:description" content={seoDesc} />
+      </Helmet>
       <Header />
 
       <PageBanner

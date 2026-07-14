@@ -53,8 +53,7 @@ export default function Hero() {
     <section className="relative mt-16 flex min-h-[88vh] items-center justify-center overflow-hidden">
       <img
         src={heroBg}
-        alt=""
-        aria-hidden
+        alt="Artisan au travail — plateforme ArtiPro Algérie"
         className="absolute inset-0 h-full w-full scale-105 object-cover"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-slate-800/55 via-slate-900/65 to-[#0c0f16]/90" />
@@ -64,12 +63,13 @@ export default function Hero() {
           <span className="section-eyebrow">Artisans qualifiés en Algérie</span>
 
           <h1 className="max-w-2xl text-3xl font-bold leading-[1.12] tracking-tight text-white sm:text-4xl md:text-5xl">
-            Trouvez le bon artisan pour vos travaux
+            Trouvez un artisan qualifié en Algérie
           </h1>
 
           <p className="max-w-lg text-base leading-relaxed text-zinc-300 sm:text-lg">
-            Pas sûr par où commencer ? Explorez le site et laissez-vous guider
-            — les filtres détaillés vous attendent sur vos demandes.
+            ArtiPro met en relation particuliers et artisans vérifiés en
+            Algérie. Publiez votre demande, recevez des devis gratuits et
+            choisissez le professionnel adapté à vos travaux.
           </p>
 
           <div className="hero-start-panel w-full max-w-lg rounded-2xl p-4 sm:rounded-3xl sm:p-5">

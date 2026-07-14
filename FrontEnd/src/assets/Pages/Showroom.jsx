@@ -34,7 +34,7 @@ export default function Showroom() {
         subtitle={
           artisanId
             ? "Réalisations de l'artisan sélectionné"
-            : "Découvrez les travaux réalisés par nos artisans professionnels"
+            : "Découvrez les travaux réalisés par nos artisans professionnels en Algérie"
         }
         action={
           canPost ? (

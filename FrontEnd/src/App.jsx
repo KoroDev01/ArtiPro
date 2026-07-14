@@ -24,9 +24,12 @@ import VerifyEmail from "./assets/Pages/VerifyEmail.jsx";
 import ForgotPassword from "./assets/Pages/ForgotPassword.jsx";
 import ResetPassword from "./assets/Pages/ResetPassword.jsx";
 import Contact from "./assets/Pages/Contact.jsx";
+import SeoHead from "./components/SeoHead.jsx";
+
 function App() {
   return (
     <>
+      <SeoHead />
       <Routes>
         <Route path="/" element={<Acceuil />} />
         <Route path="/showroom" element={<Showroom />} />

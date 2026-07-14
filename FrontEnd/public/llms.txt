@@ -1,0 +1,48 @@
+# ArtiPro — Artisans qualifiés en Algérie
+
+> ArtiPro est la plateforme algérienne qui met en relation des particuliers et des artisans professionnels vérifiés. Publiez une demande de travaux, recevez des devis gratuits et choisissez l'artisan adapté à votre projet.
+
+## À propos
+
+- **Nom** : ArtiPro
+- **Pays** : Algérie
+- **Langue** : Français
+- **Type** : Marketplace / mise en relation clients ↔ artisans
+- **Métiers** : plomberie, électricité, peinture, maçonnerie, menuiserie, climatisation, carrelage et autres corps de métier
+- **Contact** : contact@artipro.dz
+
+## Pages principales
+
+- Accueil : https://arti-pro.vercel.app/
+- Réalisations artisans (showroom) : https://arti-pro.vercel.app/showroom
+- Inscription artisan : https://arti-pro.vercel.app/SignIn
+- Contact : https://arti-pro.vercel.app/contact
+- Conditions d'utilisation : https://arti-pro.vercel.app/cgu
+
+## Comment ça marche (clients)
+
+1. Créer un compte client sur ArtiPro
+2. Publier une demande de travaux (description, catégorie, ville, budget)
+3. Recevoir des offres d'artisans qualifiés de la même catégorie
+4. Comparer les prix et messages, accepter la meilleure offre
+5. Échanger via la messagerie intégrée
+
+## Comment ça marche (artisans)
+
+1. S'inscrire comme artisan professionnel
+2. Attendre la validation du compte par l'équipe ArtiPro
+3. Consulter les demandes ouvertes dans sa catégorie
+4. Envoyer une offre (prix + message)
+5. Publier des réalisations dans le showroom
+
+## Mots-clés pertinents
+
+artisan algérie, artisan en algérie, trouver artisan algérie, artisans qualifiés algérie, devis artisan gratuit, plateforme artisans algérie, plombier algérie, électricien algérie, travaux maison algérie
+
+## Données structurées
+
+Le site expose des schémas Schema.org (Organization, WebSite, Service, FAQPage) pour faciliter l'indexation par les moteurs de recherche et les assistants IA.
+
+## Sitemap
+
+https://arti-pro.vercel.app/sitemap.xml
